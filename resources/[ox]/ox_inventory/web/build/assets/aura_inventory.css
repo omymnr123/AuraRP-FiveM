@@ -1,0 +1,747 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap');
+
+/* ==========================================================================
+   AURA ROLEPLAY - SIGNATURE TURQUOISE & CYAN LUXURY INVENTORY
+   Palette: Obsidian Dark (#0a0d16), Neon Cyan (#00f2fe), Turquoise (#05dfd7),
+   Muted Slate (#94a3b8), Pure White (#ffffff)
+   ========================================================================== */
+
+:root {
+  --aura-bg-panel: rgba(14, 18, 28, 0.94);
+  --aura-bg-slot: rgba(22, 28, 44, 0.75);
+  --aura-bg-slot-hover: rgba(30, 44, 68, 0.95);
+  --aura-cyan-primary: #00f0ff;
+  --aura-cyan-secondary: #ff00a0;
+  --aura-cyan-glow: rgba(255, 0, 160, 0.45);
+  --aura-border-subtle: rgba(255, 255, 255, 0.08);
+  --aura-border-active: rgba(0, 240, 255, 0.65);
+  --aura-text-primary: #f8fafc;
+  --aura-text-muted: #94a3b8;
+  --aura-font-title: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+  --aura-font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* Global Reset */
+* {
+  box-sizing: border-box !important;
+  user-select: none !important;
+  font-family: var(--aura-font-body);
+}
+
+body, html {
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  overflow: hidden !important;
+  background: transparent !important;
+}
+
+#root {
+  width: 100vw !important;
+  height: 100vh !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  position: absolute !important;
+  inset: 0 !important;
+  background: transparent !important;
+}
+
+/* App Wrapper */
+.app-wrapper {
+  width: 100vw !important;
+  height: 100vh !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  position: absolute !important;
+  inset: 0 !important;
+  background: transparent !important;
+  pointer-events: none !important;
+}
+
+/* Main Top Header (Spans 1044px directly above the panels) */
+.aura-header-container {
+  width: 1044px !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  margin-bottom: 14px !important;
+  position: relative !important;
+  pointer-events: auto !important;
+}
+
+.aura-header-left {
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.aura-header-title {
+  font-family: var(--aura-font-title) !important;
+  font-size: 24px !important;
+  font-weight: 900 !important;
+  letter-spacing: 2px !important;
+  background: linear-gradient(135deg, var(--aura-cyan-primary) 0%, var(--aura-cyan-secondary) 100%) !important;
+  background-clip: text !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  text-transform: uppercase !important;
+  line-height: 1.1 !important;
+  filter: drop-shadow(0 0 10px rgba(0, 240, 255, 0.45)) !important;
+}
+
+.aura-header-subtitle {
+  font-size: 10.5px !important;
+  font-weight: 600 !important;
+  letter-spacing: 1.5px !important;
+  color: var(--aura-text-muted) !important;
+  text-transform: uppercase !important;
+  margin-top: 2px !important;
+}
+
+.aura-header-divider {
+  flex: 1 !important;
+  height: 1px !important;
+  background: linear-gradient(90deg, rgba(0, 240, 255, 0.6) 0%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 0, 160, 0.6) 100%) !important;
+  margin: 0 20px !important;
+  position: relative !important;
+}
+
+.aura-header-divider::before,
+.aura-header-divider::after {
+  content: '' !important;
+  position: absolute !important;
+  top: -2px !important;
+  width: 5px !important;
+  height: 5px !important;
+  background: var(--aura-cyan-primary) !important;
+  box-shadow: 0 0 6px var(--aura-cyan-primary) !important;
+}
+
+.aura-header-divider::before { left: 0 !important; }
+.aura-header-divider::after { right: 0 !important; }
+
+.aura-header-right {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  font-family: var(--aura-font-title) !important;
+  font-size: 14px !important;
+  font-weight: 800 !important;
+  letter-spacing: 1.5px !important;
+  color: #ffffff !important;
+  text-transform: uppercase !important;
+}
+
+.aura-header-logo-icon {
+  width: 20px !important;
+  height: 20px !important;
+  background: linear-gradient(135deg, var(--aura-cyan-primary), var(--aura-cyan-secondary)) !important;
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow: 0 0 8px var(--aura-cyan-glow) !important;
+}
+
+/* Master Layout Row */
+.inventory-wrapper {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: flex-start !important;
+  justify-content: center !important;
+  gap: 20px !important;
+  width: 1044px !important;
+  margin: 0 auto !important;
+  position: relative !important;
+  pointer-events: auto !important;
+  z-index: 10 !important;
+}
+
+/* Left & Right Inventory Panels - Natural Top-Aligned Content */
+.inventory-grid-wrapper {
+  width: 460px !important;
+  min-width: 460px !important;
+  max-width: 460px !important;
+  background: var(--aura-bg-panel) !important;
+  border: 1px solid var(--aura-border-subtle) !important;
+  border-radius: 12px !important;
+  padding: 16px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-start !important;
+  gap: 8px !important;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.65) !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+.inventory-grid-wrapper:hover {
+  border-color: rgba(255, 0, 160, 0.25) !important;
+}
+
+/* Panel Header */
+.inventory-grid-header-wrapper {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  padding-bottom: 6px !important;
+  margin-bottom: 6px !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+}
+
+.inventory-grid-header-wrapper p:first-child {
+  font-family: var(--aura-font-title) !important;
+  font-size: 14.5px !important;
+  font-weight: 800 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1.2px !important;
+  color: var(--aura-cyan-primary) !important;
+  margin: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+}
+
+.inventory-grid-header-wrapper p:first-child::before {
+  content: '◆' !important;
+  font-size: 10px !important;
+  color: var(--aura-cyan-primary) !important;
+  filter: drop-shadow(0 0 4px var(--aura-cyan-primary)) !important;
+}
+
+.inventory-grid-header-wrapper p:last-child {
+  font-size: 12.5px !important;
+  font-weight: 700 !important;
+  color: var(--aura-text-muted) !important;
+  margin: 0 !important;
+}
+
+/* Weight Bar (Turquoise Gradient) */
+.weight-bar {
+  background: rgba(0, 0, 0, 0.5) !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  border-radius: 3px !important;
+  height: 4px !important;
+  margin-bottom: 10px !important;
+  overflow: hidden !important;
+}
+
+.weight-bar > div {
+  background: linear-gradient(90deg, var(--aura-cyan-primary) 0%, var(--aura-cyan-secondary) 100%) !important;
+  box-shadow: 0 0 8px var(--aura-cyan-glow) !important;
+  height: 100% !important;
+}
+
+/* Filter & Search Bar */
+.aura-filter-container {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+  margin-bottom: 10px !important;
+}
+
+.aura-search-wrapper {
+  display: flex !important;
+  align-items: center !important;
+  background: rgba(8, 11, 18, 0.85) !important;
+  border: 1px solid var(--aura-border-subtle) !important;
+  border-radius: 6px !important;
+  padding: 5px 8px !important;
+}
+
+.aura-search-wrapper:focus-within {
+  border-color: var(--aura-cyan-primary) !important;
+  box-shadow: 0 0 8px rgba(0, 240, 255, 0.3) !important;
+}
+
+.aura-search-input {
+  flex: 1 !important;
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  color: #ffffff !important;
+  font-size: 11.5px !important;
+}
+
+.aura-search-input::placeholder {
+  color: #64748b !important;
+}
+
+.aura-category-tabs {
+  display: flex !important;
+  gap: 5px !important;
+}
+
+.aura-category-tab {
+  padding: 3px 8px !important;
+  background: rgba(20, 26, 42, 0.6) !important;
+  border: 1px solid var(--aura-border-subtle) !important;
+  border-radius: 4px !important;
+  font-size: 10.5px !important;
+  font-weight: 600 !important;
+  color: var(--aura-text-muted) !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+}
+
+.aura-category-tab:hover {
+  color: #ffffff !important;
+  border-color: var(--aura-cyan-primary) !important;
+}
+
+.aura-category-tab.active {
+  background: var(--aura-cyan-primary) !important;
+  color: #0a0d16 !important;
+  font-weight: 800 !important;
+  border-color: var(--aura-cyan-primary) !important;
+  box-shadow: 0 0 8px rgba(255, 0, 160, 0.4) !important;
+}
+
+/* 5x5 Square Grid Container (Top-Anchored with zero empty top space) */
+.inventory-grid-container {
+  display: grid !important;
+  grid-template-columns: repeat(5, 78px) !important;
+  grid-auto-rows: 78px !important;
+  align-content: start !important;
+  justify-content: space-between !important;
+  gap: 6px !important;
+  max-height: 420px !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  padding-right: 2px !important;
+  margin: 0 !important;
+}
+
+.inventory-grid-container::-webkit-scrollbar {
+  width: 3px !important;
+}
+
+.inventory-grid-container::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2) !important;
+}
+
+.inventory-grid-container::-webkit-scrollbar-thumb {
+  background: rgba(255, 0, 160, 0.4) !important;
+  border-radius: 2px !important;
+}
+
+/* Slots - Perfectly Contained */
+.inventory-slot,
+.hotbar-item-slot {
+  width: 78px !important;
+  height: 78px !important;
+  min-width: 78px !important;
+  min-height: 78px !important;
+  max-width: 78px !important;
+  max-height: 78px !important;
+  aspect-ratio: 1 / 1 !important;
+  position: relative !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  background-color: var(--aura-bg-slot) !important;
+  border: 1px solid var(--aura-border-subtle) !important;
+  border-radius: 7px !important;
+  overflow: hidden !important;
+  background-size: 44px 44px !important;
+  background-repeat: no-repeat !important;
+  background-position: center 18px !important;
+  transition: all 0.15s ease !important;
+}
+
+.inventory-slot:hover,
+.hotbar-item-slot:hover {
+  background-color: var(--aura-bg-slot-hover) !important;
+  border-color: var(--aura-cyan-primary) !important;
+  box-shadow: 0 0 12px var(--aura-cyan-glow) !important;
+  transform: translateY(-1px) !important;
+  z-index: 5 !important;
+}
+
+.item-slot-wrapper {
+  width: 100% !important;
+  height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+.hotbar-slot-header-wrapper,
+.item-slot-header-wrapper {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  padding: 3px 4px !important;
+  z-index: 2 !important;
+}
+
+/* Hotkey Badge */
+.inventory-slot-number {
+  background: #ffffff !important;
+  color: #0a0d16 !important;
+  font-weight: 900 !important;
+  font-size: 9.5px !important;
+  border-radius: 3px !important;
+  padding: 1px 4px !important;
+  line-height: 1 !important;
+}
+
+/* Item Count / Weight Tag */
+.item-slot-info-wrapper {
+  background: rgba(0, 0, 0, 0.6) !important;
+  border-radius: 3px !important;
+  padding: 1px 4px !important;
+}
+
+.item-slot-info-wrapper p {
+  color: #ffffff !important;
+  font-size: 9.5px !important;
+  font-weight: 700 !important;
+  margin: 0 !important;
+}
+
+/* Price / Currency in Shop Slots */
+.item-slot-currency-wrapper {
+  display: flex !important;
+  align-items: center !important;
+  gap: 2px !important;
+  background: rgba(0, 0, 0, 0.7) !important;
+  border-radius: 3px !important;
+  padding: 1px 4px !important;
+}
+
+.item-slot-currency-wrapper p {
+  color: var(--aura-cyan-primary) !important;
+  font-size: 9.5px !important;
+  font-weight: 800 !important;
+  margin: 0 !important;
+}
+
+/* Slot Bottom Label (Locked Inside the Slot) */
+.inventory-slot-label-box {
+  position: absolute !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  background: rgba(10, 13, 22, 0.95) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+  text-align: center !important;
+  padding: 2px !important;
+  z-index: 3 !important;
+  margin: 0 !important;
+}
+
+.inventory-slot-label-text {
+  font-size: 9px !important;
+  font-weight: 600 !important;
+  color: #e2e8f0 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  display: block !important;
+  line-height: 1.2 !important;
+}
+
+/* Durability Bar */
+.durability-bar {
+  position: absolute !important;
+  bottom: 15px !important;
+  left: 0 !important;
+  right: 0 !important;
+  height: 2.5px !important;
+  background: rgba(0, 0, 0, 0.6) !important;
+  z-index: 2 !important;
+}
+
+.durability-bar > div {
+  background: linear-gradient(90deg, var(--aura-cyan-primary) 0%, var(--aura-cyan-secondary) 100%) !important;
+  height: 100% !important;
+}
+
+/* Center Action Controls */
+.inventory-control {
+  width: 84px !important;
+  min-width: 84px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 60px 0 0 0 !important;
+  gap: 8px !important;
+}
+
+.useful-controls-button {
+  display: none !important;
+}
+
+.inventory-control-wrapper {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 8px !important;
+  width: 100% !important;
+}
+
+.inventory-control-input {
+  width: 84px !important;
+  height: 36px !important;
+  background: rgba(12, 16, 26, 0.95) !important;
+  border: 1px solid var(--aura-border-active) !important;
+  border-radius: 6px !important;
+  color: var(--aura-cyan-primary) !important;
+  font-family: var(--aura-font-title) !important;
+  font-weight: 800 !important;
+  font-size: 15px !important;
+  text-align: center !important;
+  outline: none !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5) !important;
+}
+
+.inventory-control-input:focus {
+  border-color: #ffffff !important;
+  box-shadow: 0 0 12px var(--aura-cyan-glow) !important;
+}
+
+.inventory-control-button {
+  width: 84px !important;
+  height: 32px !important;
+  background: rgba(0, 240, 255, 0.12) !important;
+  border: 1px solid rgba(0, 240, 255, 0.35) !important;
+  border-radius: 6px !important;
+  color: #ffffff !important;
+  font-family: var(--aura-font-title) !important;
+  font-weight: 800 !important;
+  font-size: 11px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1px !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+}
+
+.inventory-control-button:hover {
+  background: linear-gradient(135deg, var(--aura-cyan-primary) 0%, var(--aura-cyan-secondary) 100%) !important;
+  color: #0a0d16 !important;
+  box-shadow: 0 0 14px var(--aura-cyan-glow) !important;
+}
+
+/* Bottom Item Inspection Card (Inside Left Panel Footer) */
+.aura-bottom-detail-card {
+  width: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  background: rgba(10, 13, 22, 0.85) !important;
+  border: 1px solid var(--aura-border-subtle) !important;
+  border-radius: 8px !important;
+  padding: 8px 10px !important;
+  margin-top: 8px !important;
+}
+
+.aura-detail-icon-box {
+  width: 44px !important;
+  height: 44px !important;
+  min-width: 44px !important;
+  background: rgba(20, 26, 42, 0.7) !important;
+  border: 1px solid var(--aura-border-subtle) !important;
+  border-radius: 6px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background-size: 30px 30px !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+}
+
+.aura-detail-content {
+  display: flex !important;
+  flex-direction: column !important;
+  flex: 1 !important;
+}
+
+.aura-detail-header-row {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  margin-bottom: 2px !important;
+}
+
+.aura-detail-name {
+  font-family: var(--aura-font-title) !important;
+  font-size: 13px !important;
+  font-weight: 800 !important;
+  color: #ffffff !important;
+}
+
+.aura-detail-weight {
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  color: var(--aura-cyan-primary) !important;
+}
+
+.aura-detail-desc {
+  font-size: 10px !important;
+  color: var(--aura-text-muted) !important;
+  line-height: 1.3 !important;
+}
+
+/* Tooltip & Context Menu (Topmost Overlay) */
+.tooltip-wrapper {
+  background: rgba(10, 13, 22, 0.98) !important;
+  border: 1px solid var(--aura-border-active) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.95), 0 0 15px rgba(255, 0, 160, 0.35) !important;
+  padding: 10px 14px !important;
+  max-width: 320px !important;
+  z-index: 99999999 !important;
+  position: fixed !important;
+  pointer-events: none !important;
+}
+
+.tooltip-header-wrapper {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  margin-bottom: 6px !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  padding-bottom: 4px !important;
+}
+
+.tooltip-header-wrapper p {
+  font-family: var(--aura-font-title) !important;
+  color: var(--aura-cyan-primary) !important;
+  font-weight: 800 !important;
+  font-size: 14.5px !important;
+  margin: 0 !important;
+  text-transform: capitalize !important;
+}
+
+.tooltip-description {
+  color: #f1f5f9 !important;
+  font-size: 11.5px !important;
+  line-height: 1.45 !important;
+  margin: 0 !important;
+}
+
+.tooltip-markdown {
+  color: var(--aura-text-muted) !important;
+  font-size: 11px !important;
+  line-height: 1.4 !important;
+}
+
+.context-menu-list {
+  background: rgba(10, 13, 22, 0.98) !important;
+  border: 1px solid var(--aura-border-active) !important;
+  border-radius: 6px !important;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.95) !important;
+  padding: 4px !important;
+  z-index: 99999999 !important;
+  position: fixed !important;
+}
+
+.context-menu-item {
+  border-radius: 4px !important;
+  color: var(--aura-text-primary) !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  padding: 5px 10px !important;
+}
+
+.context-menu-item:hover {
+  background: var(--aura-cyan-primary) !important;
+  color: #0a0d16 !important;
+}
+
+.item-drag-preview {
+  z-index: 999999999 !important;
+  pointer-events: none !important;
+}
+
+/* Hotbar */
+.hotbar-container {
+  display: flex !important;
+  gap: 8px !important;
+  background: rgba(12, 16, 26, 0.95) !important;
+  border: 1px solid var(--aura-border-active) !important;
+  border-radius: 10px !important;
+  padding: 8px 10px !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), 0 0 15px var(--aura-cyan-glow) !important;
+}
+
+/* ==========================================================================
+   NOTIFICACIONES DE OBJETOS (ITEM NOTIFY) - AURA ROLEPLAY
+   ========================================================================== */
+.item-notification-container {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+  padding: 20px !important;
+  z-index: 999999 !important;
+}
+
+.item-notification-item-box {
+  width: 280px !important;
+  height: 65px !important;
+  background: rgba(14, 18, 28, 0.95) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-left: 4px solid var(--aura-cyan-primary) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.8), -3px 0px 15px rgba(0, 240, 255, 0.3) !important;
+  background-size: 35px 35px !important;
+  background-position: 15px center !important;
+  background-repeat: no-repeat !important;
+  position: relative !important;
+  overflow: hidden !important;
+  transform: translateX(0) !important;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+}
+
+.item-notification-item-box .item-slot-wrapper {
+  background: transparent !important;
+  margin-left: 60px !important; /* Espacio para el icono */
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: flex-start !important;
+  height: 100% !important;
+}
+
+.item-notification-item-box .item-notification-action-box {
+  background: transparent !important;
+  position: static !important;
+  padding: 0 !important;
+  width: auto !important;
+}
+
+.item-notification-item-box .item-notification-action-box p {
+  color: var(--aura-cyan-primary) !important;
+  font-family: var(--aura-font-body) !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1px !important;
+  margin: 0 0 2px 0 !important;
+  text-shadow: 0 0 5px rgba(0, 240, 255, 0.4) !important;
+}
+
+.item-notification-item-box .inventory-slot-label-box {
+  background: transparent !important;
+  position: static !important;
+  border: none !important;
+  padding: 0 !important;
+  text-align: left !important;
+}
+
+.item-notification-item-box .inventory-slot-label-text {
+  font-family: var(--aura-font-title) !important;
+  color: #ffffff !important;
+  font-size: 14px !important;
+  font-weight: 800 !important;
+  text-transform: capitalize !important;
+  letter-spacing: 0.5px !important;
+}

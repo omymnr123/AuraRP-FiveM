@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/src/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <title>Aura Roleplay Library UI</title>
+    <script type="module" crossorigin src="./assets/index-D3YRIttc.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-SonfJNby.css">
+    <link rel="stylesheet" href="./assets/aura_lib.css">
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script>
+      (function() {
+        function formatKeycaps() {
+          const textNodes = document.querySelectorAll('#root > div:not(#_rht_toaster) p, #root > div:not(#_rht_toaster) span');
+          textNodes.forEach(el => {
+            if (el.textContent && /\[([A-Za-z0-9\s]+)\]/.test(el.innerHTML) && !el.innerHTML.includes('aura-keycap')) {
+              el.innerHTML = el.innerHTML.replace(/\[([A-Za-z0-9\s]+)\]/g, '<span class="aura-keycap">$1</span>');
+            }
+          });
+        }
+
+        const observer = new MutationObserver(formatKeycaps);
+        observer.observe(document.body, { childList: true, subtree: true });
+      })();
+    </script>
+  </body>
+</html>

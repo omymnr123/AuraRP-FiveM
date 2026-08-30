@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aura Character Creator</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- FontAwesome 6 Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <!-- Custom Luxury Glassmorphic Stylesheet -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app">
+    <!-- 3D Interactive Viewport Drag Layer -->
+    <div class="viewport-drag-layer"></div>
+
+    <!-- Drag Hint Tooltip -->
+    <div class="drag-hint">
+      <i class="fa-solid fa-arrows-rotate"></i>
+      <span>Mantén presionado y arrastra para rotar tu personaje en 360°</span>
+    </div>
+
+    <!-- Main Sidebar Glassmorphic Panel -->
+    <div class="appearance-panel">
+      <!-- Panel Header -->
+      <div class="panel-header">
+        <div class="header-brand">
+          <div class="brand-icon">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+          </div>
+          <div>
+            <div class="brand-title">AURA IDENTITY</div>
+            <div class="brand-subtitle">Personalización 3D</div>
+          </div>
+        </div>
+        <div class="gender-badge">
+          <i id="gender-icon" class="fa-solid fa-mars"></i>
+          <span id="gender-label">Masculino</span>
+        </div>
+      </div>
+
+      <!-- Main Navigation Tabs (5 Core Categories - No Tattoos) -->
+      <div class="panel-nav">
+        <button class="nav-tab active" data-tab="genetics">
+          <i class="fa-solid fa-dna"></i>
+          <span>Genética</span>
+        </button>
+        <button class="nav-tab" data-tab="features">
+          <i class="fa-solid fa-face-smile"></i>
+          <span>Rasgos</span>
+        </button>
+        <button class="nav-tab" data-tab="appearance">
+          <i class="fa-solid fa-scissors"></i>
+          <span>Aspecto</span>
+        </button>
+        <button class="nav-tab" data-tab="clothes">
+          <i class="fa-solid fa-shirt"></i>
+          <span>Ropa</span>
+        </button>
+        <button class="nav-tab" data-tab="props">
+          <i class="fa-solid fa-glasses"></i>
+          <span>Accesorios</span>
+        </button>
+      </div>
+
+      <!-- Sub-Navigation Pills (Dynamic per tab) -->
+      <div class="sub-nav" id="sub-nav"></div>
+
+      <!-- Scrollable Tab Content Container -->
+      <div class="panel-body" id="tab-content">
+        <!-- Injected Dynamically by app.js -->
+      </div>
+
+      <!-- Panel Footer (Save / Back to Identity) -->
+      <div class="panel-footer">
+        <button class="btn-primary" id="btn-save-character">
+          <i class="fa-solid fa-check"></i>
+          <span>Guardar Personaje</span>
+        </button>
+        <button class="btn-secondary" id="btn-exit-character" title="Volver y Modificar Datos del Personaje">
+          <i class="fa-solid fa-arrow-left"></i>
+          <span>Modificar Datos</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Vertical 3D Camera & Actions Toolbar (Docked right next to the panel) -->
+    <div class="viewport-hud-vertical">
+      <div class="hud-label">CÁMARA</div>
+      <button class="hud-btn active hud-cam-btn" data-cam="default" title="Cuerpo Completo">
+        <i class="fa-solid fa-user"></i>
+        <span>Completo</span>
+      </button>
+      <button class="hud-btn hud-cam-btn" data-cam="head" title="Rostro">
+        <i class="fa-solid fa-face-smile"></i>
+        <span>Rostro</span>
+      </button>
+      <button class="hud-btn hud-cam-btn" data-cam="body" title="Torso">
+        <i class="fa-solid fa-shirt"></i>
+        <span>Torso</span>
+      </button>
+      <button class="hud-btn hud-cam-btn" data-cam="bottom" title="Piernas y Calzado">
+        <i class="fa-solid fa-shoe-prints"></i>
+        <span>Piernas</span>
+      </button>
+
+      <div class="hud-divider"></div>
+      <div class="hud-label">ACCIONES</div>
+
+      <button class="hud-btn" id="btn-turn-around" title="Girar 180°">
+        <i class="fa-solid fa-arrows-rotate"></i>
+        <span>Girar 180°</span>
+      </button>
+      <div class="hud-row-btns">
+        <button class="hud-icon-btn" id="btn-rotate-left" title="Girar Izquierda">
+          <i class="fa-solid fa-rotate-left"></i>
+        </button>
+        <button class="hud-icon-btn" id="btn-rotate-right" title="Girar Derecha">
+          <i class="fa-solid fa-rotate-right"></i>
+        </button>
+      </div>
+      <button class="hud-btn" id="btn-toggle-clothes" title="Alternar Ropa / Desvestir">
+        <i class="fa-solid fa-shirt"></i>
+        <span>Desvestir</span>
+      </button>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div class="modal-overlay" id="save-modal">
+      <div class="modal-card">
+        <div class="modal-icon">
+          <i class="fa-solid fa-circle-check"></i>
+        </div>
+        <div class="modal-title">¿Guardar Apariencia?</div>
+        <div class="modal-desc">
+          Tu personaje nacerá en la ciudad con esta apariencia física y vestimenta. Podrás cambiarte de ropa o peinarte en cualquier tienda más adelante.
+        </div>
+        <div class="modal-actions">
+          <button class="btn-secondary" id="btn-cancel-save" style="flex: 1;">Seguir Editando</button>
+          <button class="btn-primary" id="btn-confirm-save" style="flex: 2;">
+            <i class="fa-solid fa-plane-arrival"></i> Entrar a la Ciudad
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Custom App Controller -->
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,267 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap');
+
+/* ==========================================================================
+   AURA ROLEPLAY - PERFECT HUD (OX_LIB)
+   1. TextUI: Single Compact Obsidian Box with Left 5px Cyan Bar (Image 2)
+   2. Notifications: Sleek Obsidian Cards with Glowing Left/Bottom Neon Accents (User Image)
+   ========================================================================== */
+
+:root {
+  --aura-cyan: #00f2fe;
+  --aura-emerald: #00ffaa;
+  --aura-crimson: #ff3366;
+  --aura-amber: #f59e0b;
+  --aura-cyan-glow: rgba(0, 242, 254, 0.45);
+  --aura-bg-card: rgba(14, 18, 28, 0.96);
+  --aura-font-title: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+  --aura-font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+* {
+  box-sizing: border-box !important;
+}
+
+body, html, #root {
+  background: transparent !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
+/* ==========================================================================
+   1. GLOBAL RESETS: PARENT WRAPPERS & INTERNAL GROUPS NEVER HAVE BORDERS
+   ========================================================================== */
+
+#root > div,
+#_rht_toaster,
+#_rht_toaster > div,
+div[class*="wrapper"] {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  pointer-events: none !important;
+}
+
+/* Clear all inner flex wrappers to prevent double boxes */
+.mantine-Group-root,
+div[class*="mantine-Group"],
+div[class*="mantine-Stack"] {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* ==========================================================================
+   2. TEXTUI INTERACTION PROMPT - EXACT REPLICA OF IMAGE 2
+   ========================================================================== */
+
+/* Target exclusively the single TextUI Paper Card */
+#root > div:not(#_rht_toaster) .mantine-Paper-root,
+div[class*="sp1-container"] {
+  background: rgba(9, 13, 22, 0.96) !important;
+  background-color: rgba(9, 13, 22, 0.96) !important;
+  border: 1.5px solid var(--aura-cyan) !important;
+  border-left: 5px solid var(--aura-cyan) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 0 15px var(--aura-cyan-glow), 0 8px 25px rgba(0, 0, 0, 0.9) !important;
+  padding: 10px 16px !important;
+  margin: 12px 20px !important;
+  width: fit-content !important;
+  min-width: auto !important;
+  max-width: 320px !important;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 12px !important;
+  pointer-events: auto !important;
+}
+
+/* TextUI SVG Icon (Turquoise Glowing Basket) */
+#root > div:not(#_rht_toaster) .mantine-Paper-root svg {
+  color: var(--aura-cyan) !important;
+  fill: currentColor !important;
+  font-size: 24px !important;
+  width: 24px !important;
+  height: 24px !important;
+  filter: drop-shadow(0 0 6px var(--aura-cyan)) !important;
+  flex-shrink: 0 !important;
+}
+
+/* TextUI Title (Bold Uppercase White Text) */
+#root > div:not(#_rht_toaster) strong,
+#root > div:not(#_rht_toaster) b {
+  display: block !important;
+  font-family: var(--aura-font-title) !important;
+  font-size: 15px !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.8px !important;
+  color: #ffffff !important;
+  text-transform: uppercase !important;
+  text-shadow: 0 0 8px rgba(0, 242, 254, 0.4) !important;
+  line-height: 1.2 !important;
+  margin: 0 0 2px 0 !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+/* TextUI Subtitle ("Interactuar con") */
+#root > div:not(#_rht_toaster) p,
+#root > div:not(#_rht_toaster) span {
+  font-family: var(--aura-font-body) !important;
+  font-size: 12.5px !important;
+  font-weight: 600 !important;
+  color: #94a3b8 !important;
+  line-height: 1.2 !important;
+  margin: 0 !important;
+}
+
+/* TextUI Glowing Keycap [E] */
+.aura-keycap,
+#root > div:not(#_rht_toaster) kbd,
+#root > div:not(#_rht_toaster) code {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 22px !important;
+  height: 22px !important;
+  min-width: 22px !important;
+  background: rgba(0, 242, 254, 0.15) !important;
+  border: 1.5px solid var(--aura-cyan) !important;
+  border-radius: 4px !important;
+  color: var(--aura-cyan) !important;
+  font-family: var(--aura-font-title) !important;
+  font-weight: 900 !important;
+  font-size: 12px !important;
+  box-shadow: 0 0 8px rgba(0, 242, 254, 0.6) !important;
+  text-shadow: 0 0 6px var(--aura-cyan) !important;
+  margin-left: 6px !important;
+  vertical-align: middle !important;
+}
+
+/* ==========================================================================
+   3. NOTIFICATIONS - USER REFERENCE REPLICA (OBSIDIAN + GLOWING ACCENT EDGES)
+   ========================================================================== */
+
+/* Main Notification Card inside the Toaster */
+#_rht_toaster .mantine-Paper-root,
+#_rht_toaster div[class*="eo1-container"] {
+  background: var(--aura-bg-card) !important;
+  background-color: var(--aura-bg-card) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-left: 3.5px solid var(--aura-cyan) !important;
+  border-bottom: 2.5px solid var(--aura-cyan) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), -2px 2px 14px var(--aura-cyan-glow) !important;
+  padding: 12px 16px !important;
+  margin: 6px 10px !important;
+  width: 320px !important;
+  max-width: 340px !important;
+  position: relative !important;
+  overflow: hidden !important;
+  pointer-events: auto !important;
+}
+
+/* Status Variations for Notifications */
+#_rht_toaster .mantine-Paper-root:has([color*="red"]),
+#_rht_toaster .mantine-Paper-root:has([class*="circle-xmark"]),
+#_rht_toaster .mantine-Paper-root:has(.toast-error) {
+  border-left-color: var(--aura-crimson) !important;
+  border-bottom-color: var(--aura-crimson) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), -2px 2px 14px rgba(255, 51, 102, 0.45) !important;
+}
+
+#_rht_toaster .mantine-Paper-root:has([color*="teal"]),
+#_rht_toaster .mantine-Paper-root:has([color*="green"]),
+#_rht_toaster .mantine-Paper-root:has([class*="circle-check"]),
+#_rht_toaster .mantine-Paper-root:has(.toast-success) {
+  border-left-color: var(--aura-emerald) !important;
+  border-bottom-color: var(--aura-emerald) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), -2px 2px 14px rgba(0, 255, 170, 0.45) !important;
+}
+
+#_rht_toaster .mantine-Paper-root:has([color*="yellow"]),
+#_rht_toaster .mantine-Paper-root:has([class*="circle-exclamation"]) {
+  border-left-color: var(--aura-amber) !important;
+  border-bottom-color: var(--aura-amber) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), -2px 2px 14px rgba(245, 158, 11, 0.45) !important;
+}
+
+/* Circular Icon Badge on the Left of Notification */
+#_rht_toaster .mantine-ThemeIcon-root {
+  width: 32px !important;
+  height: 32px !important;
+  min-width: 32px !important;
+  min-height: 32px !important;
+  border-radius: 50% !important;
+  background: rgba(0, 242, 254, 0.15) !important;
+  border: 1.5px solid rgba(0, 242, 254, 0.6) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+#_rht_toaster .mantine-ThemeIcon-root svg {
+  color: var(--aura-cyan) !important;
+  fill: currentColor !important;
+  font-size: 15px !important;
+}
+
+/* Success / Error / Warning Icon Badges */
+#_rht_toaster .mantine-Paper-root:has([class*="circle-check"]) .mantine-ThemeIcon-root {
+  background: rgba(0, 255, 170, 0.15) !important;
+  border-color: rgba(0, 255, 170, 0.7) !important;
+}
+#_rht_toaster .mantine-Paper-root:has([class*="circle-check"]) .mantine-ThemeIcon-root svg {
+  color: var(--aura-emerald) !important;
+}
+
+#_rht_toaster .mantine-Paper-root:has([class*="circle-xmark"]) .mantine-ThemeIcon-root {
+  background: rgba(255, 51, 102, 0.15) !important;
+  border-color: rgba(255, 51, 102, 0.7) !important;
+}
+#_rht_toaster .mantine-Paper-root:has([class*="circle-xmark"]) .mantine-ThemeIcon-root svg {
+  color: var(--aura-crimson) !important;
+}
+
+#_rht_toaster .mantine-Paper-root:has([class*="circle-exclamation"]) .mantine-ThemeIcon-root {
+  background: rgba(245, 158, 11, 0.15) !important;
+  border-color: rgba(245, 158, 11, 0.7) !important;
+}
+#_rht_toaster .mantine-Paper-root:has([class*="circle-exclamation"]) .mantine-ThemeIcon-root svg {
+  color: var(--aura-amber) !important;
+}
+
+/* Notification Title */
+#_rht_toaster div[class*="mantine-Text-root"],
+#_rht_toaster [class*="title"] {
+  font-family: var(--aura-font-title) !important;
+  font-size: 15px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.3px !important;
+  color: #ffffff !important;
+  text-transform: capitalize !important;
+  margin-bottom: 2px !important;
+}
+
+/* Notification Description Text */
+#_rht_toaster .description,
+#_rht_toaster p {
+  font-family: var(--aura-font-body) !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  color: #cbd5e1 !important;
+  line-height: 1.35 !important;
+  margin: 0 !important;
+}
+
+/* Notification Progress Duration Ring */
+#_rht_toaster circle {
+  stroke: var(--aura-cyan) !important;
+  filter: drop-shadow(0 0 4px var(--aura-cyan)) !important;
+}

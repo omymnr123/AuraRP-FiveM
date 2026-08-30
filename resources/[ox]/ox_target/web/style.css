@@ -1,0 +1,322 @@
+:root {
+  --aura-turquoise: #00f0ff;
+  --aura-pink: #ff00a0;
+  --glow-color: rgba(255, 0, 160, 0.75);
+  --bg-glass: rgba(10, 15, 26, 0.92);
+  --border-glass: rgba(0, 240, 255, 0.22);
+  --border-glass-hover: rgba(255, 0, 160, 0.65);
+  --text-default: #cbd5e1;
+  --text-hover: #ffffff;
+}
+
+html,
+body,
+#target-cursor,
+#options-wrapper,
+.option-container,
+*,
+*::before,
+*::after {
+  cursor: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==") 0 0, none !important;
+  box-sizing: border-box;
+}
+
+body {
+  visibility: hidden;
+  user-select: none;
+  white-space: nowrap;
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  font-family: "Outfit", sans-serif;
+  background: transparent !important;
+}
+
+/* ========================================================= */
+/*                   TARGET CURSOR SYSTEM                    */
+/* ========================================================= */
+
+.target-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 9999;
+  will-change: transform;
+  transition: opacity 0.15s ease-out;
+}
+
+/* Ambient Radial Glow */
+.cursor-glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 32px;
+  height: 32px;
+  background: radial-gradient(circle, rgba(0, 240, 255, 0.4) 0%, rgba(255, 0, 160, 0.2) 40%, rgba(255, 0, 160, 0) 70%);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  transition: width 0.25s ease, height 0.25s ease, opacity 0.25s ease;
+}
+
+/* Central Glowing Turquoise Dot (Pure Dot in Idle) */
+.cursor-dot {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 8px;
+  height: 8px;
+  background: var(--aura-turquoise);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  border: 0;
+  outline: 0;
+  box-shadow: 0 0 8px var(--aura-turquoise),
+              0 0 16px rgba(0, 240, 255, 0.8),
+              0 0 28px rgba(255, 0, 160, 0.45);
+  transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1),
+              background-color 0.2s,
+              box-shadow 0.22s;
+}
+
+/* Outer Ring (HIDDEN in idle, ONLY shown when target is active) */
+.cursor-ring {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 32px;
+  height: 32px;
+  border: 1.5px solid rgba(255, 0, 160, 0.85);
+  border-radius: 50%;
+  transform: translate(-50%, -50%) scale(0.6);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
+}
+
+/* Tech Reticle Brackets (HIDDEN in idle, ONLY shown when target is active) */
+.cursor-reticle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 40px;
+  height: 40px;
+  transform: translate(-50%, -50%) scale(0.6) rotate(0deg);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reticle-corner {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border: 1.5px solid var(--aura-turquoise);
+  filter: drop-shadow(0 0 4px var(--aura-turquoise));
+}
+
+.reticle-corner.top-left {
+  top: 0;
+  left: 0;
+  border-right: none;
+  border-bottom: none;
+}
+
+.reticle-corner.top-right {
+  top: 0;
+  right: 0;
+  border-left: none;
+  border-bottom: none;
+}
+
+.reticle-corner.bottom-left {
+  bottom: 0;
+  left: 0;
+  border-right: none;
+  border-top: none;
+}
+
+.reticle-corner.bottom-right {
+  bottom: 0;
+  right: 0;
+  border-left: none;
+  border-top: none;
+}
+
+/* Pulse Ripple (HIDDEN in idle) */
+.cursor-pulse {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid var(--aura-pink);
+  transform: translate(-50%, -50%) scale(1);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ========================================================= */
+/*              TARGET ACQUIRED (ACTIVE) STATE               */
+/* ========================================================= */
+
+.target-cursor.target-active .cursor-dot {
+  transform: translate(-50%, -50%) scale(1.35);
+  background: #ffffff;
+  box-shadow: 0 0 10px #ffffff,
+              0 0 22px var(--aura-turquoise),
+              0 0 40px var(--glow-color);
+}
+
+.target-cursor.target-active .cursor-glow {
+  width: 50px;
+  height: 50px;
+  opacity: 1;
+}
+
+.target-cursor.target-active .cursor-ring {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+  box-shadow: 0 0 14px rgba(255, 0, 160, 0.6), inset 0 0 8px rgba(0, 240, 255, 0.35);
+  animation: ringRotate 6s linear infinite;
+}
+
+.target-cursor.target-active .cursor-reticle {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1) rotate(45deg);
+}
+
+.target-cursor.target-active .cursor-pulse {
+  animation: sonarPulse 1.3s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+}
+
+/* ========================================================= */
+/*                     OPTIONS WRAPPER                       */
+/* ========================================================= */
+
+.options-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9998;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 175px;
+  max-width: 290px;
+  pointer-events: auto;
+  will-change: transform, opacity;
+}
+
+.option-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 8px 16px 8px 12px;
+  background: linear-gradient(135deg, rgba(0, 240, 255, 0.85) 0%, rgba(255, 0, 160, 0.85) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 13.5px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+  overflow: hidden;
+  animation: optionSlideIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* Left White Indicator Bar */
+.option-container::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: #ffffff;
+  opacity: 0;
+  transform: scaleY(0.4);
+  transition: opacity 0.2s ease, transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 0 8px #ffffff;
+}
+
+.option-container:hover, .option-container.selected {
+  background: linear-gradient(135deg, rgba(0, 240, 255, 1) 0%, rgba(255, 0, 160, 1) 100%);
+  border-color: rgba(255, 255, 255, 0.6);
+  color: #ffffff;
+  transform: translateX(4px) scale(1.015);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 16px rgba(0, 240, 255, 0.4), 0 0 16px rgba(255, 0, 160, 0.4);
+}
+
+.option-container:hover::before, .option-container.selected::before {
+  opacity: 1;
+  transform: scaleY(1);
+}
+
+.option-container:active {
+  transform: scale(0.97);
+}
+
+.option-icon {
+  font-size: 14px;
+  width: 20px;
+  text-align: center;
+  margin-right: 10px;
+  color: #ffffff;
+  filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.5));
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.option-container:hover .option-icon, .option-container.selected .option-icon {
+  transform: scale(1.18);
+  filter: drop-shadow(0 0 8px #ffffff);
+}
+
+.option-label {
+  margin: 0;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+/* ========================================================= */
+/*                       ANIMATIONS                          */
+/* ========================================================= */
+
+@keyframes ringRotate {
+  0% {
+    transform: translate(-50%, -50%) scale(1) rotate(0deg);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1) rotate(360deg);
+  }
+}
+
+@keyframes sonarPulse {
+  0% {
+    transform: translate(-50%, -50%) scale(0.8);
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(3.5);
+    opacity: 0;
+  }
+}
+
+@keyframes optionSlideIn {
+  0% {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}

@@ -1,0 +1,267 @@
+return {
+	['testburger'] = {
+		label = 'Hamburguesa Gourmet',
+		weight = 220,
+		degrade = 60,
+		description = 'Hamburguesa especial elaborada con carne de primera y vegetales frescos.',
+		client = {
+			image = 'burger_chicken.png',
+			status = { hunger = 200000 },
+			anim = 'eating',
+			prop = 'burger',
+			usetime = 2500,
+			export = 'ox_inventory_examples.testburger'
+		},
+		server = {
+			export = 'ox_inventory_examples.testburger',
+			test = 'what an amazingly delicious burger, amirite?'
+		},
+		buttons = {
+			{
+				label = 'Morder',
+				action = function(slot)
+					print('Has mordido la hamburguesa')
+				end
+			}
+		},
+		consume = 0.3
+	},
+
+	['bandage'] = {
+		label = 'Vendaje Médico',
+		weight = 115,
+		description = 'Venda elástica esterilizada para curar heridas leves y contener hemorragias.',
+		client = {
+			anim = { dict = 'missheistdockssetup1clipboard@idle_a', clip = 'idle_a', flag = 49 },
+			prop = { model = `prop_rolled_sock_02`, pos = vec3(-0.14, -0.14, -0.08), rot = vec3(-50.0, -50.0, 0.0) },
+			disable = { move = true, car = true, combat = true },
+			usetime = 2500,
+			notification = 'Te has aplicado un vendaje de primeros auxilios'
+		}
+	},
+
+	['black_money'] = {
+		label = 'Dinero Negro',
+		weight = 0,
+		stack = true,
+		close = true,
+		description = 'Fajos de billetes no declarados procedentes de actividades ilegales.',
+	},
+
+	['burger'] = {
+		label = 'Hamburguesa Clásica',
+		weight = 220,
+		description = 'Deliciosa hamburguesa con queso y salsa. Sacia el apetito y recupera energía.',
+		client = {
+			anim = 'eating',
+			prop = 'burger',
+			usetime = 2500,
+			notification = 'Has comido una deliciosa hamburguesa'
+		},
+		server = {
+			export = 'aura_status.consumeItem'
+		}
+	},
+
+	['sprunk'] = {
+		label = 'Sprunk',
+		weight = 350,
+		description = 'Lata de refresco carbonatado de lima-limón con electrolitos. Calma la sed.',
+		client = {
+			anim = { dict = 'mp_player_intdrink', clip = 'loop_bottle' },
+			prop = { model = `prop_ld_can_01`, pos = vec3(0.01, 0.01, 0.06), rot = vec3(5.0, 5.0, -180.5) },
+			usetime = 2500,
+			notification = 'Has bebido una refrescante lata de Sprunk'
+		},
+		server = {
+			export = 'aura_status.consumeItem'
+		}
+	},
+
+	['cola'] = {
+		label = 'eCola',
+		weight = 350,
+		description = 'Famoso refresco de cola con cafeína. Ideal para recargar energía e hidratarse.',
+		client = {
+			anim = { dict = 'mp_player_intdrink', clip = 'loop_bottle' },
+			prop = { model = `prop_ecola_can`, pos = vec3(0.01, 0.01, 0.06), rot = vec3(5.0, 5.0, -180.5) },
+			usetime = 2500,
+			notification = 'Has bebido una refrescante lata de eCola'
+		},
+		server = {
+			export = 'aura_status.consumeItem'
+		}
+	},
+
+	['water'] = {
+		label = 'Botella de Agua',
+		weight = 500,
+		description = 'Botella de agua mineral pura de manantial. Hidrata por completo.',
+		client = {
+			anim = { dict = 'mp_player_intdrink', clip = 'loop_bottle' },
+			prop = { model = `prop_ld_flow_bottle`, pos = vec3(0.03, 0.03, 0.02), rot = vec3(0.0, 0.0, -1.5) },
+			usetime = 2500,
+			cancel = true,
+			notification = 'Has bebido agua mineral'
+		},
+		server = {
+			export = 'aura_status.consumeItem'
+		}
+	},
+
+	['parachute'] = {
+		label = 'Paracaídas',
+		weight = 8000,
+		stack = false,
+		description = 'Equipo de paracaidismo deportivo de alta resistencia para saltos desde aeronaves o alturas.',
+		client = {
+			anim = { dict = 'clothingshirt', clip = 'try_shirt_positive_d' },
+			usetime = 1500
+		}
+	},
+
+	['garbage'] = {
+		label = 'Bolsa de Basura',
+		weight = 100,
+		description = 'Desechos y residuos orgánicos e inorgánicos sin valor comercial.',
+	},
+
+	['paperbag'] = {
+		label = 'Bolsa de Papel',
+		weight = 1,
+		stack = false,
+		close = false,
+		consume = 0,
+		description = 'Bolsa de papel kraft biodegradable para envolver compras de tienda.',
+	},
+
+	['identification'] = {
+		label = 'DNI (Documento de Identidad)',
+		weight = 10,
+		description = 'Documento oficial con tus datos biométricos y personales acreditados por el Estado.',
+		client = {
+			image = 'card_id.png'
+		}
+	},
+
+	['panties'] = {
+		label = 'Prenda Íntima',
+		weight = 10,
+		consume = 0,
+		description = 'Ropa interior femenina de seda con acabados de diseño.',
+		client = {
+			status = { thirst = -100000, stress = -25000 },
+			anim = { dict = 'mp_player_intdrink', clip = 'loop_bottle' },
+			prop = { model = `prop_cs_panties_02`, pos = vec3(0.03, 0.0, 0.02), rot = vec3(0.0, -13.5, -1.5) },
+			usetime = 2500,
+		}
+	},
+
+	['lockpick'] = {
+		label = 'Ganzúa de Cerrajero',
+		weight = 160,
+		description = 'Instrumento metálico fino para manipular bombines de cerraduras y puertas mecánicas.',
+	},
+
+	['phone'] = {
+		label = 'Teléfono Móvil',
+		weight = 190,
+		stack = false,
+		consume = 0,
+		description = 'Smartphone de última generación con mensajería, llamadas, banca online y GPS.',
+		client = {
+			add = function(total)
+				if total > 0 then
+					pcall(function() return exports.npwd:setPhoneDisabled(false) end)
+				end
+			end,
+
+			remove = function(total)
+				if total < 1 then
+					pcall(function() return exports.npwd:setPhoneDisabled(true) end)
+				end
+			end
+		}
+	},
+
+	['money'] = {
+		label = 'Efectivo',
+		weight = 0,
+		stack = true,
+		close = true,
+		description = 'Dólares estadounidenses en billetes de curso legal en circulación.',
+	},
+
+	['cash'] = {
+		label = 'Efectivo',
+		weight = 0,
+		stack = true,
+		close = true,
+		description = 'Dólares estadounidenses en billetes de curso legal en circulación.',
+	},
+
+	['mustard'] = {
+		label = 'Bote de Mostaza',
+		weight = 500,
+		description = 'Envase de mostaza picante tradicional de Los Santos.',
+		client = {
+			status = { hunger = 25000, thirst = 25000 },
+			anim = { dict = 'mp_player_intdrink', clip = 'loop_bottle' },
+			prop = { model = `prop_food_mustard`, pos = vec3(0.01, 0.0, -0.07), rot = vec3(1.0, 1.0, -1.5) },
+			usetime = 2500,
+			notification = 'Has probado un poco de mostaza'
+		}
+	},
+
+	['radio'] = {
+		label = 'Radio Walkie-Talkie',
+		weight = 1000,
+		stack = false,
+		allowArmed = true,
+		description = 'Transmisor portátil de radiofrecuencia para comunicarse por frecuencias abiertas y encriptadas.',
+	},
+
+	['armour'] = {
+		label = 'Chaleco de Kevlar',
+		weight = 3000,
+		stack = false,
+		description = 'Blindaje balístico ligero de fibra de aramida que absorbe impactos de bala.',
+		client = {
+			anim = { dict = 'clothingshirt', clip = 'try_shirt_positive_d' },
+			usetime = 3500
+		}
+	},
+
+	['clothing'] = {
+		label = 'Prendas de Ropa',
+		weight = 500,
+		consume = 0,
+		description = 'Conjunto textil de vestimenta casual o de trabajo.',
+	},
+
+	['mastercard'] = {
+		label = 'Tarjeta Fleeca Bank',
+		stack = false,
+		weight = 10,
+		description = 'Tarjeta bancaria con chip EMV asociada a tu cuenta bancaria personal.',
+		client = {
+			image = 'card_bank.png'
+		}
+	},
+
+	['credit_card'] = {
+		label = 'Tarjeta de Crédito',
+		stack = false,
+		weight = 5,
+		description = 'Tarjeta de crédito física de alta seguridad del Banco Central de Aura. Úsala en cualquier cajero ATM.',
+		client = {
+			image = 'card_bank.png'
+		}
+	},
+
+	['scrapmetal'] = {
+		label = 'Chatarra de Metal',
+		weight = 80,
+		description = 'Fragmentos de hierro y acero reciclable para uso en herrería, mecánica o artesanía.',
+	},
+}

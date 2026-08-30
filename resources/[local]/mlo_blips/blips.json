@@ -1,0 +1,84 @@
+[
+    {
+        "z": 13.0,
+        "y": -977.0,
+        "x": -1552.0,
+        "name": "Marc Vazou",
+        "scale": 0.8,
+        "color": 3,
+        "sprite": 417
+    },
+    {
+        "z": 31.0,
+        "y": -1300.0,
+        "x": -205.0,
+        "name": "Benny's Motorworks",
+        "scale": 0.8,
+        "color": 4,
+        "sprite": 446
+    },
+    {
+        "z": 29.2,
+        "y": -866.3,
+        "x": 362.6,
+        "name": "Legion Square Bus Lanes",
+        "scale": 0.8,
+        "color": 3,
+        "sprite": 513
+    },
+    {
+        "z": 26.0,
+        "y": -1200.0,
+        "x": 750.0,
+        "name": "La Mesa Gym (LMSC)",
+        "scale": 0.8,
+        "color": 7,
+        "sprite": 311
+    },
+    {
+        "z": 20.0,
+        "y": 1075.0,
+        "x": -3170.0,
+        "name": "Hookies Restaurant",
+        "scale": 0.8,
+        "color": 5,
+        "sprite": 274
+    },
+    {
+        "z": 29.4,
+        "y": -1092.78,
+        "x": 313.86,
+        "name": "Salieri's Bar",
+        "scale": 0.8,
+        "color": 5,
+        "sprite": 93
+    },
+    {
+        "z": 83.0,
+        "y": 280.0,
+        "x": -560.0,
+        "name": "Tequi-la-la",
+        "scale": 0.8,
+        "color": 5,
+        "sprite": 93
+    },
+    {
+        "z": 41.29,
+        "y": -1504.83,
+        "x": 1152.37,
+        "name": "Thunder Medical Center",
+        "scale": 0.8,
+        "color": 1,
+        "sprite": 153
+    },
+
+    {
+        "z": 64.5296630859375,
+        "y": -307.4769287109375,
+        "x": 1086.3692626953126,
+        "name": "marihuana",
+        "scale": 0.8,
+        "color": 3,
+        "sprite": 1
+    }
+]

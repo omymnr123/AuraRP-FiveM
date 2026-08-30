@@ -1,0 +1,174 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    overflow: hidden;
+    /* Para evitar que el fondo de GTA sea blanco durante el desarrollo, dejamos background transparente */
+    background-color: transparent; 
+}
+
+.hidden {
+    display: none !important;
+}
+
+#hud-container {
+    position: absolute;
+    bottom: 3.5%;
+    left: 17.5%; /* Posicionado a la derecha del minimapa estándar (puede requerir ajuste según resolución) */
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.hud-item {
+    position: relative;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    
+    /* Eliminamos el Glassmorphism de la caja exterior para evitar el bug de cuadrado negro de CEF */
+    background: transparent;
+    
+    /* Transiciones ultra fluidas para aparición/desaparición (ancho, margen, escala, opacidad) */
+    transition: width 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), 
+                margin 0.4s cubic-bezier(0.25, 0.8, 0.25, 1),
+                transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), 
+                opacity 0.4s ease;
+}
+
+/* Modos de edición */
+#hud-container.editing {
+    outline: 2px dashed rgba(0, 255, 255, 0.5); /* Strong Turquoise */
+    background: rgba(0, 0, 0, 0.2);
+    cursor: grab;
+}
+
+#hud-container.editing .hud-item {
+    width: 44px !important;
+    margin: 0 !important;
+    opacity: 1 !important;
+    transform: scale(1) !important;
+    display: flex !important;
+}
+
+#hud-container.editing:active {
+    cursor: grabbing;
+}
+
+#edit-overlay {
+    position: absolute;
+    top: 10%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(15, 15, 20, 0.9);
+    padding: 20px 40px;
+    border-radius: 8px;
+    text-align: center;
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    z-index: 999;
+}
+
+.edit-text {
+    font-size: 24px;
+    font-weight: 600;
+    color: #00FFFF;
+    margin-bottom: 5px;
+}
+
+.edit-subtext {
+    font-size: 14px;
+    color: #ccc;
+    margin-bottom: 15px;
+}
+
+#save-btn {
+    background: linear-gradient(to right, #00FFFF, #FF1493);
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    color: #111;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    transition: transform 0.2s;
+}
+
+#save-btn:hover {
+    transform: scale(1.05);
+}
+
+/* Iconos centrales */
+.hud-icon {
+    position: absolute;
+    z-index: 10;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.85);
+    text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+    transition: color 0.3s ease;
+}
+
+/* Progreso SVG (Anillos) */
+.progress-ring {
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform: rotate(-90deg); /* Empezar desde arriba */
+}
+
+.progress-ring-track {
+    stroke: rgba(255, 255, 255, 0.06);
+}
+
+.progress-ring-circle {
+    /* La longitud de la circunferencia r=18 es ~113.097 */
+    stroke-dasharray: 113.097 113.097;
+    stroke-dashoffset: 0;
+    stroke-linecap: round;
+    /* Transición súper suave (cubic-bezier premium) */
+    transition: stroke-dashoffset 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Opcional: Cuando el estado es crítico (<20%), hacer palpitar el icono */
+@keyframes pulse-danger {
+    0% { color: rgba(255, 60, 60, 0.8); transform: scale(1); }
+    50% { color: rgba(255, 60, 60, 1); transform: scale(1.15); }
+    100% { color: rgba(255, 60, 60, 0.8); transform: scale(1); }
+}
+
+.danger-state .hud-icon {
+    animation: pulse-danger 1s infinite;
+}
+
+/* Voice state */
+#item-voice .progress-ring-circle {
+    stroke-dashoffset: 113.097; /* Oculto por defecto */
+    transition: stroke-dashoffset 0.2s ease; /* Más rápido para voice */
+}
+
+#item-voice.talking .progress-ring-circle {
+    stroke-dashoffset: 0;
+}
+
+#item-voice.talking .hud-icon {
+    color: #00FFFF;
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.6);
+}
+
+/* Marco del Minimapa (Fijo y perfectamente alineado al mapa nativo) */
+#minimap-border {
+    position: absolute;
+    border: 2px solid transparent;
+    border-image: linear-gradient(to right, #00FFFF, #FF1493) 1;
+    pointer-events: none;
+    z-index: 5;
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.4), inset 0 0 10px rgba(255, 20, 147, 0.2);
+}

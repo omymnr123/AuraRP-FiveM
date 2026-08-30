@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AuraRP HUD</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div id="hud-container" class="hidden">
+        <!-- Definición global del Gradiente Aura -->
+        <svg width="0" height="0">
+            <defs>
+                <linearGradient id="auraGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#00FFFF" /> <!-- Strong Turquoise -->
+                    <stop offset="100%" stop-color="#FF1493" /> <!-- Strong Pink -->
+                </linearGradient>
+            </defs>
+        </svg>
+
+        <!-- Indicador: Voice -->
+        <div class="hud-item" id="item-voice">
+            <div class="hud-icon"><i class="fa-solid fa-microphone"></i></div>
+            <svg class="progress-ring" width="44" height="44">
+                <circle class="progress-ring-track" stroke-width="3" fill="rgba(15, 15, 20, 0.75)" r="18" cx="22" cy="22"/>
+                <circle class="progress-ring-circle" id="circle-voice" stroke="url(#auraGradient)" stroke-width="3" fill="transparent" r="18" cx="22" cy="22"/>
+            </svg>
+        </div>
+
+        <!-- Indicador: Health -->
+        <div class="hud-item" id="item-health">
+            <div class="hud-icon"><i class="fa-solid fa-heart"></i></div>
+            <svg class="progress-ring" width="44" height="44">
+                <circle class="progress-ring-track" stroke-width="3" fill="rgba(15, 15, 20, 0.75)" r="18" cx="22" cy="22"/>
+                <circle class="progress-ring-circle" id="circle-health" stroke="url(#auraGradient)" stroke-width="3" fill="transparent" r="18" cx="22" cy="22"/>
+            </svg>
+        </div>
+
+        <!-- Indicador: Armor -->
+        <div class="hud-item" id="item-armor">
+            <div class="hud-icon"><i class="fa-solid fa-shield-halved"></i></div>
+            <svg class="progress-ring" width="44" height="44">
+                <circle class="progress-ring-track" stroke-width="3" fill="rgba(15, 15, 20, 0.75)" r="18" cx="22" cy="22"/>
+                <circle class="progress-ring-circle" id="circle-armor" stroke="url(#auraGradient)" stroke-width="3" fill="transparent" r="18" cx="22" cy="22"/>
+            </svg>
+        </div>
+
+        <!-- Indicador: Stamina -->
+        <div class="hud-item" id="item-stamina">
+            <div class="hud-icon"><i class="fa-solid fa-person-running"></i></div>
+            <svg class="progress-ring" width="44" height="44">
+                <circle class="progress-ring-track" stroke-width="3" fill="rgba(15, 15, 20, 0.75)" r="18" cx="22" cy="22"/>
+                <circle class="progress-ring-circle" id="circle-stamina" stroke="url(#auraGradient)" stroke-width="3" fill="transparent" r="18" cx="22" cy="22"/>
+            </svg>
+        </div>
+
+        <!-- Indicador: Hunger -->
+        <div class="hud-item" id="item-hunger">
+            <div class="hud-icon"><i class="fa-solid fa-burger"></i></div>
+            <svg class="progress-ring" width="44" height="44">
+                <circle class="progress-ring-track" stroke-width="3" fill="rgba(15, 15, 20, 0.75)" r="18" cx="22" cy="22"/>
+                <circle class="progress-ring-circle" id="circle-hunger" stroke="url(#auraGradient)" stroke-width="3" fill="transparent" r="18" cx="22" cy="22"/>
+            </svg>
+        </div>
+
+        <!-- Indicador: Thirst -->
+        <div class="hud-item" id="item-thirst">
+            <div class="hud-icon"><i class="fa-solid fa-droplet"></i></div>
+            <svg class="progress-ring" width="44" height="44">
+                <circle class="progress-ring-track" stroke-width="3" fill="rgba(15, 15, 20, 0.75)" r="18" cx="22" cy="22"/>
+                <circle class="progress-ring-circle" id="circle-thirst" stroke="url(#auraGradient)" stroke-width="3" fill="transparent" r="18" cx="22" cy="22"/>
+            </svg>
+        </div>
+    </div>
+
+    <!-- Edit Mode Overlay -->
+    <div id="edit-overlay" class="hidden">
+        <div class="edit-text">Modo Edición Activado</div>
+        <div class="edit-subtext">Arrastra el HUD a la posición deseada</div>
+        <button id="save-btn"><i class="fa-solid fa-floppy-disk"></i> Guardar Posición</button>
+    </div>
+
+    <!-- Minimap Border -->
+    <div id="minimap-border" class="hidden"></div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>

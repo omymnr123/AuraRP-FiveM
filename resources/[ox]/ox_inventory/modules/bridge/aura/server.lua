@@ -1,0 +1,91 @@
+local Inventory = require 'modules.inventory.server'
+
+-- Evento al seleccionar personaje desde aura_multichar
+AddEventHandler('aura_economy:server:characterLoaded', function(arg1, arg2, arg3)
+    local src, charId, accounts
+    if type(arg1) == 'number' and type(arg2) == 'number' then
+        src = arg1
+        charId = arg2
+        accounts = arg3
+    else
+        src = source
+        charId = arg1
+        accounts = arg2
+    end
+
+    src = tonumber(src)
+    if not src or not charId then return end
+
+    local player = {
+        source = src,
+        identifier = tostring(charId),
+        name = GetPlayerName(src) or ('Character %s'):format(charId),
+        groups = {}
+    }
+
+    server.setPlayerInventory(player, nil)
+    
+    -- Sincronizar el efectivo físico inicial si aplica
+    local cash = accounts and accounts.cash or 0
+    if cash > 0 then
+        Inventory.SetItem(src, 'money', cash)
+    end
+end)
+
+-- Auto-inicialización si el recurso se reinicia con jugadores conectados
+CreateThread(function()
+    Wait(500)
+    for _, srcStr in ipairs(GetPlayers()) do
+        local src = tonumber(srcStr)
+        if src then
+            local multicharActive = exports.aura_multichar and exports.aura_multichar:GetActiveCharacter(src)
+            if multicharActive and multicharActive.id then
+                local player = {
+                    source = src,
+                    identifier = tostring(multicharActive.id),
+                    name = GetPlayerName(src) or ('Character %s'):format(multicharActive.id),
+                    groups = {}
+                }
+                server.setPlayerInventory(player, nil)
+            end
+        end
+    end
+end)
+
+-- Evento al desconectarse el jugador
+AddEventHandler('playerDropped', function()
+    local src = source
+    if src then
+        server.playerDropped(src)
+    end
+end)
+
+---@diagnostic disable-next-line: duplicate-set-field
+function server.setPlayerData(player)
+    return {
+        source = player.source,
+        identifier = player.identifier or player.source,
+        name = player.name or GetPlayerName(player.source),
+        groups = player.groups or {}
+    }
+end
+
+---@diagnostic disable-next-line: duplicate-set-field
+function server.hasLicense(inv, license)
+    return false
+end
+
+---@diagnostic disable-next-line: duplicate-set-field
+function server.buyLicense(inv, license)
+    return false, 'can_not_afford'
+end
+
+---@diagnostic disable-next-line: duplicate-set-field
+function server.isPlayerBoss(playerId, group)
+    return false
+end
+
+---@diagnostic disable-next-line: duplicate-set-field
+function server.getOwnedVehicleId(entityId)
+    return nil
+end

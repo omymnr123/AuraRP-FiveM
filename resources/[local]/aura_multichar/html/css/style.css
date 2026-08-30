@@ -1,0 +1,368 @@
+:root {
+    --primary: #ffffff;
+    --accent: #4ade80;
+    --accent-hover: #22c55e;
+    --danger: #f87171;
+    --danger-hover: #ef4444;
+    --bg-glass: rgba(15, 15, 20, 0.85);
+    --border-glass: rgba(255, 255, 255, 0.08);
+    --text-muted: rgba(255, 255, 255, 0.6);
+    --transition-snappy: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    user-select: none;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    color: var(--primary);
+    background: transparent;
+    overflow: hidden;
+}
+
+.background-overlay {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 70% 50%, rgba(0,0,0,0) 0%, rgba(0,0,0,0.85) 100%);
+    z-index: -1;
+}
+
+.logo-container {
+    position: absolute;
+    top: 40px;
+    left: 50px;
+}
+
+.logo-container h1 {
+    font-size: 3.5rem;
+    font-weight: 800;
+    letter-spacing: 8px;
+    margin-bottom: -5px;
+    text-shadow: 0 4px 20px rgba(255,255,255,0.2);
+}
+
+.logo-container p {
+    font-size: 0.8rem;
+    letter-spacing: 4px;
+    color: var(--accent);
+    font-weight: 600;
+}
+
+.screen {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    pointer-events: none;
+    transition: var(--transition-snappy);
+    transform: scale(1.02);
+}
+
+.screen.active {
+    opacity: 1;
+    pointer-events: all;
+    transform: scale(1);
+}
+
+/* Glassmorphism Classes */
+.glass-panel {
+    background: var(--bg-glass);
+    border: 1px solid var(--border-glass);
+    border-radius: 16px;
+    box-shadow: 0 24px 40px rgba(0, 0, 0, 0.4);
+}
+
+/* Modales */
+.modal-overlay {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+.modal-content {
+    width: 450px;
+    padding: 35px;
+    text-align: center;
+}
+.modal-content h2 {
+    color: var(--danger);
+    margin-bottom: 15px;
+    font-size: 1.8rem;
+    font-weight: 800;
+    text-shadow: 0 0 10px rgba(255, 68, 68, 0.5);
+}
+.modal-content p {
+    color: var(--text-muted);
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+/* Selección de Personajes */
+.slots-container {
+    position: absolute;
+    bottom: 50px;
+    left: 50px;
+    display: flex;
+    gap: 20px;
+}
+
+.slot {
+    width: 80px;
+    height: 80px;
+    border-radius: 12px;
+    background: var(--bg-glass);
+    border: 1px solid var(--border-glass);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: var(--transition-snappy);
+}
+
+.slot:hover {
+    transform: translateY(-5px);
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--primary);
+    border-color: rgba(255,255,255,0.3);
+}
+
+.slot.selected {
+    background: var(--primary);
+    color: #000;
+    box-shadow: 0 0 20px rgba(255,255,255,0.4);
+    border-color: var(--primary);
+}
+
+.slot-avatar {
+    width: 55px;
+    height: 55px;
+    object-fit: cover;
+    opacity: 0.6;
+    transition: var(--transition-snappy);
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+}
+
+.fallback-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    color: var(--primary);
+    font-size: 1.5rem;
+    font-weight: 800;
+}
+.slot:hover .slot-avatar {
+    opacity: 0.9;
+}
+.slot.selected .slot-avatar {
+    opacity: 1;
+}
+
+.slot.empty {
+    border: 1px dashed var(--text-muted);
+    background: transparent;
+}
+.slot.empty:hover {
+    border: 1px dashed var(--accent);
+    color: var(--accent);
+}
+
+.character-info-panel {
+    position: absolute;
+    right: 50px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 400px;
+    padding: 40px;
+}
+
+.character-info-panel h2 {
+    font-size: 2rem;
+    margin-bottom: 30px;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.info-details p {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    font-size: 1rem;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border-glass);
+}
+
+.info-details p span:first-child {
+    color: var(--text-muted);
+    font-weight: 600;
+}
+
+.info-details p span:last-child {
+    font-weight: 800;
+}
+
+button {
+    width: 100%;
+    padding: 16px;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 800;
+    letter-spacing: 2px;
+    cursor: pointer;
+    margin-top: 15px;
+    transition: var(--transition-snappy);
+    font-family: 'Inter', sans-serif;
+}
+
+button:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.btn-primary {
+    background: var(--primary);
+    color: #000;
+}
+.btn-primary:not(:disabled):hover {
+    background: #e0e0e0;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(255,255,255,0.2);
+}
+
+.btn-danger {
+    background: transparent;
+    color: var(--danger);
+    border: 1px solid var(--danger);
+}
+.btn-danger:not(:disabled):hover {
+    background: var(--danger);
+    color: #fff;
+}
+
+.btn-secondary {
+    background: transparent;
+    color: var(--primary);
+    border: 1px solid var(--border-glass);
+}
+.btn-secondary:not(:disabled):hover {
+    background: rgba(255,255,255,0.1);
+}
+
+/* Creación de Personaje */
+.creation-panel {
+    position: absolute;
+    left: 50px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 450px;
+    padding: 50px;
+}
+
+.creation-panel h2 {
+    font-size: 2rem;
+    margin-bottom: 30px;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+
+.form-group {
+    position: relative;
+    margin-bottom: 25px;
+}
+
+.form-group input[type="text"],
+.form-group input[type="date"],
+.form-group select {
+    width: 100%;
+    padding: 15px 0;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid var(--border-glass);
+    color: var(--primary);
+    font-size: 1.1rem;
+    font-family: 'Inter', sans-serif;
+    transition: var(--transition-snappy);
+}
+
+.form-group select {
+    appearance: none;
+    cursor: pointer;
+}
+
+.form-group select option {
+    background: #111;
+    color: #fff;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-bottom-color: var(--accent);
+}
+
+.form-group > label:not(.static-label) {
+    position: absolute;
+    left: 0;
+    top: 15px;
+    color: var(--text-muted);
+    transition: var(--transition-snappy);
+    pointer-events: none;
+    font-weight: 600;
+}
+
+.form-group > input:focus ~ label:not(.static-label),
+.form-group > input:not(:placeholder-shown) ~ label:not(.static-label) {
+    top: -10px;
+    font-size: 0.8rem;
+    color: var(--accent);
+}
+
+.static-label {
+    display: block;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.radio-group {
+    display: flex;
+    gap: 15px;
+}
+
+.radio-group input {
+    display: none;
+}
+
+.radio-group label {
+    flex: 1;
+    padding: 12px;
+    text-align: center;
+    border: 1px solid var(--border-glass);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: var(--transition-snappy);
+    font-weight: 600;
+}
+
+.radio-group input:checked + label {
+    background: var(--primary);
+    color: #000;
+    border-color: var(--primary);
+}
+
+.form-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 40px;
+}

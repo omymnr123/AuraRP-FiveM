@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap"
+    rel="stylesheet" />
+  <title>Inventario Aura Roleplay</title>
+  <script type="module" crossorigin src="./assets/index.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index.css">
+  <link rel="stylesheet" href="./assets/aura_inventory.css">
+</head>
+
+<body>
+  <div id="root"></div>
+
+  <!-- UI Structure & Spanish Localization Controller -->
+  <script>
+    (function () {
+      let activeCategory = 'all';
+      let searchQuery = '';
+
+      // Diccionario de descripciones dinámicas para la tarjeta de pie
+      const itemDescriptions = {
+        'water': 'Botella de agua mineral natural pura de manantial. Hidrata por completo.',
+        'burger': 'Deliciosa hamburguesa con queso y salsa. Sacia el apetito y recupera energía.',
+        'sprunk': 'Lata de refresco carbonatado de lima-limón con electrolitos. Calma la sed.',
+        'cola': 'Famoso refresco de cola con cafeína. Ideal para recargar energía e hidratarse.',
+        'bandage': 'Venda elástica esterilizada para curar heridas leves y contener hemorragias.',
+        'black_money': 'Fajos de billetes no declarados procedentes de actividades ilegales.',
+        'money': 'Dólares estadounidenses en billetes de curso legal en circulación.',
+        'cash': 'Dólares estadounidenses en billetes de curso legal en circulación.',
+        'phone': 'Smartphone moderno con mensajería, llamadas, banca online y GPS.',
+        'lockpick': 'Instrumento metálico fino para manipular bombines de cerraduras y puertas mecánicas.',
+        'armour': 'Blindaje balístico ligero de fibra de aramida que absorbe impactos de bala.',
+        'radio': 'Transmisor portátil de radiofrecuencia para comunicarse por frecuencias de voz.',
+        'parachute': 'Equipo de paracaidismo deportivo de alta resistencia para saltos desde alturas.',
+        'identification': 'Documento oficial con tus datos biométricos acreditados por el Estado.',
+        'mastercard': 'Tarjeta bancaria con chip EMV asociada a tu cuenta bancaria personal.',
+        'scrapmetal': 'Fragmentos de hierro y acero reciclable para herrería, mecánica o artesanía.'
+      };
+
+      function setupUI() {
+        const invWrapper = document.querySelector('.inventory-wrapper');
+        if (!invWrapper) return;
+
+        // 1. Inyectar Cabecera Superior en Español
+        if (!document.querySelector('.aura-header-container')) {
+          const header = document.createElement('div');
+          header.className = 'aura-header-container';
+          header.innerHTML = `
+              <div class="aura-header-left">
+                <div class="aura-header-title">INVENTARIO</div>
+                <div class="aura-header-subtitle">DE TU PERSONAJE</div>
+              </div>
+              <div class="aura-header-divider"></div>
+              <div class="aura-header-right">
+                <div class="aura-header-logo-icon"></div>
+                <span>AURA ROLEPLAY</span>
+              </div>
+            `;
+          invWrapper.parentElement.insertBefore(header, invWrapper);
+        }
+
+        // 2. Inyectar Buscador y Filtros en Español dentro del panel izquierdo (Player)
+        const leftGridWrapper = invWrapper.querySelector('.inventory-grid-wrapper:first-child');
+        if (leftGridWrapper && !leftGridWrapper.querySelector('.aura-filter-container')) {
+          const filterContainer = document.createElement('div');
+          filterContainer.className = 'aura-filter-container';
+          filterContainer.innerHTML = `
+              <div class="aura-search-wrapper">
+                <input type="text" class="aura-search-input" placeholder="Buscar artículo..." />
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+              </div>
+              <div class="aura-category-tabs">
+                <button class="aura-category-tab active" data-cat="all">Todos</button>
+                <button class="aura-category-tab" data-cat="weapons">Armas</button>
+                <button class="aura-category-tab" data-cat="foods">Comida / Bebida</button>
+                <button class="aura-category-tab" data-cat="craftable">Materiales</button>
+                <button class="aura-category-tab" data-cat="clothes">Ropa</button>
+              </div>
+            `;
+
+          const weightBar = leftGridWrapper.querySelector('.weight-bar');
+          if (weightBar) {
+            weightBar.after(filterContainer);
+          } else {
+            leftGridWrapper.prepend(filterContainer);
+          }
+
+          const searchInput = filterContainer.querySelector('.aura-search-input');
+          searchInput.addEventListener('input', (e) => {
+            searchQuery = e.target.value.toLowerCase().trim();
+            filterSlots();
+          });
+
+          const tabs = filterContainer.querySelectorAll('.aura-category-tab');
+          tabs.forEach(tab => {
+            tab.addEventListener('click', (e) => {
+              tabs.forEach(t => t.classList.remove('active'));
+              e.target.classList.add('active');
+              activeCategory = e.target.dataset.cat;
+              filterSlots();
+            });
+          });
+        }
+
+        // 3. Inyectar Tarjeta de Detalle en Español al pie del panel izquierdo
+        if (leftGridWrapper && !leftGridWrapper.querySelector('.aura-bottom-detail-card')) {
+          const bottomCard = document.createElement('div');
+          bottomCard.className = 'aura-bottom-detail-card';
+          bottomCard.innerHTML = `
+              <div class="aura-detail-icon-box" id="aura-detail-icon"></div>
+              <div class="aura-detail-content">
+                <div class="aura-detail-header-row">
+                  <span class="aura-detail-name" id="aura-detail-name">Selecciona un artículo</span>
+                  <span class="aura-detail-weight" id="aura-detail-weight">-</span>
+                </div>
+                <div class="aura-detail-desc" id="aura-detail-desc">Pasa el cursor sobre un objeto para ver su descripción.</div>
+              </div>
+            `;
+          leftGridWrapper.appendChild(bottomCard);
+        }
+      }
+
+      // Filtro en vivo de slots
+      function filterSlots() {
+        const leftGrid = document.querySelector('.inventory-grid-wrapper:first-child .inventory-grid-container');
+        if (!leftGrid) return;
+
+        const slots = leftGrid.querySelectorAll('.inventory-slot');
+        slots.forEach(slot => {
+          const labelEl = slot.querySelector('.inventory-slot-label-text');
+          const itemName = labelEl ? labelEl.textContent.toLowerCase() : '';
+          const bgImage = slot.style.backgroundImage || '';
+          const hasItem = bgImage && bgImage !== 'none' && !bgImage.includes('none');
+
+          if (!hasItem && (searchQuery || activeCategory !== 'all')) {
+            slot.style.display = 'none';
+            return;
+          }
+
+          let matchesSearch = !searchQuery || itemName.includes(searchQuery);
+          let matchesCategory = true;
+
+          if (activeCategory === 'weapons') {
+            matchesCategory = itemName.includes('arma') || itemName.includes('pistola') || itemName.includes('rifle') || itemName.includes('cuchillo') || itemName.includes('munición') || itemName.includes('weapon');
+          } else if (activeCategory === 'foods') {
+            matchesCategory = itemName.includes('hamburguesa') || itemName.includes('agua') || itemName.includes('sprunk') || itemName.includes('cola') || itemName.includes('comida') || itemName.includes('mostaza') || itemName.includes('burger');
+          } else if (activeCategory === 'craftable') {
+            matchesCategory = itemName.includes('metal') || itemName.includes('chatarra') || itemName.includes('ganzúa') || itemName.includes('material') || itemName.includes('lockpick');
+          } else if (activeCategory === 'clothes') {
+            matchesCategory = itemName.includes('ropa') || itemName.includes('chaleco') || itemName.includes('prenda') || itemName.includes('paracaídas') || itemName.includes('vest');
+          }
+
+          slot.style.display = (matchesSearch && matchesCategory) ? 'flex' : 'none';
+        });
+      }
+
+      // Detección de Hover sobre ítems para alimentar la tarjeta de inspección en Español
+      document.addEventListener('mouseover', (e) => {
+        const slot = e.target.closest('.inventory-slot');
+        if (!slot) return;
+
+        const labelEl = slot.querySelector('.inventory-slot-label-text');
+        const countEl = slot.querySelector('.item-slot-info-wrapper p');
+        const bgImage = slot.style.backgroundImage;
+
+        if (labelEl && bgImage && bgImage !== 'none' && !bgImage.includes('none')) {
+          const nameEl = document.getElementById('aura-detail-name');
+          const weightEl = document.getElementById('aura-detail-weight');
+          const descEl = document.getElementById('aura-detail-desc');
+          const iconEl = document.getElementById('aura-detail-icon');
+
+          const labelText = labelEl.textContent.trim();
+          if (nameEl) nameEl.textContent = labelText;
+          if (weightEl) weightEl.textContent = countEl ? countEl.textContent : '1x';
+          if (iconEl) iconEl.style.backgroundImage = bgImage;
+
+          // Extraer nombre del archivo del ítem para obtener su descripción precisa
+          const rawFileNameMatch = bgImage.match(/\/([^/]+)\.(?:png|jpg|webp)/i);
+          const rawItemKey = rawFileNameMatch ? rawFileNameMatch[1].toLowerCase() : labelText.toLowerCase();
+          const resolvedDesc = itemDescriptions[rawItemKey] || `Artículo homologado en Los Santos. Disponible para uso o intercambio.`;
+
+          if (descEl) descEl.textContent = resolvedDesc;
+        }
+      });
+
+      const observer = new MutationObserver(() => {
+        setupUI();
+      });
+
+      observer.observe(document.body, { childList: true, subtree: true });
+    })();
+  </script>
+</body>
+
+</html>
