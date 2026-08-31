@@ -1,0 +1,45 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+
+.voiceInfo {
+    font-family: 'Inter', sans-serif !important;
+    position: fixed;
+    text-align: right;
+    bottom: 15px;
+    right: 15px;
+    padding: 10px 15px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #e0e0e0;
+    
+    /* Aura Glassmorphism */
+    background: rgba(15, 15, 25, 0.45) !important;
+    backdrop-filter: blur(15px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(15px) saturate(180%) !important;
+    border: 1px solid rgba(0, 240, 255, 0.15) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5), inset 0 0 10px rgba(0, 240, 255, 0.05) !important;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+}
+
+.voiceInfo p {
+    margin: 0;
+    padding: 2px 0;
+}
+
+.talking {
+    color: #FF0055 !important; /* Pink/Magenta */
+    text-shadow: 0 0 10px rgba(255, 0, 85, 0.8) !important;
+    animation: pulseAura 1.5s infinite !important;
+}
+
+.radio {
+    color: #00F0FF !important; /* Turquoise/Cyan */
+    text-shadow: 0 0 8px rgba(0, 240, 255, 0.6) !important;
+}
+
+/* Custom animaciones */
+@keyframes pulseAura {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}

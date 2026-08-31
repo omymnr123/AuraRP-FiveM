@@ -1,0 +1,288 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
+
+:root {
+    --primary-cyan: #00F0FF;
+    --primary-pink: #FF0055;
+    --bg-dark: rgba(10, 10, 15, 0.7);
+    --glass-bg: rgba(20, 20, 30, 0.45);
+    --glass-border: rgba(255, 255, 255, 0.1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+    user-select: none;
+}
+
+body {
+    background: transparent;
+    overflow: hidden;
+}
+
+.hidden {
+    display: none !important;
+}
+
+#phone-container {
+    position: absolute;
+    bottom: -800px;
+    right: 50px;
+    width: 320px;
+    height: 650px;
+    transition: bottom 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+#phone-container.show {
+    bottom: 50px;
+}
+
+.phone-hardware {
+    width: 100%;
+    height: 100%;
+    background: #000;
+    border-radius: 40px;
+    padding: 8px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5), 
+                0 0 20px rgba(0, 240, 255, 0.2), 
+                inset 0 0 10px rgba(255, 255, 255, 0.2);
+    position: relative;
+}
+
+.notch {
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 25px;
+    background: #000;
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+    z-index: 100;
+}
+
+.phone-screen {
+    width: 100%;
+    height: 100%;
+    background: url('https://i.imgur.com/3cW4p2X.png') center/cover; /* Placeholder Wallpaper Aura */
+    border-radius: 32px;
+    overflow: hidden;
+    position: relative;
+    background-color: #111;
+}
+
+/* Glassmorphism General */
+.glass-panel {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px) saturate(150%);
+    -webkit-backdrop-filter: blur(20px) saturate(150%);
+    border: 1px solid var(--glass-border);
+}
+
+/* Status Bar */
+.status-bar {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 20px;
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+    z-index: 50;
+    position: relative;
+}
+
+/* App Views */
+.app-view {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    transform: scale(0.95);
+}
+
+.app-view.active {
+    opacity: 1;
+    pointer-events: all;
+    transform: scale(1);
+}
+
+/* Home Screen */
+.app-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px 10px;
+    padding: 30px 15px;
+    margin-top: 20px;
+}
+
+.app-icon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.app-icon:active {
+    transform: scale(0.9);
+}
+
+.icon-bg {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    color: white;
+    margin-bottom: 5px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+.app-icon span {
+    color: white;
+    font-size: 11px;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+    font-weight: 500;
+}
+
+.bank-bg { background: linear-gradient(135deg, var(--primary-cyan), #0055ff); }
+.msg-bg { background: linear-gradient(135deg, #00d2ff, #3a7bd5); }
+.call-bg { background: linear-gradient(135deg, #11998e, #38ef7d); }
+.sett-bg { background: linear-gradient(135deg, #8e9eab, #eef2f3); color: #333;}
+.cam-bg { background: linear-gradient(135deg, var(--primary-pink), #ff758c); }
+
+.dock {
+    position: absolute;
+    bottom: 25px;
+    left: 15px;
+    right: 15px;
+    height: 70px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(25px);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 0 10px;
+    border: 1px solid rgba(255,255,255,0.05);
+}
+
+.home-indicator {
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40%;
+    height: 4px;
+    background: white;
+    border-radius: 10px;
+    cursor: pointer;
+    z-index: 999;
+}
+
+/* Aura Bank App */
+#app-bank {
+    background: var(--bg-dark);
+    backdrop-filter: blur(30px);
+}
+
+.app-header {
+    padding: 40px 20px 10px 20px;
+    display: flex;
+    align-items: center;
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.back-btn {
+    margin-right: 15px;
+    cursor: pointer;
+}
+
+.app-content {
+    padding: 20px;
+}
+
+.balance-card {
+    background: linear-gradient(135deg, rgba(0, 240, 255, 0.15), rgba(255, 0, 85, 0.15));
+    border: 1px solid var(--primary-cyan);
+    border-radius: 15px;
+    padding: 20px;
+    text-align: center;
+    color: white;
+    box-shadow: 0 0 20px rgba(0, 240, 255, 0.1);
+    margin-bottom: 20px;
+}
+
+.balance-card h3 {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: rgba(255,255,255,0.7);
+}
+
+.balance-card h1 {
+    font-size: 32px;
+    margin-top: 10px;
+    font-weight: 800;
+}
+
+.transfer-box {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 15px;
+    padding: 20px;
+}
+
+.transfer-box h3 {
+    color: white;
+    font-size: 14px;
+    margin-bottom: 15px;
+}
+
+.transfer-box input {
+    width: 100%;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 12px;
+    border-radius: 8px;
+    color: white;
+    margin-bottom: 10px;
+    outline: none;
+}
+
+.transfer-box input:focus {
+    border-color: var(--primary-cyan);
+}
+
+.btn-glow {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    background: linear-gradient(45deg, var(--primary-cyan), var(--primary-pink));
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
+    transition: all 0.3s;
+}
+
+.btn-glow:hover {
+    box-shadow: 0 0 25px rgba(255, 0, 85, 0.6);
+    transform: translateY(-2px);
+}
+
+#transfer-status {
+    margin-top: 10px;
+    font-size: 12px;
+    text-align: center;
+    color: var(--primary-pink);
+}

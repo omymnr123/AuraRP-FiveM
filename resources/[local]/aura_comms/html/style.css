@@ -1,0 +1,40 @@
+/* 
+   Aura Comms - CSS Override for pma-voice 
+   Coloca este contenido en el archivo style.css de pma-voice para aplicar
+   la estética Aura Glassmorphism (Turquoise/Pink).
+*/
+
+.voice-ui {
+    background: rgba(15, 15, 25, 0.45) !important;
+    backdrop-filter: blur(15px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(15px) saturate(180%) !important;
+    border: 1px solid rgba(0, 240, 255, 0.15) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5), inset 0 0 10px rgba(0, 240, 255, 0.05) !important;
+    color: #e0e0e0 !important;
+    font-family: 'Inter', sans-serif !important;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+}
+
+.voice-ui .radio {
+    color: #00F0FF !important; /* Turquoise/Cyan */
+    text-shadow: 0 0 8px rgba(0, 240, 255, 0.6) !important;
+}
+
+.voice-ui .talking {
+    color: #FF0055 !important; /* Pink/Magenta */
+    text-shadow: 0 0 10px rgba(255, 0, 85, 0.8) !important;
+    transform: scale(1.05) !important;
+}
+
+/* Custom animaciones */
+@keyframes pulseAura {
+    0% { box-shadow: 0 0 0 0 rgba(255, 0, 85, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(255, 0, 85, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 0, 85, 0); }
+}
+
+.voice-ui.is-talking {
+    animation: pulseAura 1.5s infinite !important;
+    border-color: rgba(255, 0, 85, 0.4) !important;
+}

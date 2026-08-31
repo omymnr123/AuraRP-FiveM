@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aura OS V2</title>
+    <!-- CSS Core -->
+    <link rel="stylesheet" href="css/os.css">
+    <link rel="stylesheet" href="css/apps.css">
+    <!-- FontAwesome Pro (Simulated via CDN) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div id="phone-container" class="hidden">
+        
+        <!-- Hardware Frame (The Physical Phone) -->
+        <div class="phone-hardware">
+            <!-- Dynamic Island / Notch -->
+            <div class="dynamic-island" id="dynamic-island">
+                <div class="island-camera"></div>
+                <div class="island-sensor"></div>
+                <span id="island-text" class="hidden"></span>
+            </div>
+            
+            <!-- Phone Screen Area -->
+            <div class="phone-screen">
+                
+                <!-- Status Bar -->
+                <div class="status-bar">
+                    <span class="time" id="clock">12:00</span>
+                    <div class="icons">
+                        <i class="fas fa-signal"></i>
+                        <i class="fas fa-wifi"></i>
+                        <i class="fas fa-battery-three-quarters"></i>
+                    </div>
+                </div>
+
+                <!-- Main Home Screen (Grid & Widgets) -->
+                <div id="home-screen" class="view-layer active">
+                    <!-- Widgets Area (Top) -->
+                    <div class="widgets-area">
+                        <div class="widget time-widget">
+                            <h1 id="widget-time">12:00</h1>
+                            <p id="widget-date">Lunes, 1 Enero</p>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic App Grid -->
+                    <div class="app-grid" id="app-grid">
+                        <!-- JS Inyecta las apps aquí -->
+                    </div>
+                    
+                    <!-- App Dock -->
+                    <div class="dock-container">
+                        <div class="dock" id="app-dock">
+                            <!-- JS Inyecta las apps de dock aquí -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Control Center (Swipe down) -->
+                <div id="control-center" class="view-layer">
+                    <div class="cc-panel">
+                        <h3>Centro de Control</h3>
+                        <!-- Contenido del CC a futuro -->
+                    </div>
+                </div>
+
+                <!-- Dynamic Apps Container -->
+                <div id="apps-container">
+                    <!-- Las ventanas de las apps se renderizan dentro de aquí vía JS -->
+                </div>
+
+
+
+                <!-- Home Indicator Bar (Swipe up to close app) -->
+                <div class="home-indicator" id="home-indicator"></div>
+
+            </div>
+        </div>
+    </div>
+    
+    <!-- Scripts -->
+    <script src="js/apps.js"></script>
+    <script src="js/bank.js"></script>
+    <script src="js/phone.js"></script>
+    <script src="js/messages.js"></script>
+    <script src="js/contacts.js"></script>
+    <script src="js/core.js"></script>
+</body>
+</html>

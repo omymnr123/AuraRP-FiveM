@@ -149,6 +149,14 @@ lib.callback.register('aura_multichar:createCharacter', function(source, data)
     })
 
     if insertId then
+        -- Generar número de teléfono a través de aura_phone
+        local phoneNum = nil
+        pcall(function()
+            if exports.aura_phone and exports.aura_phone.assignPhoneNumber then
+                phoneNum = exports.aura_phone:assignPhoneNumber(insertId)
+            end
+        end)
+
         local newChar = {
             id = insertId,
             citizenid = citizenRecord.citizenid,
@@ -158,11 +166,19 @@ lib.callback.register('aura_multichar:createCharacter', function(source, data)
             nationality = data.nationality,
             dob = data.dob,
             gender = data.gender,
+            phone_number = phoneNum,
             accounts = accounts,
             metadata = metadata
         }
         -- Registrar inmediatamente como personaje activo en esta sesión
         activeCharacters[tonumber(src)] = newChar
+        
+        -- Sincronizar teléfono
+        pcall(function()
+            if phoneNum and exports.aura_phone and exports.aura_phone.setPhoneOnline then
+                exports.aura_phone:setPhoneOnline(src, phoneNum)
+            end
+        end)
 
         -- Registrar transacción inicial en auditoría económica
         pcall(function()
@@ -202,6 +218,15 @@ lib.callback.register('aura_multichar:selectCharacter', function(source, id)
     local char = MySQL.single.await('SELECT * FROM characters WHERE citizenid = ? AND id = ?', {citizenRecord.citizenid, id})
     if not char then return nil end
 
+    -- Retrocompatibilidad: Asignar número si es un personaje viejo sin teléfono
+    if not char.phone_number or char.phone_number == "" then
+        pcall(function()
+            if exports.aura_phone and exports.aura_phone.assignPhoneNumber then
+                char.phone_number = exports.aura_phone:assignPhoneNumber(char.id)
+            end
+        end)
+    end
+
     char.metadata = json.decode(char.metadata)
     if char.accounts then
         char.accounts = json.decode(char.accounts)
@@ -215,6 +240,13 @@ lib.callback.register('aura_multichar:selectCharacter', function(source, id)
     
     -- Registrar personaje activo para esta sesión
     activeCharacters[tonumber(src)] = char
+
+    -- Sincronizar teléfono
+    pcall(function()
+        if char.phone_number and exports.aura_phone and exports.aura_phone.setPhoneOnline then
+            exports.aura_phone:setPhoneOnline(src, char.phone_number)
+        end
+    end)
 
     -- Sincronizar estado en memoria en aura_economy
     TriggerEvent('aura_economy:server:characterLoaded', src, char.id, char.accounts)
