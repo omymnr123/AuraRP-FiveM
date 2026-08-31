@@ -5,7 +5,7 @@
 -- Obtener Lista de Chats
 lib.callback.register('aura_phone:server:getChats', function(source)
     local src = source
-    local number = AuraPhone.PhoneToSource[src]
+    local number = AuraPhone.GetPlayerPhoneNumber(src)
     if not number then return {} end
 
     -- Obtenemos los chats y tratamos de hacer JOIN con la tabla de contactos
@@ -29,7 +29,7 @@ end)
 -- Obtener Mensajes de un Chat
 lib.callback.register('aura_phone:server:getMessages', function(source, data)
     local src = source
-    local number = AuraPhone.PhoneToSource[src]
+    local number = AuraPhone.GetPlayerPhoneNumber(src)
     if not number then return { messages = {} } end
 
     local chatId = data.chat_id
@@ -66,7 +66,7 @@ end)
 -- Enviar Mensaje
 lib.callback.register('aura_phone:server:sendMessage', function(source, data)
     local src = source
-    local senderNumber = AuraPhone.PhoneToSource[src]
+    local senderNumber = AuraPhone.GetPlayerPhoneNumber(src)
     if not senderNumber then return { success = false } end
 
     local chatId = data.chat_id
@@ -122,7 +122,7 @@ end)
 -- Marcar mensajes como leidos
 lib.callback.register('aura_phone:server:markRead', function(source, data)
     local src = source
-    local number = AuraPhone.PhoneToSource[src]
+    local number = AuraPhone.GetPlayerPhoneNumber(src)
     if not number or not data.chat_id then return false end
 
     MySQL.update.await('UPDATE aura_phone_messages SET is_read = 1 WHERE chat_id = ? AND sender_number != ?', {

@@ -15,14 +15,16 @@ server_scripts {
     'server/main.lua',
     'server/calls.lua',
     'server/messages.lua',
-    'server/contacts.lua'
+    'server/contacts.lua',
+    'server/settings.lua'
 }
 
 client_scripts {
     'client/main.lua',
     'client/calls.lua',
     'client/messages.lua',
-    'client/contacts.lua'
+    'client/contacts.lua',
+    'client/settings.lua'
 }
 
 files {
@@ -35,5 +37,6 @@ files {
     'html/js/phone.js',
     'html/js/messages.js',
     'html/js/contacts.js',
+    'html/js/settings.js',
     'audio/*.mp3'
 }

@@ -5,7 +5,7 @@
 -- Obtener todos los contactos del jugador
 lib.callback.register('aura_phone:server:getAllContacts', function(source)
     local src = source
-    local number = AuraPhone.PhoneToSource[src]
+    local number = AuraPhone.GetPlayerPhoneNumber(src)
     if not number then return {} end
 
     local query = [[
@@ -20,7 +20,7 @@ end)
 -- Obtener información propia (Número y Nombre)
 lib.callback.register('aura_phone:server:getOwnInfo', function(source)
     local src = source
-    local number = AuraPhone.PhoneToSource[src]
+    local number = AuraPhone.GetPlayerPhoneNumber(src)
     if not number then return { number = "Desconocido", name = "Mi Tarjeta" } end
 
     local charData = MySQL.single.await('SELECT firstname, lastname FROM characters WHERE phone_number = ?', {number})
@@ -38,7 +38,7 @@ end)
 -- Guardar / Crear Contacto
 lib.callback.register('aura_phone:server:saveContact', function(source, data)
     local src = source
-    local number = AuraPhone.PhoneToSource[src]
+    local number = AuraPhone.GetPlayerPhoneNumber(src)
     if not number then return { success = false, message = "No tienes teléfono registrado" } end
 
     local contactName = data.name and data.name:match("^%s*(.-)%s*$")
@@ -67,7 +67,7 @@ end)
 -- Eliminar Contacto
 lib.callback.register('aura_phone:server:deleteContact', function(source, contactId)
     local src = source
-    local number = AuraPhone.PhoneToSource[src]
+    local number = AuraPhone.GetPlayerPhoneNumber(src)
     if not number or not contactId then return false end
 
     local affected = MySQL.update.await('DELETE FROM aura_phone_contacts WHERE id = ? AND owner_number = ?', {
@@ -79,7 +79,7 @@ end)
 -- Alternar Favorito
 lib.callback.register('aura_phone:server:toggleFavorite', function(source, data)
     local src = source
-    local number = AuraPhone.PhoneToSource[src]
+    local number = AuraPhone.GetPlayerPhoneNumber(src)
     if not number or not data.id then return false end
 
     local newStatus = data.is_favorite and 1 or 0
@@ -92,7 +92,7 @@ end)
 -- Enviar Ubicación directa a un contacto
 lib.callback.register('aura_phone:server:sendLocationToContact', function(source, data)
     local src = source
-    local senderNumber = AuraPhone.PhoneToSource[src]
+    local senderNumber = AuraPhone.GetPlayerPhoneNumber(src)
     if not senderNumber or not data.target_number or not data.coords then return false end
 
     local targetNumber = data.target_number
@@ -150,7 +150,7 @@ lib.callback.register('aura_phone:server:getNearbyPlayerDetails', function(sourc
     for _, targetSrc in ipairs(nearbyServerIds) do
         local targetSrcNum = tonumber(targetSrc)
         if targetSrcNum and targetSrcNum ~= source then
-            local targetNumber = AuraPhone.PhoneToSource[targetSrcNum]
+            local targetNumber = AuraPhone.GetPlayerPhoneNumber(targetSrcNum)
             local targetName = "Ciudadano (" .. targetSrcNum .. ")"
 
             if targetNumber then
@@ -174,7 +174,7 @@ end)
 -- Enviar solicitud de compartir contacto
 lib.callback.register('aura_phone:server:sendContactShareRequest', function(source, targetServerId)
     local src = source
-    local senderNumber = AuraPhone.PhoneToSource[src]
+    local senderNumber = AuraPhone.GetPlayerPhoneNumber(src)
     if not senderNumber then return { success = false, message = "No tienes teléfono registrado" } end
 
     local targetSrc = tonumber(targetServerId)
@@ -201,7 +201,7 @@ end)
 -- Aceptar contacto compartido (Guardar en base de datos)
 lib.callback.register('aura_phone:server:acceptContactShare', function(source, data)
     local receiverSrc = source
-    local receiverNumber = AuraPhone.PhoneToSource[receiverSrc]
+    local receiverNumber = AuraPhone.GetPlayerPhoneNumber(receiverSrc)
     if not receiverNumber then return { success = false } end
 
     local contactName = data.name or "Desconocido"

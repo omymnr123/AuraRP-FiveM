@@ -120,7 +120,7 @@ end)
 -- NUI Callbacks: DB Fetching
 lib.callback.register('aura_phone:server:getRecents', function(source)
     local src = source
-    local number = AuraPhone.PhoneToSource[src]
+    local number = AuraPhone.GetPlayerPhoneNumber(src)
     if not number then return {} end
 
     -- Obtenemos llamadas y tratamos de hacer un JOIN con contactos si existe
@@ -140,7 +140,7 @@ end)
 
 lib.callback.register('aura_phone:server:getContacts', function(source)
     local src = source
-    local number = AuraPhone.PhoneToSource[src]
+    local number = AuraPhone.GetPlayerPhoneNumber(src)
     if not number then return {} end
 
     local results = MySQL.query.await('SELECT * FROM aura_phone_contacts WHERE owner_number = ? ORDER BY is_favorite DESC, contact_name ASC', {number})
@@ -149,7 +149,7 @@ end)
 
 lib.callback.register('aura_phone:server:getFavorites', function(source)
     local src = source
-    local number = AuraPhone.PhoneToSource[src]
+    local number = AuraPhone.GetPlayerPhoneNumber(src)
     if not number then return {} end
 
     local results = MySQL.query.await('SELECT * FROM aura_phone_contacts WHERE owner_number = ? AND is_favorite = 1 ORDER BY contact_name ASC', {number})
@@ -158,7 +158,7 @@ end)
 
 lib.callback.register('aura_phone:server:addContact', function(source, name, targetNumber)
     local src = source
-    local number = AuraPhone.PhoneToSource[src]
+    local number = AuraPhone.GetPlayerPhoneNumber(src)
     
     if not number then 
         print("^1[AuraPhone] Error: No se pudo obtener el numero del Source " .. tostring(src) .. "^7")
@@ -179,7 +179,7 @@ end)
 -- ANTI-CRASH: Si un jugador crashea o se desconecta, cortar la llamada del otro
 AddEventHandler('playerDropped', function(reason)
     local src = source
-    local number = AuraPhone.PhoneToSource[src]
+    local number = AuraPhone.GetPlayerPhoneNumber(src)
     
     if number then
         AuraPhone.ActivePhones[number] = nil

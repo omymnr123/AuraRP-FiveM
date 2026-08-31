@@ -50,7 +50,8 @@ const AuraAppsRegistry = [
         icon: "fas fa-cog",
         colorClass: "bg-settings",
         inDock: false,
-        isSystem: true
+        isSystem: true,
+        script: "AuraSettingsApp"
     },
     {
         id: "app-twitter",

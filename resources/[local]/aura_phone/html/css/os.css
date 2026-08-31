@@ -27,6 +27,22 @@ body {
     display: none !important;
 }
 
+/* Custom Sleek Scrollbar */
+::-webkit-scrollbar {
+    width: 4px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 240, 255, 0.5);
+}
+
+
 /* =========================================
    HARDWARE & FRAME
    ========================================= */
@@ -296,3 +312,207 @@ body {
     background: white;
     transform: translateX(-50%) scaleY(1.5);
 }
+
+/* =========================================
+   LOCK SCREEN & FACE ID
+   ========================================= */
+
+#lock-screen {
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(25px);
+    z-index: 500;
+}
+
+.lock-screen-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    height: 100%;
+    padding: 60px 20px 30px 20px;
+}
+
+.lock-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.lock-icon-box {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 20px;
+    margin-bottom: 8px;
+    transition: all 0.3s;
+}
+
+.lock-icon-box.unlocked {
+    color: var(--primary-cyan);
+    transform: scale(1.2);
+}
+
+#lock-time {
+    font-size: 58px;
+    font-weight: 800;
+    color: white;
+    letter-spacing: -2px;
+    line-height: 1;
+    text-shadow: 0 4px 15px rgba(0,0,0,0.6);
+}
+
+#lock-date {
+    font-size: 14px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.85);
+    margin-top: 5px;
+}
+
+/* Dynamic Island Face ID Scanning Mode */
+.island-faceid-scan {
+    width: 150px !important;
+    height: 38px !important;
+    border: 1px solid var(--primary-cyan) !important;
+    box-shadow: 0 0 25px rgba(0, 240, 255, 0.6) !important;
+}
+
+.faceid-banner {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0, 240, 255, 0.15);
+    border: 1px solid rgba(0, 240, 255, 0.3);
+    padding: 8px 16px;
+    border-radius: 20px;
+    color: var(--primary-cyan);
+    font-size: 12px;
+    font-weight: 700;
+    margin: 15px 0;
+    animation: pulseGlow 1s infinite alternate;
+}
+
+/* Keypad PIN */
+.lock-pin-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.pin-prompt-text {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
+.pin-dots {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 25px;
+}
+
+.pin-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    background: transparent;
+    transition: all 0.2s;
+}
+
+.pin-dot.filled {
+    background: var(--primary-cyan);
+    border-color: var(--primary-cyan);
+    box-shadow: 0 0 10px var(--primary-cyan);
+    transform: scale(1.1);
+}
+
+.pin-keypad {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 230px;
+}
+
+.pin-row {
+    display: flex;
+    justify-content: space-between;
+}
+
+.pin-btn {
+    width: 62px;
+    height: 62px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    font-weight: 600;
+    color: white;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.pin-btn:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: scale(1.05);
+}
+
+.pin-btn:active {
+    background: rgba(0, 240, 255, 0.4);
+    transform: scale(0.92);
+}
+
+.pin-action-btn {
+    background: transparent;
+    border: none;
+    font-size: 20px;
+}
+
+.hidden-btn {
+    visibility: hidden;
+}
+
+.lock-shortcuts {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    padding: 0 10px;
+}
+
+.shortcut-circle {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(25, 25, 35, 0.6);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.shortcut-circle:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: scale(1.1);
+}
+
+/* Shake Animation for incorrect PIN */
+@keyframes shakeKeypad {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-12px); }
+    40%, 80% { transform: translateX(12px); }
+}
+
+.shake-anim {
+    animation: shakeKeypad 0.4s ease-in-out;
+}
+

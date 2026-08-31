@@ -73,6 +73,65 @@
 
 
 
+                <!-- Lock Screen (Seguridad / PIN / Face ID) -->
+                <div id="lock-screen" class="view-layer hidden">
+                    <div class="lock-screen-content">
+                        <div class="lock-header">
+                            <div class="lock-icon-box" id="lock-padlock-icon">
+                                <i class="fas fa-lock"></i>
+                            </div>
+                            <h1 id="lock-time">12:00</h1>
+                            <p id="lock-date">Lunes, 31 de Agosto</p>
+                        </div>
+
+                        <!-- Face ID Dynamic Banner (opcional en pantalla) -->
+                        <div id="lock-faceid-banner" class="faceid-banner hidden">
+                            <i class="fas fa-smile fa-spin"></i>
+                            <span>Verificando Face ID...</span>
+                        </div>
+
+                        <!-- Keypad PIN Container -->
+                        <div id="lock-pin-container" class="lock-pin-container">
+                            <p class="pin-prompt-text">Introduce el código</p>
+                            <div class="pin-dots">
+                                <div class="pin-dot" id="pdot-1"></div>
+                                <div class="pin-dot" id="pdot-2"></div>
+                                <div class="pin-dot" id="pdot-3"></div>
+                                <div class="pin-dot" id="pdot-4"></div>
+                            </div>
+                            
+                            <div class="pin-keypad">
+                                <div class="pin-row">
+                                    <div class="pin-btn" onclick="AuraCore.enterPinDigit('1')">1</div>
+                                    <div class="pin-btn" onclick="AuraCore.enterPinDigit('2')">2</div>
+                                    <div class="pin-btn" onclick="AuraCore.enterPinDigit('3')">3</div>
+                                </div>
+                                <div class="pin-row">
+                                    <div class="pin-btn" onclick="AuraCore.enterPinDigit('4')">4</div>
+                                    <div class="pin-btn" onclick="AuraCore.enterPinDigit('5')">5</div>
+                                    <div class="pin-btn" onclick="AuraCore.enterPinDigit('6')">6</div>
+                                </div>
+                                <div class="pin-row">
+                                    <div class="pin-btn" onclick="AuraCore.enterPinDigit('7')">7</div>
+                                    <div class="pin-btn" onclick="AuraCore.enterPinDigit('8')">8</div>
+                                    <div class="pin-btn" onclick="AuraCore.enterPinDigit('9')">9</div>
+                                </div>
+                                <div class="pin-row">
+                                    <div class="pin-btn hidden-btn"></div>
+                                    <div class="pin-btn" onclick="AuraCore.enterPinDigit('0')">0</div>
+                                    <div class="pin-btn pin-action-btn" onclick="AuraCore.deletePinDigit()"><i class="fas fa-backspace"></i></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Bottom Shortcuts -->
+                        <div class="lock-shortcuts">
+                            <div class="shortcut-circle" title="Linterna"><i class="fas fa-bolt"></i></div>
+                            <div class="shortcut-circle" title="Cámara" onclick="AuraCore.openApp('app-camera')"><i class="fas fa-camera"></i></div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Home Indicator Bar (Swipe up to close app) -->
                 <div class="home-indicator" id="home-indicator"></div>
 
@@ -86,6 +145,7 @@
     <script src="js/phone.js"></script>
     <script src="js/messages.js"></script>
     <script src="js/contacts.js"></script>
+    <script src="js/settings.js"></script>
     <script src="js/core.js"></script>
 </body>
 </html>
