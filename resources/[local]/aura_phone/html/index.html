@@ -73,8 +73,45 @@
 
 
 
-                <!-- Lock Screen (Seguridad / PIN / Face ID) -->
-                <div id="lock-screen" class="view-layer hidden">
+                <!-- Top Dynamic Island / Pop-up Notification Banner -->
+                <div id="top-notification-banner" class="top-notif-banner hidden" onclick="AuraCore.clickTopBanner()">
+                    <div class="top-notif-icon" id="top-notif-icon"><i class="fas fa-comment"></i></div>
+                    <div class="top-notif-content">
+                        <div class="top-notif-header">
+                            <span class="top-notif-app" id="top-notif-app">Mensajes</span>
+                            <span class="top-notif-time">ahora</span>
+                        </div>
+                        <span class="top-notif-title" id="top-notif-title">Franklin Clinton</span>
+                        <span class="top-notif-body" id="top-notif-body">¿Dónde estás bro?</span>
+                    </div>
+                </div>
+
+                <!-- Peek Incoming Call Banner (Shown when receiving a call) -->
+                <div id="peek-call-card" class="peek-call-card hidden">
+                    <div class="peek-call-top">
+                        <div class="peek-call-avatar pulsing-ring">
+                            <i class="fas fa-phone-alt"></i>
+                        </div>
+                        <div class="peek-call-info">
+                            <span class="peek-call-subtitle">LLAMADA ENTRANTE</span>
+                            <span class="peek-call-name" id="peek-caller-name">Michael De Santa</span>
+                            <span class="peek-call-number" id="peek-caller-number">555-0199</span>
+                        </div>
+                    </div>
+                    <div class="peek-call-actions">
+                        <div class="peek-btn peek-btn-accept" onclick="AuraCore.acceptIncomingCall()">
+                            <i class="fas fa-phone"></i>
+                            <span>[ENTER] Contestar</span>
+                        </div>
+                        <div class="peek-btn peek-btn-decline" onclick="AuraCore.declineIncomingCall()">
+                            <i class="fas fa-phone-slash"></i>
+                            <span>[BORRAR] Rechazar</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lock Screen (Seguridad / PIN / Face ID / Notificaciones / Barra inferior) -->
+                <div id="lock-screen" class="view-layer">
                     <div class="lock-screen-content">
                         <div class="lock-header">
                             <div class="lock-icon-box" id="lock-padlock-icon">
@@ -84,14 +121,14 @@
                             <p id="lock-date">Lunes, 31 de Agosto</p>
                         </div>
 
-                        <!-- Face ID Dynamic Banner (opcional en pantalla) -->
+                        <!-- Face ID Dynamic Banner -->
                         <div id="lock-faceid-banner" class="faceid-banner hidden">
                             <i class="fas fa-smile fa-spin"></i>
                             <span>Verificando Face ID...</span>
                         </div>
 
-                        <!-- Keypad PIN Container -->
-                        <div id="lock-pin-container" class="lock-pin-container">
+                        <!-- Keypad PIN Container (Visible si tiene PIN configurado) -->
+                        <div id="lock-pin-container" class="lock-pin-container hidden">
                             <p class="pin-prompt-text">Introduce el código</p>
                             <div class="pin-dots">
                                 <div class="pin-dot" id="pdot-1"></div>
@@ -124,6 +161,25 @@
                             </div>
                         </div>
 
+                        <!-- Centro de Notificaciones en Pantalla de Bloqueo -->
+                        <div id="lock-notifications-container" class="lock-notifications-container hidden">
+                            <div class="lock-notifs-header" id="lock-notifs-header">
+                                <span>NOTIFICACIONES</span>
+                                <button id="btn-clear-lock-notifs" class="btn-clear-notifs" onclick="AuraCore.clearAllNotifications(event)" title="Borrar todas las notificaciones">
+                                    <i class="fas fa-trash-alt" style="margin-right: 4px;"></i> Borrar todo
+                                </button>
+                            </div>
+                            <div class="lock-notifs-list" id="lock-notifs-list">
+                                <!-- Las notificaciones se inyectan dinámicamente -->
+                            </div>
+                        </div>
+
+                        <!-- Indicador para desbloquear tocando la barra inferior -->
+                        <div id="lock-swipe-hint" class="lock-swipe-hint" onclick="AuraCore.handleHomeIndicatorClick()">
+                            <i class="fas fa-chevron-up bounce-anim"></i>
+                            <span>Toca la barra para desbloquear</span>
+                        </div>
+
                         <!-- Bottom Shortcuts -->
                         <div class="lock-shortcuts">
                             <div class="shortcut-circle" title="Linterna"><i class="fas fa-bolt"></i></div>
@@ -146,6 +202,8 @@
     <script src="js/messages.js"></script>
     <script src="js/contacts.js"></script>
     <script src="js/settings.js"></script>
+    <script src="js/gallery.js"></script>
+    <script src="js/camera.js"></script>
     <script src="js/core.js"></script>
 </body>
 </html>

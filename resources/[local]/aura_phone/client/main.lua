@@ -1,53 +1,106 @@
-local isPhoneOpen = false
-local phoneProp = 0
+AuraPhoneClient = AuraPhoneClient or {}
+AuraPhoneClient.isPhoneOpen = false
+AuraPhoneClient.phoneProp = 0
+AuraPhoneClient.isInCall = false
 
 -- Utils para Animación y Prop
-local function LoadAnimDict(dict)
+function AuraPhoneClient.LoadAnimDict(dict)
     RequestAnimDict(dict)
     while not HasAnimDictLoaded(dict) do Wait(10) end
 end
 
-local function LoadModel(model)
+function AuraPhoneClient.LoadModel(model)
     RequestModel(model)
     while not HasModelLoaded(model) do Wait(10) end
 end
 
-local function AttachPhoneProp()
+function AuraPhoneClient.AttachPhoneProp()
+    if DoesEntityExist(AuraPhoneClient.phoneProp) then return end
     local ped = PlayerPedId()
     local model = joaat('prop_npc_phone_02')
-    LoadModel(model)
+    AuraPhoneClient.LoadModel(model)
     
     local coords = GetEntityCoords(ped)
-    phoneProp = CreateObject(model, coords.x, coords.y, coords.z, true, true, false)
+    AuraPhoneClient.phoneProp = CreateObject(model, coords.x, coords.y, coords.z, true, true, false)
     
     local bone = GetPedBoneIndex(ped, 28422) -- Mano derecha
-    AttachEntityToEntity(phoneProp, ped, bone, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, true, true, false, true, 1, true)
+    AttachEntityToEntity(AuraPhoneClient.phoneProp, ped, bone, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, true, true, false, true, 1, true)
     SetModelAsNoLongerNeeded(model)
 end
 
-local function RemovePhoneProp()
-    if DoesEntityExist(phoneProp) then
-        DeleteEntity(phoneProp)
-        phoneProp = 0
+function AuraPhoneClient.RemovePhoneProp()
+    if DoesEntityExist(AuraPhoneClient.phoneProp) then
+        DeleteEntity(AuraPhoneClient.phoneProp)
+        AuraPhoneClient.phoneProp = 0
     end
 end
+
+function AuraPhoneClient.StartCallAnimation()
+    local ped = PlayerPedId()
+    AuraPhoneClient.isInCall = true
+    AuraPhoneClient.LoadAnimDict("cellphone@")
+    AuraPhoneClient.AttachPhoneProp()
+    
+    -- Sacar el teléfono y ponérselo en la oreja
+    TaskPlayAnim(ped, "cellphone@", "cellphone_call_in", 3.0, -1, -1, 50, 0, false, false, false)
+    
+    CreateThread(function()
+        Wait(1000)
+        if AuraPhoneClient.isInCall then
+            TaskPlayAnim(ped, "cellphone@", "cellphone_call_listen_base", 3.0, -1, -1, 49, 0, false, false, false)
+        end
+    end)
+end
+
+function AuraPhoneClient.StopCallAnimation()
+    if not AuraPhoneClient.isInCall then return end
+    AuraPhoneClient.isInCall = false
+    local ped = PlayerPedId()
+    
+    AuraPhoneClient.LoadAnimDict("cellphone@")
+    TaskPlayAnim(ped, "cellphone@", "cellphone_call_out", 3.0, -1, -1, 50, 0, false, false, false)
+    
+    SetTimeout(600, function()
+        StopAnimTask(ped, "cellphone@", "cellphone_call_out", 1.0)
+        StopAnimTask(ped, "cellphone@", "cellphone_call_listen_base", 1.0)
+        StopAnimTask(ped, "cellphone@", "cellphone_call_in", 1.0)
+        
+        if not AuraPhoneClient.isPhoneOpen then
+            StopAnimTask(ped, "cellphone@", "cellphone_text_in", 1.0)
+            ClearPedSecondaryTask(ped)
+            AuraPhoneClient.RemovePhoneProp()
+        else
+            TaskPlayAnim(ped, "cellphone@", "cellphone_text_in", 4.0, -1, -1, 50, 0, false, false, false)
+        end
+    end)
+end
+
+AddEventHandler('onResourceStop', function(resourceName)
+    if resourceName == GetCurrentResourceName() then
+        AuraPhoneClient.RemovePhoneProp()
+    end
+end)
 
 -- Funciones principales del Teléfono
 local function TogglePhone(state)
     local ped = PlayerPedId()
-    isPhoneOpen = state
+    AuraPhoneClient.isPhoneOpen = state
     
-    if isPhoneOpen then
-        LoadAnimDict("cellphone@")
-        TaskPlayAnim(ped, "cellphone@", "cellphone_text_in", 4.0, -1, -1, 50, 0, false, false, false)
-        AttachPhoneProp()
+    if AuraPhoneClient.isPhoneOpen then
+        if not AuraPhoneClient.isInCall then
+            AuraPhoneClient.LoadAnimDict("cellphone@")
+            TaskPlayAnim(ped, "cellphone@", "cellphone_text_in", 4.0, -1, -1, 50, 0, false, false, false)
+            AuraPhoneClient.AttachPhoneProp()
+        end
         
         SetNuiFocus(true, true)
-        SetNuiFocusKeepInput(false) -- Impedir movimiento de cámara
+        SetNuiFocusKeepInput(false)
         SendNUIMessage({ action = "openPhone" })
     else
-        StopAnimTask(ped, "cellphone@", "cellphone_text_in", 1.0)
-        RemovePhoneProp()
+        if not AuraPhoneClient.isInCall then
+            StopAnimTask(ped, "cellphone@", "cellphone_text_in", 1.0)
+            AuraPhoneClient.RemovePhoneProp()
+        end
         
         SetNuiFocus(false, false)
         SendNUIMessage({ action = "closePhone" })
@@ -56,7 +109,7 @@ end
 
 -- Export para abrir desde ox_inventory (ej. usar el item "phone")
 exports('openPhone', function()
-    if not isPhoneOpen then
+    if not AuraPhoneClient.isPhoneOpen then
         TogglePhone(true)
     end
 end)

@@ -8,6 +8,7 @@ ui_page 'html/index.html'
 
 shared_scripts {
     '@ox_lib/init.lua',
+    'config.lua'
 }
 
 server_scripts {
@@ -16,7 +17,9 @@ server_scripts {
     'server/calls.lua',
     'server/messages.lua',
     'server/contacts.lua',
-    'server/settings.lua'
+    'server/settings.lua',
+    'server/gallery.lua',
+    'server/debug.lua'
 }
 
 client_scripts {
@@ -24,7 +27,9 @@ client_scripts {
     'client/calls.lua',
     'client/messages.lua',
     'client/contacts.lua',
-    'client/settings.lua'
+    'client/settings.lua',
+    'client/camera.lua',
+    'client/debug.lua'
 }
 
 files {
@@ -38,5 +43,7 @@ files {
     'html/js/messages.js',
     'html/js/contacts.js',
     'html/js/settings.js',
+    'html/js/gallery.js',
+    'html/js/camera.js',
     'audio/*.mp3'
 }

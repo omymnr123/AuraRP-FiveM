@@ -53,12 +53,22 @@ body {
     right: 50px;
     width: 340px;
     height: 700px;
-    transition: bottom 0.8s var(--bezier-smooth), transform 0.4s var(--bezier-smooth);
+    transition: bottom 0.6s var(--bezier-smooth), transform 0.4s var(--bezier-smooth);
     filter: drop-shadow(0 30px 60px rgba(0,0,0,0.8));
+    z-index: 1000;
 }
 
 #phone-container.show {
-    bottom: 40px;
+    bottom: 40px !important;
+}
+
+#phone-container.peek-call,
+#phone-container.peek-notif {
+    bottom: -580px !important;
+    transform: scale(0.95);
+    transform-origin: bottom center;
+    transition: bottom 0.5s var(--bezier-smooth), transform 0.5s var(--bezier-smooth);
+    filter: drop-shadow(0 15px 40px rgba(0,0,0,0.85));
 }
 
 #phone-container.minimized {
@@ -202,6 +212,38 @@ body {
     align-items: center;
     cursor: pointer;
     transition: transform 0.15s ease;
+    position: relative;
+}
+
+.app-badge {
+    position: absolute;
+    top: -4px;
+    right: 3px;
+    background: #FF3B30;
+    color: white;
+    font-size: 10px;
+    font-weight: 800;
+    min-width: 18px;
+    height: 18px;
+    border-radius: 9px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0 4px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.6);
+    border: 1.5px solid rgba(255,255,255,0.7);
+    z-index: 10;
+    animation: popBadge 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.app-badge.hidden {
+    display: none !important;
+}
+
+@keyframes popBadge {
+    0% { transform: scale(0); }
+    80% { transform: scale(1.2); }
+    100% { transform: scale(1); }
 }
 
 .app-icon-container:active {
@@ -318,9 +360,16 @@ body {
    ========================================= */
 
 #lock-screen {
-    background: rgba(0, 0, 0, 0.4);
+    background: rgba(0, 0, 0, 0.35);
     backdrop-filter: blur(25px);
     z-index: 500;
+    transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+#lock-screen.sliding-up {
+    opacity: 0;
+    transform: translateY(-50px) scale(1.02);
+    pointer-events: none;
 }
 
 .lock-screen-content {
@@ -329,7 +378,8 @@ body {
     align-items: center;
     justify-content: space-between;
     height: 100%;
-    padding: 60px 20px 30px 20px;
+    padding: 60px 20px 20px 20px;
+    box-sizing: border-box;
 }
 
 .lock-header {
@@ -477,11 +527,42 @@ body {
     visibility: hidden;
 }
 
+.lock-swipe-hint {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 13px;
+    font-weight: 600;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.6);
+    margin-top: auto;
+    margin-bottom: 15px;
+    cursor: pointer;
+    animation: fadeIn 0.4s ease-out;
+}
+
+.lock-swipe-hint span {
+    font-size: 12px;
+    letter-spacing: 0.3px;
+}
+
+@keyframes bounceUp {
+    0%, 100% { transform: translateY(0); opacity: 0.6; }
+    50% { transform: translateY(-5px); opacity: 1; }
+}
+
+.bounce-anim {
+    animation: bounceUp 1.5s infinite ease-in-out;
+    font-size: 12px;
+}
+
 .lock-shortcuts {
     display: flex;
     justify-content: space-between;
     width: 100%;
     padding: 0 10px;
+    margin-bottom: 14px;
 }
 
 .shortcut-circle {
@@ -516,3 +597,411 @@ body {
     animation: shakeKeypad 0.4s ease-in-out;
 }
 
+/* =========================================
+   LOCK SCREEN NOTIFICATIONS CENTER (AuraRP Style)
+   ========================================= */
+
+.lock-notifications-container {
+    width: 100%;
+    max-height: 270px;
+    display: flex;
+    flex-direction: column;
+    margin: 8px 0;
+    overflow: hidden;
+    animation: fadeIn 0.3s ease-out;
+    box-sizing: border-box;
+}
+
+.lock-notifications-container.hidden {
+    display: none !important;
+}
+
+.lock-notifs-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 6px 8px 6px;
+    font-size: 10.5px;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+    background: linear-gradient(90deg, #00F0FF, #FF0055);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.btn-clear-notifs {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 0, 85, 0.4);
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    -webkit-text-fill-color: initial;
+}
+
+.btn-clear-notifs:hover {
+    background: rgba(255, 0, 85, 0.35);
+    color: #FF0055;
+    border-color: #FF0055;
+    box-shadow: 0 0 10px rgba(255, 0, 85, 0.4);
+}
+
+.lock-notifs-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    overflow-y: auto;
+    max-height: 235px;
+    padding: 2px 3px 6px 3px;
+}
+
+.lock-notif-card {
+    background: rgba(13, 16, 26, 0.92);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border-radius: 16px;
+    padding: 11px 13px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7), 0 0 14px rgba(0, 240, 255, 0.14), inset 0 0 15px rgba(255, 0, 85, 0.06);
+    border: 1.5px solid transparent;
+    background-image: linear-gradient(rgba(13, 16, 26, 0.92), rgba(13, 16, 26, 0.92)), linear-gradient(135deg, rgba(0, 240, 255, 0.7) 0%, rgba(255, 0, 85, 0.7) 100%);
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    user-select: none;
+    flex-shrink: 0;
+}
+
+.lock-notif-card:hover {
+    transform: scale(1.02);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.85), 0 0 20px rgba(0, 240, 255, 0.35), inset 0 0 20px rgba(255, 0, 85, 0.15);
+    background-image: linear-gradient(rgba(20, 25, 42, 0.96), rgba(20, 25, 42, 0.96)), linear-gradient(135deg, #00F0FF 0%, #FF0055 100%);
+}
+
+.lock-notif-card:active {
+    transform: scale(0.98);
+}
+
+.notif-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+}
+
+.notif-app-badge {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.notif-app-icon {
+    width: 19px;
+    height: 19px;
+    border-radius: 6px;
+    background: linear-gradient(135deg, #00F0FF, #FF0055) !important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 10px;
+    box-shadow: 0 2px 8px rgba(0, 240, 255, 0.4);
+}
+
+.notif-app-name {
+    font-weight: 800;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    background: linear-gradient(90deg, #00F0FF, #FF0055);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-transform: uppercase;
+}
+
+.notif-time {
+    color: rgba(255, 255, 255, 0.45);
+    font-size: 10px;
+    font-weight: 500;
+    margin-right: 16px;
+}
+
+.notif-card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.notif-card-title {
+    color: white;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.2;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+}
+
+.notif-card-msg {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.notif-card-close {
+    position: absolute;
+    top: 7px;
+    right: 8px;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 11px;
+    padding: 3px 5px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.notif-card-close:hover {
+    color: #FF0055;
+    background: rgba(255, 0, 85, 0.25);
+}
+
+/* =========================================
+   TOP DYNAMIC NOTIFICATION BANNER
+   ========================================= */
+
+.top-notif-banner {
+    position: absolute;
+    top: 42px;
+    left: 10px;
+    right: 10px;
+    background: rgba(14, 18, 28, 0.96);
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    border-radius: 16px;
+    padding: 9px 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.85), 0 0 20px rgba(0, 240, 255, 0.25);
+    border: 1.5px solid transparent;
+    background-image: linear-gradient(rgba(14, 18, 28, 0.96), rgba(14, 18, 28, 0.96)), linear-gradient(135deg, #00F0FF, #FF0055);
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
+    z-index: 1200;
+    cursor: pointer;
+    animation: slideDownBanner 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: transform 0.2s, opacity 0.2s;
+    box-sizing: border-box;
+}
+
+@keyframes slideDownBanner {
+    from {
+        transform: translateY(-50px) scale(0.9);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+}
+
+.top-notif-banner.hidden {
+    display: none !important;
+}
+
+.top-notif-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #00F0FF, #FF0055) !important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 15px;
+    flex-shrink: 0;
+    box-shadow: 0 3px 10px rgba(0, 240, 255, 0.3);
+}
+
+.top-notif-content {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    flex: 1;
+}
+
+.top-notif-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 9px;
+    color: rgba(255, 255, 255, 0.5);
+    margin-bottom: 1px;
+}
+
+.top-notif-app {
+    font-weight: 800;
+    background: linear-gradient(90deg, #00F0FF, #FF0055);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-transform: uppercase;
+}
+
+.top-notif-title {
+    color: white;
+    font-size: 12.5px;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.top-notif-body {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 11.5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* =========================================
+   PEEK INCOMING CALL BANNER (AuraRP Edition)
+   ========================================= */
+
+.peek-call-card {
+    position: absolute;
+    top: 42px;
+    left: 10px;
+    right: 10px;
+    background: rgba(14, 18, 28, 0.96);
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    border-radius: 18px;
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 1500;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.85), 0 0 25px rgba(0, 240, 255, 0.25);
+    border: 1.5px solid transparent;
+    background-image: linear-gradient(rgba(14, 18, 28, 0.96), rgba(14, 18, 28, 0.96)), linear-gradient(135deg, #00F0FF, #FF0055);
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
+    animation: slideDownBanner 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    box-sizing: border-box;
+}
+
+.peek-call-card.hidden {
+    display: none !important;
+}
+
+.peek-call-top {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.peek-call-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #00F0FF, #FF0055);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 15px;
+    flex-shrink: 0;
+    box-shadow: 0 3px 12px rgba(0, 240, 255, 0.4);
+}
+
+@keyframes pulseCallRing {
+    0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 240, 255, 0.7); }
+    50% { transform: scale(1.08); box-shadow: 0 0 0 8px rgba(255, 0, 85, 0); }
+}
+
+.pulsing-ring {
+    animation: pulseCallRing 1.4s infinite ease-in-out;
+}
+
+.peek-call-info {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.peek-call-subtitle {
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.7px;
+    background: linear-gradient(90deg, #00F0FF, #FF0055);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.peek-call-name {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: white;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.peek-call-number {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.65);
+}
+
+.peek-call-actions {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+}
+
+.peek-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 7px 6px;
+    border-radius: 10px;
+    font-size: 10.5px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    user-select: none;
+}
+
+.peek-btn-accept {
+    background: #34C759;
+    color: white;
+    box-shadow: 0 3px 10px rgba(52, 199, 89, 0.4);
+}
+
+.peek-btn-accept:hover {
+    background: #2ebd51;
+    transform: scale(1.02);
+}
+
+.peek-btn-decline {
+    background: #FF3B30;
+    color: white;
+    box-shadow: 0 3px 10px rgba(255, 59, 48, 0.4);
+}
+
+.peek-btn-decline:hover {
+    background: #e63228;
+    transform: scale(1.02);
+}

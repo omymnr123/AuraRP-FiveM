@@ -24,7 +24,17 @@ const AuraAppsRegistry = [
         icon: "fas fa-camera",
         colorClass: "bg-camera",
         inDock: true,
-        isSystem: true
+        isSystem: true,
+        script: "AuraCameraApp"
+    },
+    {
+        id: "app-gallery",
+        name: "Fotos",
+        icon: "fas fa-images",
+        colorClass: "bg-gallery",
+        inDock: false,
+        isSystem: true,
+        script: "AuraGalleryApp"
     },
     {
         id: "app-bank",

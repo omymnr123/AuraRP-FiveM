@@ -232,6 +232,11 @@ const AuraMessagesApp = {
         }
     },
 
+    openChatDirectly: function(targetNumber, contactName) {
+        if (!targetNumber) return;
+        this.openActiveChat(null, targetNumber, contactName || targetNumber);
+    },
+
     openActiveChat: function(chatId, number, name) {
         this.currentChatId = chatId;
         this.targetNumber = number;

@@ -233,9 +233,12 @@ const AuraContactsApp = {
             favSection.classList.remove('hidden');
             favorites.forEach(fav => {
                 const initial = fav.contact_name.charAt(0).toUpperCase();
+                const avatarHtml = fav.avatar_url 
+                    ? `<img src="${fav.avatar_url}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">` 
+                    : initial;
                 favList.innerHTML += `
                     <div class="contacts-fav-card" onclick="AuraContactsApp.openDetailView(${fav.id})">
-                        <div class="fav-card-avatar">${initial}</div>
+                        <div class="fav-card-avatar">${avatarHtml}</div>
                         <span class="fav-card-name">${fav.contact_name}</span>
                     </div>
                 `;
@@ -254,6 +257,7 @@ const AuraContactsApp = {
         });
 
         const sortedKeys = Object.keys(grouped).sort();
+        let alphabetHtml = '';
         sortedKeys.forEach(letter => {
             let letterGroupHtml = `
                 <div class="contacts-letter-group">
@@ -263,11 +267,14 @@ const AuraContactsApp = {
 
             grouped[letter].forEach(contact => {
                 const initial = contact.contact_name.charAt(0).toUpperCase();
+                const avatarHtml = contact.avatar_url 
+                    ? `<img src="${contact.avatar_url}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">` 
+                    : initial;
                 const star = contact.is_favorite == 1 ? '<i class="fas fa-star" style="color:#FFD700; margin-left:auto; font-size:12px;"></i>' : '';
                 
                 letterGroupHtml += `
                     <div class="contacts-row-item" onclick="AuraContactsApp.openDetailView(${contact.id})">
-                        <div class="contacts-row-avatar">${initial}</div>
+                        <div class="contacts-row-avatar">${avatarHtml}</div>
                         <div class="contacts-row-info">
                             <span class="contacts-row-name">${contact.contact_name}</span>
                             <span class="contacts-row-num">${contact.contact_number}</span>
@@ -278,8 +285,9 @@ const AuraContactsApp = {
             });
 
             letterGroupHtml += `</div></div>`;
-            alphabetContainer.innerHTML += letterGroupHtml;
+            alphabetHtml += letterGroupHtml;
         });
+        alphabetContainer.innerHTML = alphabetHtml;
     },
 
     filterContacts: function(query) {
@@ -302,7 +310,14 @@ const AuraContactsApp = {
         if (!contact) return;
         this.currentContact = contact;
 
-        document.getElementById('detail-avatar').innerText = contact.contact_name.charAt(0).toUpperCase();
+        const avatarElem = document.getElementById('detail-avatar');
+        if (avatarElem) {
+            if (contact.avatar_url) {
+                avatarElem.innerHTML = `<img src="${contact.avatar_url}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`;
+            } else {
+                avatarElem.innerText = contact.contact_name.charAt(0).toUpperCase();
+            }
+        }
         document.getElementById('detail-name').innerText = contact.contact_name;
         document.getElementById('detail-number').innerText = contact.contact_number;
         document.getElementById('detail-card-number').innerText = contact.contact_number;

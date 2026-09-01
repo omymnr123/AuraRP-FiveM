@@ -11,8 +11,11 @@
 /* Contactos */
 .bg-contacts { background: linear-gradient(135deg, #f2709c, #ff9472); }
 /* Cámara */
-.bg-camera { background: #1a1a24; border: 1px solid #333; }
-.bg-camera i { background: linear-gradient(135deg, #FF0055, #ff758c); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.bg-camera { background: linear-gradient(135deg, #2b2b36, #16161f); border: 1px solid rgba(255,255,255,0.15); }
+.bg-camera i { background: linear-gradient(135deg, #00F0FF, #FF0055); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+/* Galería / Fotos */
+.bg-gallery { background: linear-gradient(135deg, #FF0055, #00F0FF); border: 1px solid rgba(255, 255, 255, 0.2); }
+.bg-gallery i { color: #ffffff; text-shadow: 0 2px 10px rgba(0,0,0,0.3); }
 /* Ajustes */
 .bg-settings { background: linear-gradient(135deg, #8e9eab, #eef2f3); color: #333; }
 /* Twitter / Bleeter */
@@ -352,6 +355,12 @@
     flex-direction: column;
     align-items: center;
     cursor: pointer;
+    user-select: none;
+    transition: transform 0.15s ease;
+}
+
+.call-action-btn:active {
+    transform: scale(0.95);
 }
 
 .call-action-btn i {
@@ -364,22 +373,99 @@
     font-size: 22px;
     color: white;
     margin-bottom: 8px;
-    transition: background 0.2s;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.call-action-btn:active i {
-    background: rgba(255,255,255,0.3);
+.call-action-btn.active i {
+    background: #ffffff !important;
+    color: #0c1017 !important;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.75), 0 0 35px rgba(0, 240, 255, 0.5);
+    transform: scale(1.05);
+}
+
+.call-action-btn.active span {
+    color: #00F0FF !important;
+    font-weight: 700;
 }
 
 .call-action-btn span {
-    font-size: 11px;
+    font-size: 11.5px;
     color: rgba(255,255,255,0.8);
+    transition: color 0.2s;
+}
+
+/* Teclado numérico dentro de llamada (In-Call Keypad) */
+.in-call-keypad-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: auto;
+    margin-top: 25px;
+    animation: fadeIn 0.25s ease-out;
+}
+
+.in-call-dtmf-display {
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    margin-bottom: 6px;
+}
+
+.in-call-dial-pad {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.in-call-dial-pad .dial-btn {
+    width: 54px;
+    height: 54px;
+    font-size: 20px;
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(10px);
+    border-radius: 50%;
+    margin: 2px 8px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.in-call-dial-pad .dial-btn:active {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.in-call-dial-pad .dial-btn span {
+    font-size: 8px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.in-call-hide-keypad-btn {
+    margin-top: 14px;
+    color: #00F0FF;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    padding: 7px 18px;
+    border-radius: 14px;
+    background: rgba(0, 240, 255, 0.12);
+    border: 1px solid rgba(0, 240, 255, 0.3);
+    transition: all 0.2s;
+    user-select: none;
+}
+
+.in-call-hide-keypad-btn:hover {
+    background: rgba(0, 240, 255, 0.25);
+    transform: scale(1.04);
 }
 
 .call-end-container {
     display: flex;
     justify-content: center;
     gap: 30px;
+    margin-top: 20px;
 }
 
 .end-btn {
@@ -2158,6 +2244,750 @@
     font-size: 11px;
     margin: 15px 0 25px 0;
     line-height: 1.4;
+}
+
+/* ===================================================
+   AURA GALLERY APP (FOTOS & MULTIMEDIA)
+   =================================================== */
+.gallery-window {
+    background: #0a0c12;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+.gallery-header {
+    padding: 46px 18px 14px 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(15, 18, 25, 0.7);
+    backdrop-filter: blur(15px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    z-index: 10;
+}
+
+.gallery-header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 20px;
+    font-weight: 800;
+    color: white;
+}
+
+.gallery-header-icon {
+    font-size: 20px;
+    background: linear-gradient(135deg, #FF0055, #00F0FF);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.gallery-header-stats {
+    font-size: 12px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.08);
+    padding: 4px 10px;
+    border-radius: 12px;
+}
+
+.gallery-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px;
+    position: relative;
+}
+
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+}
+
+.gallery-item-card {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    border-radius: 10px;
+    overflow: hidden;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s;
+}
+
+.gallery-item-card:hover {
+    transform: scale(1.03);
+    border-color: rgba(0, 240, 255, 0.4);
+    box-shadow: 0 4px 15px rgba(0, 240, 255, 0.2);
+    z-index: 2;
+}
+
+.gallery-item-card:active {
+    transform: scale(0.96);
+}
+
+.gallery-item-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.gallery-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 60px 20px;
+    color: white;
+}
+
+.gallery-empty-state .empty-icon-circle {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background: rgba(255, 0, 85, 0.1);
+    border: 1px solid rgba(255, 0, 85, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    color: #FF0055;
+    margin-bottom: 16px;
+    box-shadow: 0 0 20px rgba(255, 0, 85, 0.2);
+}
+
+.gallery-empty-state h3 {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 6px;
+}
+
+.gallery-empty-state p {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.5);
+    margin-bottom: 20px;
+    line-height: 1.4;
+}
+
+.btn-open-camera {
+    background: linear-gradient(135deg, #00F0FF, #0077ff);
+    color: #0c1017;
+    font-weight: 700;
+    font-size: 13px;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 15px rgba(0, 240, 255, 0.3);
+    transition: transform 0.15s;
+}
+
+.btn-open-camera:active {
+    transform: scale(0.95);
+}
+
+/* ===================================================
+   FULLSCREEN PHOTO VIEWER & ACTION SHEET
+   =================================================== */
+.gallery-fullscreen-view {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: #000000;
+    z-index: 50;
+    display: flex;
+    flex-direction: column;
+    animation: fadeIn 0.2s ease-out;
+}
+
+.gallery-fs-topbar {
+    padding: 44px 16px 12px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, transparent 100%);
+    z-index: 10;
+}
+
+.fs-nav-btn {
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 14px;
+    cursor: pointer;
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.fs-nav-close {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+.fs-photo-date {
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.gallery-fs-img-container {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    padding: 10px 0;
+}
+
+.gallery-fs-img-container img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    border-radius: 4px;
+}
+
+/* iOS-Style Bottom Action Sheet */
+.gallery-action-sheet {
+    background: rgba(20, 24, 34, 0.92);
+    backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 24px 24px 0 0;
+    padding: 12px 16px 28px 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.6);
+}
+
+.sheet-handle {
+    width: 36px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 2px;
+    margin-bottom: 14px;
+}
+
+.sheet-actions-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    width: 100%;
+}
+
+.sheet-action-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    cursor: pointer;
+    user-select: none;
+    transition: transform 0.15s;
+}
+
+.sheet-action-item:active {
+    transform: scale(0.92);
+}
+
+.sheet-action-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 19px;
+    color: white;
+    margin-bottom: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.sheet-action-item span {
+    font-size: 10px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.85);
+    line-height: 1.2;
+}
+
+.wallpaper-icon {
+    background: linear-gradient(135deg, #00F0FF, #0077ff);
+}
+
+.contact-icon {
+    background: linear-gradient(135deg, #8A2387, #E94057, #F27121);
+}
+
+.share-icon {
+    background: linear-gradient(135deg, #38ef7d, #11998e);
+}
+
+.delete-icon {
+    background: linear-gradient(135deg, #FF0055, #cc0044);
+}
+
+.delete-action span {
+    color: #FF0055;
+}
+
+/* ===================================================
+   CONTACT PICKER MODAL
+   =================================================== */
+.gallery-picker-modal {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    z-index: 60;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+
+.picker-modal-backdrop {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+}
+
+.picker-modal-content {
+    position: relative;
+    background: #141822;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 20px 20px 0 0;
+    padding: 16px;
+    max-height: 65%;
+    display: flex;
+    flex-direction: column;
+    z-index: 2;
+    animation: slideUpModal 0.25s ease-out;
+}
+
+.picker-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+    margin-bottom: 12px;
+}
+
+.picker-modal-header h3 {
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.picker-modal-header button {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.picker-search-box {
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 8px 12px;
+    margin-bottom: 12px;
+    color: white;
+}
+
+.picker-search-box i {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.5);
+    margin-right: 8px;
+}
+
+.picker-search-box input {
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 13px;
+    outline: none;
+    width: 100%;
+}
+
+.picker-contacts-list {
+    overflow-y: auto;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.picker-contact-row {
+    display: flex;
+    align-items: center;
+    padding: 8px 10px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.picker-contact-row:hover {
+    background: rgba(0, 240, 255, 0.1);
+    border-color: rgba(0, 240, 255, 0.3);
+}
+
+.picker-contact-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #00F0FF, #FF0055);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: white;
+    font-size: 14px;
+    margin-right: 12px;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.picker-contact-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.picker-contact-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.picker-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: white;
+}
+
+.picker-num {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.picker-select-icon {
+    color: #00F0FF;
+    font-size: 14px;
+    opacity: 0;
+    transition: opacity 0.15s;
+}
+
+.picker-contact-row:hover .picker-select-icon {
+    opacity: 1;
+}
+
+/* ===================================================
+   AURA IN-PHONE CAMERA (TRANSPARENT VIEWPORT)
+   =================================================== */
+#phone-container.camera-mode-active .phone-hardware {
+    background: transparent !important;
+    box-shadow: inset 0 0 0 12px #000, inset 0 0 15px rgba(255, 255, 255, 0.2), 0 0 0 2px #1a1a24 !important;
+}
+
+#phone-container.camera-mode-active .phone-screen {
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+#phone-container.camera-mode-active .phone-screen::before {
+    display: none !important;
+}
+
+#phone-container.camera-mode-active #home-screen,
+#phone-container.camera-mode-active #lock-screen,
+#phone-container.camera-mode-active #control-center {
+    display: none !important;
+}
+
+#phone-container.camera-mode-active #apps-container {
+    background: transparent !important;
+}
+
+#phone-container.camera-mode-active .app-window:not(#app-camera-window) {
+    display: none !important;
+}
+
+.camera-in-phone-window {
+    background: transparent !important;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
+    position: relative;
+}
+
+.camera-flash-screen {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: #ffffff;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 100;
+}
+
+.camera-flash-screen.flash-screen-active {
+    opacity: 0.95;
+    transition: opacity 0.25s ease-out;
+}
+
+.cam-in-phone-topbar {
+    padding: 48px 18px 10px 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(180deg, rgba(0,0,0,0.6) 0%, transparent 100%);
+    z-index: 10;
+}
+
+.cam-icon-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.cam-icon-btn.active {
+    background: #FFD700;
+    color: #000000;
+    border-color: #FFD700;
+    box-shadow: 0 0 12px rgba(255, 215, 0, 0.5);
+}
+
+.cam-hdr-pill {
+    padding: 4px 12px;
+    background: rgba(0, 240, 255, 0.15);
+    border: 1px solid rgba(0, 240, 255, 0.4);
+    border-radius: 14px;
+    backdrop-filter: blur(8px);
+}
+
+.cam-hdr-pill span {
+    font-size: 10px;
+    font-weight: 800;
+    color: #00F0FF;
+    letter-spacing: 1.5px;
+}
+
+.cam-in-phone-viewfinder {
+    flex: 1;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+}
+
+.cam-viewfinder-grid {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    pointer-events: none;
+}
+
+.v-line { position: absolute; top: 0; bottom: 0; width: 1px; background: rgba(255, 255, 255, 0.18); }
+.v-1 { left: 33.33%; }
+.v-2 { left: 66.66%; }
+.h-line { position: absolute; left: 0; right: 0; height: 1px; background: rgba(255, 255, 255, 0.18); }
+.h-1 { top: 33.33%; }
+.h-2 { top: 66.66%; }
+
+.cam-focus-reticle {
+    width: 65px;
+    height: 65px;
+    border: 1.5px solid rgba(255, 215, 0, 0.7);
+    border-radius: 8px;
+    box-shadow: 0 0 12px rgba(255, 215, 0, 0.3);
+    animation: pulseFocus 2s infinite;
+}
+
+.cam-mode-indicator {
+    position: absolute;
+    bottom: 6px;
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    padding: 3px 12px;
+    border-radius: 12px;
+}
+
+.cam-mode-indicator span {
+    font-size: 10px;
+    font-weight: 800;
+    color: #00F0FF;
+    letter-spacing: 1px;
+}
+
+.cam-zoom-selector {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    z-index: 10;
+}
+
+.zoom-pill {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    font-size: 10.5px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.zoom-pill.active {
+    background: #FFD700;
+    color: #0c1017;
+    font-weight: 800;
+    border-color: #FFD700;
+    box-shadow: 0 0 12px rgba(255, 215, 0, 0.5);
+    transform: scale(1.12);
+}
+
+.zoom-pill:active {
+    transform: scale(0.92);
+}
+
+.cam-in-phone-bottombar {
+    padding: 10px 22px 35px 22px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(0deg, rgba(0,0,0,0.7) 0%, transparent 100%);
+    z-index: 10;
+}
+
+.cam-gallery-preview-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 2px solid rgba(255, 255, 255, 0.6);
+    cursor: pointer;
+    background: #111;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    transition: transform 0.15s;
+}
+
+.cam-gallery-preview-btn:hover {
+    transform: scale(1.06);
+    border-color: #00F0FF;
+}
+
+.cam-gallery-preview-btn:active {
+    transform: scale(0.92);
+}
+
+.cam-gallery-preview-btn img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.cam-shutter-button-outer {
+    width: 66px;
+    height: 66px;
+    border-radius: 50%;
+    border: 4px solid #00F0FF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 0 20px rgba(0, 240, 255, 0.5);
+    transition: transform 0.15s;
+}
+
+.cam-shutter-button-outer:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 28px rgba(0, 240, 255, 0.75);
+}
+
+.cam-shutter-button-outer:active {
+    transform: scale(0.92);
+}
+
+.cam-shutter-button-inner {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: #ffffff;
+    transition: transform 0.1s, background 0.1s;
+}
+
+.cam-shutter-button-inner.shutter-clicked {
+    transform: scale(0.85);
+    background: #00F0FF;
+}
+
+.cam-flip-camera-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.18);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cam-flip-camera-btn:hover {
+    transform: scale(1.06);
+    background: rgba(255, 255, 255, 0.28);
+}
+
+.cam-flip-camera-btn.rotating {
+    transform: rotate(180deg) scale(1.15);
+}
+
+.cam-flip-camera-btn:active {
+    transform: scale(0.9);
+}
+
+@keyframes slideUpModal {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
 }
 
 

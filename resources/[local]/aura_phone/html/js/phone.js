@@ -1,8 +1,59 @@
-// Módulo aislado para la aplicación de Teléfono / Llamadas
 const AuraPhoneApp = {
     currentCallNumber: null,
     callTimerInterval: null,
     callSeconds: 0,
+    activeAudio: null,
+    isMuted: false,
+    isSpeakerOn: false,
+    inCallDTMFDigits: "",
+
+    stopActiveAudio: function() {
+        if (this.activeAudio) {
+            try {
+                this.activeAudio.pause();
+                this.activeAudio.currentTime = 0;
+                this.activeAudio.src = "";
+            } catch (e) {}
+            this.activeAudio = null;
+        }
+    },
+
+    playDTMFTone: function(digit) {
+        const dtmfFreqs = {
+            '1': [697, 1209], '2': [697, 1336], '3': [697, 1477],
+            '4': [770, 1209], '5': [770, 1336], '6': [770, 1477],
+            '7': [852, 1209], '8': [852, 1336], '9': [852, 1477],
+            '*': [941, 1209], '0': [941, 1336], '#': [941, 1477]
+        };
+        const freqs = dtmfFreqs[digit];
+        if (!freqs) return;
+
+        try {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc1 = ctx.createOscillator();
+            const osc2 = ctx.createOscillator();
+            const gain = ctx.createGain();
+
+            osc1.type = 'sine';
+            osc2.type = 'sine';
+            osc1.frequency.value = freqs[0];
+            osc2.frequency.value = freqs[1];
+
+            const vol = (window.AuraCore && AuraCore.settings && AuraCore.settings.volume_msg) ? (AuraCore.settings.volume_msg / 100) * 0.12 : 0.12;
+            gain.gain.setValueAtTime(vol, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.12);
+
+            osc1.connect(gain);
+            osc2.connect(gain);
+            gain.connect(ctx.destination);
+
+            osc1.start();
+            osc2.start();
+            osc1.stop(ctx.currentTime + 0.12);
+            osc2.stop(ctx.currentTime + 0.12);
+            setTimeout(() => { ctx.close(); }, 200);
+        } catch (e) {}
+    },
     
     getHTML: function() {
         return `
@@ -105,10 +156,43 @@ const AuraPhoneApp = {
                         <p id="call-status">Llamando...</p>
                     </div>
                     
-                    <div class="call-actions-grid">
-                        <div class="call-action-btn"><i class="fas fa-microphone-slash"></i><span>Silenciar</span></div>
-                        <div class="call-action-btn"><i class="fas fa-th"></i><span>Teclado</span></div>
-                        <div class="call-action-btn"><i class="fas fa-volume-up"></i><span>Altavoz</span></div>
+                    <!-- Vista 1: Grid de Acciones de Llamada -->
+                    <div id="in-call-actions-view" class="call-actions-grid">
+                        <div class="call-action-btn" id="call-btn-mute" onclick="AuraPhoneApp.toggleMute()"><i class="fas fa-microphone-slash"></i><span>Silenciar</span></div>
+                        <div class="call-action-btn" id="call-btn-keypad" onclick="AuraPhoneApp.toggleInCallKeypad(true)"><i class="fas fa-th"></i><span>Teclado</span></div>
+                        <div class="call-action-btn" id="call-btn-speaker" onclick="AuraPhoneApp.toggleSpeaker()"><i class="fas fa-volume-up"></i><span>Altavoz</span></div>
+                    </div>
+
+                    <!-- Vista 2: Teclado numérico durante la llamada (DTMF) -->
+                    <div id="in-call-keypad-view" class="in-call-keypad-container hidden">
+                        <div class="in-call-dtmf-display">
+                            <span id="in-call-dtmf-digits"></span>
+                        </div>
+                        <div class="dial-pad in-call-dial-pad">
+                            <div class="dial-row">
+                                <div class="dial-btn" onclick="AuraPhoneApp.pressInCallDTMF('1')">1</div>
+                                <div class="dial-btn" onclick="AuraPhoneApp.pressInCallDTMF('2')">2<span>ABC</span></div>
+                                <div class="dial-btn" onclick="AuraPhoneApp.pressInCallDTMF('3')">3<span>DEF</span></div>
+                            </div>
+                            <div class="dial-row">
+                                <div class="dial-btn" onclick="AuraPhoneApp.pressInCallDTMF('4')">4<span>GHI</span></div>
+                                <div class="dial-btn" onclick="AuraPhoneApp.pressInCallDTMF('5')">5<span>JKL</span></div>
+                                <div class="dial-btn" onclick="AuraPhoneApp.pressInCallDTMF('6')">6<span>MNO</span></div>
+                            </div>
+                            <div class="dial-row">
+                                <div class="dial-btn" onclick="AuraPhoneApp.pressInCallDTMF('7')">7<span>PQRS</span></div>
+                                <div class="dial-btn" onclick="AuraPhoneApp.pressInCallDTMF('8')">8<span>TUV</span></div>
+                                <div class="dial-btn" onclick="AuraPhoneApp.pressInCallDTMF('9')">9<span>WXYZ</span></div>
+                            </div>
+                            <div class="dial-row">
+                                <div class="dial-btn" onclick="AuraPhoneApp.pressInCallDTMF('*')">*</div>
+                                <div class="dial-btn" onclick="AuraPhoneApp.pressInCallDTMF('0')">0<span>+</span></div>
+                                <div class="dial-btn" onclick="AuraPhoneApp.pressInCallDTMF('#')">#</div>
+                            </div>
+                        </div>
+                        <div class="in-call-hide-keypad-btn" onclick="AuraPhoneApp.toggleInCallKeypad(false)">
+                            <span>Ocultar</span>
+                        </div>
                     </div>
 
                     <div class="call-end-container">
@@ -128,6 +212,7 @@ const AuraPhoneApp = {
     },
 
     addNumber: function(num) {
+        this.playDTMFTone(num);
         const display = document.getElementById('dial-number-text');
         if (display.innerText.length < 15) {
             display.innerText += num;
@@ -137,6 +222,73 @@ const AuraPhoneApp = {
     removeNumber: function() {
         const display = document.getElementById('dial-number-text');
         display.innerText = display.innerText.slice(0, -1);
+    },
+
+    // =========================================
+    // ACCIONES EN LLAMADA: MUTE, ALTAVOZ, TECLADO
+    // =========================================
+
+    toggleMute: function() {
+        this.isMuted = !this.isMuted;
+        const btn = document.getElementById('call-btn-mute');
+        if (btn) {
+            if (this.isMuted) {
+                btn.classList.add('active');
+                btn.querySelector('span').innerText = 'Silenciado';
+            } else {
+                btn.classList.remove('active');
+                btn.querySelector('span').innerText = 'Silenciar';
+            }
+        }
+        fetch(`https://${GetParentResourceName()}/toggleMute`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ muted: this.isMuted })
+        });
+    },
+
+    toggleSpeaker: function() {
+        this.isSpeakerOn = !this.isSpeakerOn;
+        const btn = document.getElementById('call-btn-speaker');
+        if (btn) {
+            if (this.isSpeakerOn) {
+                btn.classList.add('active');
+                btn.querySelector('span').innerText = 'Altavoz On';
+            } else {
+                btn.classList.remove('active');
+                btn.querySelector('span').innerText = 'Altavoz';
+            }
+        }
+        fetch(`https://${GetParentResourceName()}/toggleSpeaker`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ enabled: this.isSpeakerOn })
+        });
+    },
+
+    toggleInCallKeypad: function(show) {
+        const keypadView = document.getElementById('in-call-keypad-view');
+        const actionsView = document.getElementById('in-call-actions-view');
+        if (!keypadView || !actionsView) return;
+        
+        if (show === undefined) {
+            show = keypadView.classList.contains('hidden');
+        }
+
+        if (show) {
+            actionsView.classList.add('hidden');
+            keypadView.classList.remove('hidden');
+        } else {
+            keypadView.classList.add('hidden');
+            actionsView.classList.remove('hidden');
+        }
+    },
+
+    pressInCallDTMF: function(digit) {
+        this.playDTMFTone(digit);
+        this.inCallDTMFDigits += digit;
+        const display = document.getElementById('in-call-dtmf-digits');
+        if (display) display.innerText = this.inCallDTMFDigits;
     },
 
     // Iniciar llamada (saliente)
@@ -159,15 +311,18 @@ const AuraPhoneApp = {
                 // Si el número no existe o está apagado, simulamos el fallo realista
                 document.getElementById('call-status').innerText = data.message || "Número no disponible";
                 
-                // Reproducir el audio de la operadora si existe
-                if (data.audio) {
-                    console.log("Intentando reproducir audio:", data.audio);
+                // Reproducir el audio de la operadora si existe, SOLO si no hemos colgado
+                if (data.audio && this.currentCallNumber === number) {
+                    this.stopActiveAudio();
                     const audio = new Audio(`../audio/${data.audio}`);
-                    audio.volume = 0.5;
+                    const volume = (window.AuraCore && AuraCore.settings && AuraCore.settings.volume_ring) ? (AuraCore.settings.volume_ring / 100) : 0.5;
+                    audio.volume = Math.max(0.1, Math.min(1.0, volume));
+                    this.activeAudio = audio;
                     audio.play().catch(e => console.log("Error al reproducir audio:", e));
                     
                     // Cerrar la pantalla dinámicamente cuando el audio termine de hablar
                     audio.onended = () => {
+                        this.stopActiveAudio();
                         if (this.currentCallNumber === number) {
                             this.hideActiveCallScreen();
                         }
@@ -203,25 +358,56 @@ const AuraPhoneApp = {
 
     // Aceptar llamada entrante
     acceptCall: function() {
+        this.stopActiveAudio();
+        this.startTimer();
+        const btnAccept = document.getElementById('btn-accept-call');
+        if (btnAccept) btnAccept.classList.add('hidden');
+
         fetch(`https://${GetParentResourceName()}/acceptCall`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({})
         });
-        document.getElementById('btn-accept-call').classList.add('hidden');
     },
 
     // Finalizar/Rechazar llamada
     endCall: function() {
+        this.stopActiveAudio();
+        this.hideActiveCallScreen();
         fetch(`https://${GetParentResourceName()}/endCall`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({})
         });
-        this.hideActiveCallScreen();
     },
 
     hideActiveCallScreen: function() {
+        this.stopActiveAudio();
+        
+        // Resetear estados y vistas de llamada
+        this.isMuted = false;
+        this.isSpeakerOn = false;
+        this.inCallDTMFDigits = "";
+        
+        const btnMute = document.getElementById('call-btn-mute');
+        if (btnMute) {
+            btnMute.classList.remove('active');
+            const span = btnMute.querySelector('span');
+            if (span) span.innerText = 'Silenciar';
+        }
+        
+        const btnSpeaker = document.getElementById('call-btn-speaker');
+        if (btnSpeaker) {
+            btnSpeaker.classList.remove('active');
+            const span = btnSpeaker.querySelector('span');
+            if (span) span.innerText = 'Altavoz';
+        }
+
+        this.toggleInCallKeypad(false);
+
+        const dtmfDisplay = document.getElementById('in-call-dtmf-digits');
+        if (dtmfDisplay) dtmfDisplay.innerText = '';
+
         document.getElementById('active-call-overlay').classList.add('hidden');
         this.stopTimer();
         this.currentCallNumber = null;
@@ -398,15 +584,17 @@ const AuraPhoneApp = {
     // Recepción de eventos desde el cliente (Lua)
     handleIncomingEvent: function(action, data) {
         if (action === "incomingCall") {
-            this.showActiveCallScreen(data.number, "Llamada Entrante", false);
+            this.showActiveCallScreen(data.number, data.callerName || data.number || "Llamada Entrante", false);
         } else if (action === "callConnected") {
             this.startTimer();
-            document.getElementById('btn-accept-call').classList.add('hidden');
+            const btnAccept = document.getElementById('btn-accept-call');
+            if (btnAccept) btnAccept.classList.add('hidden');
         } else if (action === "callEnded") {
-            document.getElementById('call-status').innerText = data.reason || "Llamada finalizada";
+            const statusEl = document.getElementById('call-status');
+            if (statusEl) statusEl.innerText = data.reason || "Llamada finalizada";
             setTimeout(() => {
                 this.hideActiveCallScreen();
-            }, 2000);
+            }, 1000);
         }
     }
 };
@@ -416,12 +604,6 @@ window.addEventListener('message', (event) => {
     const data = event.data;
     if (["incomingCall", "callConnected", "callEnded"].includes(data.action)) {
         AuraPhoneApp.handleIncomingEvent(data.action, data);
-        
-        // Si hay una llamada entrante y el teléfono está cerrado, forzar apertura
-        if (data.action === "incomingCall" && !AuraCore.isOpen) {
-            AuraCore.openPhone();
-            AuraCore.openApp('app-phone');
-        }
     }
 });
 

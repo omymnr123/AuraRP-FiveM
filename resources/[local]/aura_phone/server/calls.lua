@@ -53,6 +53,27 @@ lib.callback.register('aura_phone:server:dialNumber', function(source, targetNum
     return true, "Llamando..."
 end)
 
+-- Iniciar Llamada de Prueba / Simulada
+RegisterNetEvent('aura_phone:server:startTestCall', function(callerName, callerNumber)
+    local src = source
+    local myNumber = AuraPhone.GetPlayerPhoneNumber(src) or "555-0000"
+    local cNumber = callerNumber or "555-0199"
+    local cName = callerName or "Michael De Santa"
+    
+    AuraPhone.CallData[src] = {
+        target = -1,
+        channel = math.random(10000, 99999),
+        status = 'ringing',
+        isCaller = false,
+        number = myNumber,
+        targetNumber = cNumber,
+        startTime = 0,
+        isSimulated = true
+    }
+
+    TriggerClientEvent('aura_phone:client:incomingCall', src, cNumber, cName)
+end)
+
 -- Aceptar Llamada
 RegisterNetEvent('aura_phone:server:acceptCall', function()
     local src = source
@@ -63,14 +84,17 @@ RegisterNetEvent('aura_phone:server:acceptCall', function()
         data.status = 'active'
         data.startTime = now
         
-        if AuraPhone.CallData[data.target] then
+        if data.target and data.target ~= -1 and AuraPhone.CallData[data.target] then
             AuraPhone.CallData[data.target].status = 'active'
             AuraPhone.CallData[data.target].startTime = now
+            TriggerClientEvent('aura_phone:client:callAccepted', data.target, data.channel)
         end
 
-        -- Ordenar a ambos clientes que cambien al canal de pma-voice
+        -- Ordenar a este cliente que cambie al canal
         TriggerClientEvent('aura_phone:client:callAccepted', src, data.channel)
-        TriggerClientEvent('aura_phone:client:callAccepted', data.target, data.channel)
+    else
+        -- Fallback seguro para llamadas simuladas o sin estado
+        TriggerClientEvent('aura_phone:client:callAccepted', src, math.random(10000, 99999))
     end
 end)
 
@@ -85,35 +109,34 @@ RegisterNetEvent('aura_phone:server:endCall', function()
         local finalStatus = 'missed'
         
         if data.status == 'active' then
-            duration = os.time() - data.startTime
+            duration = data.startTime > 0 and (os.time() - data.startTime) or 0
             finalStatus = 'answered'
         elseif data.status == 'ringing' and not data.isCaller then
             finalStatus = 'declined'
         end
 
-        -- Solo el que inició la llamada registra en la DB para no duplicar (o quien corte si el otro no está)
-        if data.isCaller then
+        -- Solo registrar si no es llamada simulada y es el llamante
+        if not data.isSimulated and data.isCaller then
             MySQL.insert('INSERT INTO aura_phone_calls (caller_number, receiver_number, status, duration) VALUES (?, ?, ?, ?)', {
                 data.number, data.targetNumber, finalStatus, duration
             })
         end
         
-        -- Limpiar servidor
         AuraPhone.CallData[src] = nil
-        if targetSrc and AuraPhone.CallData[targetSrc] then
-            -- Si el target era el llamante y el receptor rechazó/colgó primero
-            if AuraPhone.CallData[targetSrc].isCaller then
+        if targetSrc and targetSrc ~= -1 and AuraPhone.CallData[targetSrc] then
+            if not AuraPhone.CallData[targetSrc].isSimulated and AuraPhone.CallData[targetSrc].isCaller then
                 MySQL.insert('INSERT INTO aura_phone_calls (caller_number, receiver_number, status, duration) VALUES (?, ?, ?, ?)', {
                     AuraPhone.CallData[targetSrc].number, AuraPhone.CallData[targetSrc].targetNumber, finalStatus, duration
                 })
             end
             AuraPhone.CallData[targetSrc] = nil
-            -- Avisar al otro cliente
-            TriggerClientEvent('aura_phone:client:callEnded', targetSrc)
+            TriggerClientEvent('aura_phone:client:callEnded', targetSrc, "Llamada finalizada")
         end
         
-        -- Avisar a este cliente
-        TriggerClientEvent('aura_phone:client:callEnded', src)
+        TriggerClientEvent('aura_phone:client:callEnded', src, "Llamada finalizada")
+    else
+        -- Fallback seguro: siempre enviar callEnded al cliente para que no quede atascado
+        TriggerClientEvent('aura_phone:client:callEnded', src, "Llamada finalizada")
     end
 end)
 
