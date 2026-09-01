@@ -50,16 +50,7 @@ AddEventHandler('aura_appearance:applyAppearance', function(appearance)
         return
     end
 
-    -- Establecer el modelo correcto primero si está especificado
-    if appearance.model then
-        local modelHash = GetHashKey(appearance.model)
-        RequestModel(modelHash)
-        while not HasModelLoaded(modelHash) do Wait(0) end
-        SetPlayerModel(PlayerId(), modelHash)
-        SetModelAsNoLongerNeeded(modelHash)
-    end
-
-    -- Aplicar la apariencia completa usando illenium
+    -- Aplicar la apariencia completa usando illenium (maneja modelo, componentes, props, overlays y blend)
     exports['illenium-appearance']:setPlayerAppearance(appearance)
 
     -- Descongelar jugador

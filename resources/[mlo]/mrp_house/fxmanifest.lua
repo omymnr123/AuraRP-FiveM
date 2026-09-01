@@ -4,3 +4,8 @@ lua54 'yes'
 this_is_a_map 'yes'
 
 data_file 'DLC_ITYP_REQUEST' 'stream/ytyps/mrp_house.ytyp'
+data_file 'DLC_ITYP_REQUEST' 'stream/nights_lods/indust_02_metadata_004_strm.ytyp'
+data_file 'DLC_ITYP_REQUEST' 'stream/nights_lods/indust_02_metadata_010_strm.ytyp'
+data_file 'DLC_ITYP_REQUEST' 'stream/nights_lods/indust_02_metadata_011_strm.ytyp'
+data_file 'DLC_ITYP_REQUEST' 'stream/nights_lods/indust_02_metadata_013_strm.ytyp'
+data_file 'DLC_ITYP_REQUEST' 'stream/nights_lods/indust_02_metadata_014_strm.ytyp'

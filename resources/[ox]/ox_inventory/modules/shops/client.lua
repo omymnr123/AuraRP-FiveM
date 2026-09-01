@@ -38,6 +38,7 @@ local function onEnterShop(point)
 
 		local entity = CreatePed(0, model, point.coords.x, point.coords.y, point.coords.z, point.heading, false, true)
 
+		SetEntityAsMissionEntity(entity, true, true)
 		if point.scenario then TaskStartScenarioInPlace(entity, point.scenario, 0, true) end
 
 		SetModelAsNoLongerNeeded(model)

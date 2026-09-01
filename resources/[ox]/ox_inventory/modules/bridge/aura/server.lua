@@ -1,5 +1,14 @@
 local Inventory = require 'modules.inventory.server'
 
+local function GetPlayerJobGroups(charId)
+    if not charId then return {} end
+    local row = MySQL.single.await('SELECT job, job_grade FROM characters WHERE id = ?', { charId })
+    if row and row.job then
+        return { [row.job] = tonumber(row.job_grade) or 0 }
+    end
+    return {}
+end
+
 -- Evento al seleccionar personaje desde aura_multichar
 AddEventHandler('aura_economy:server:characterLoaded', function(arg1, arg2, arg3)
     local src, charId, accounts
@@ -16,11 +25,13 @@ AddEventHandler('aura_economy:server:characterLoaded', function(arg1, arg2, arg3
     src = tonumber(src)
     if not src or not charId then return end
 
+    local groups = GetPlayerJobGroups(charId)
+
     local player = {
         source = src,
         identifier = tostring(charId),
         name = GetPlayerName(src) or ('Character %s'):format(charId),
-        groups = {}
+        groups = groups
     }
 
     server.setPlayerInventory(player, nil)
@@ -32,6 +43,14 @@ AddEventHandler('aura_economy:server:characterLoaded', function(arg1, arg2, arg3
     end
 end)
 
+-- Sincronización en vivo cuando aura_jobs actualiza el trabajo de un jugador
+AddEventHandler('aura_jobs:server:jobUpdated', function(src, job, grade)
+    local inv = Inventory(src)
+    if inv and inv.player then
+        inv.player.groups = { [job] = tonumber(grade) or 0 }
+    end
+end)
+
 -- Auto-inicialización si el recurso se reinicia con jugadores conectados
 CreateThread(function()
     Wait(500)
@@ -40,11 +59,12 @@ CreateThread(function()
         if src then
             local multicharActive = exports.aura_multichar and exports.aura_multichar:GetActiveCharacter(src)
             if multicharActive and multicharActive.id then
+                local groups = GetPlayerJobGroups(multicharActive.id)
                 local player = {
                     source = src,
                     identifier = tostring(multicharActive.id),
                     name = GetPlayerName(src) or ('Character %s'):format(multicharActive.id),
-                    groups = {}
+                    groups = groups
                 }
                 server.setPlayerInventory(player, nil)
             end
@@ -82,6 +102,12 @@ end
 
 ---@diagnostic disable-next-line: duplicate-set-field
 function server.isPlayerBoss(playerId, group)
+    local multicharActive = exports.aura_multichar and exports.aura_multichar:GetActiveCharacter(playerId)
+    if not multicharActive or not multicharActive.id then return false end
+    local jobRow = MySQL.single.await('SELECT job, job_grade FROM characters WHERE id = ?', { multicharActive.id })
+    if jobRow and jobRow.job == group then
+        return (tonumber(jobRow.job_grade) or 0) >= 3
+    end
     return false
 end
 

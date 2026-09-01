@@ -5,7 +5,8 @@ description 'Aura Core - Connection & Registry System'
 version '1.0.0'
 
 shared_scripts {
-    '@ox_lib/init.lua'
+    '@ox_lib/init.lua',
+    'config.lua'
 }
 
 server_scripts {
@@ -14,5 +15,6 @@ server_scripts {
 }
 
 client_scripts {
-    'client/main.lua'
+    'client/main.lua',
+    'client/world.lua'
 }

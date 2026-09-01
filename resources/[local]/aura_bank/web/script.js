@@ -256,6 +256,18 @@ window.addEventListener('message', (e) => {
         loadTransactions();
         initChart();
         
+        // Manejo de pestaña corporativa exclusiva para jefes/directores
+        const corpNavBtn = document.getElementById('nav-btn-corporate');
+        if (msg.data.isBoss && msg.data.society) {
+            corpNavBtn.style.display = 'flex';
+            document.getElementById('corp-company-name').innerText = `CUENTA: ${msg.data.society.label.toUpperCase()}`;
+            document.getElementById('corp-society-holder').innerText = msg.data.society.label.toUpperCase();
+            document.getElementById('corp-society-name').innerText = `SOCIETY_${msg.data.society.name.toUpperCase()}`;
+            document.getElementById('corp-balance').innerText = formatMoney(msg.data.society.balance || 0);
+        } else {
+            corpNavBtn.style.display = 'none';
+        }
+
         // Reset tabs
         document.querySelectorAll('.nav-btn')[0].click();
     }
@@ -344,3 +356,47 @@ document.getElementById('btn-change-pin').addEventListener('click', async () => 
         showNotification(res ? res.message : "Error al cambiar PIN", true);
     }
 });
+
+// ACCIONES DE BANCA CORPORATIVA (EXCLUSIVO DIRECTORES)
+document.getElementById('btn-corp-deposit').addEventListener('click', async () => {
+    const amountInput = document.getElementById('corp-deposit-amount');
+    const amount = parseFloat(amountInput.value);
+
+    if (isNaN(amount) || amount <= 0) {
+        showNotification('Introduce una cantidad válida.', true);
+        return;
+    }
+
+    const res = await postMessage('corporateDeposit', { amount: amount });
+    if (res && res.success) {
+        showNotification(res.message);
+        amountInput.value = '';
+        if (res.newBalance !== undefined) {
+            document.getElementById('corp-balance').innerText = formatMoney(res.newBalance);
+        }
+    } else {
+        showNotification(res ? res.message : "Error al depositar fondos corporativos", true);
+    }
+});
+
+document.getElementById('btn-corp-withdraw').addEventListener('click', async () => {
+    const amountInput = document.getElementById('corp-withdraw-amount');
+    const amount = parseFloat(amountInput.value);
+
+    if (isNaN(amount) || amount <= 0) {
+        showNotification('Introduce una cantidad válida.', true);
+        return;
+    }
+
+    const res = await postMessage('corporateWithdraw', { amount: amount });
+    if (res && res.success) {
+        showNotification(res.message);
+        amountInput.value = '';
+        if (res.newBalance !== undefined) {
+            document.getElementById('corp-balance').innerText = formatMoney(res.newBalance);
+        }
+    } else {
+        showNotification(res ? res.message : "Error al retirar fondos corporativos", true);
+    }
+});
+

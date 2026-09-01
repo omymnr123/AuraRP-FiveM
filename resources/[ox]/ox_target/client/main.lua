@@ -27,6 +27,7 @@ local currentMenu
 local menuChanged
 local menuHistory = {}
 local nearbyZones
+local isMenuOpen = false
 
 -- Toggle ox_target, instead of holding the hotkey
 local toggleHotkey = GetConvarInt('ox_target:toggleHotkey', 0) == 1
@@ -126,6 +127,7 @@ end
 local function startTargeting()
     if state.isDisabled() or state.isActive() or IsNuiFocused() or IsPauseMenuActive() then return end
 
+    isMenuOpen = false
     state.setActive(true)
     state.setNuiFocus(true, true)
 
@@ -175,14 +177,25 @@ local function startTargeting()
             break
         end
 
-        local screenWidth, screenHeight = GetActiveScreenResolution()
-        local cursorX, cursorY = GetNuiCursorPosition()
-        local screenX = (cursorX and cursorX > 0) and (cursorX / screenWidth) or 0.5
-        local screenY = (cursorY and cursorY > 0) and (cursorY / screenHeight) or 0.5
+        if isMenuOpen then
+            local playerCoords = GetEntityCoords(cache.ped)
+            local targetCoords = currentTarget.coords or (currentTarget.entity and currentTarget.entity > 0 and DoesEntityExist(currentTarget.entity) and GetEntityCoords(currentTarget.entity))
+            if targetCoords and #(playerCoords - targetCoords) > 7.0 then
+                isMenuOpen = false
+                SendNuiMessage('{"event": "leftTarget"}')
+                options:wipe()
+                hasTarget = false
+            end
+            Wait(50)
+        else
+            local screenWidth, screenHeight = GetActiveScreenResolution()
+            local cursorX, cursorY = GetNuiCursorPosition()
+            local screenX = (cursorX and cursorX > 0) and (cursorX / screenWidth) or 0.5
+            local screenY = (cursorY and cursorY > 0) and (cursorY / screenHeight) or 0.5
 
-        local playerCoords = GetEntityCoords(cache.ped)
-        hit, entityHit, endCoords = utils.raycastFromScreen(screenX, screenY, flag, 20)
-        distance = #(playerCoords - endCoords)
+            local playerCoords = GetEntityCoords(cache.ped)
+            hit, entityHit, endCoords = utils.raycastFromScreen(screenX, screenY, flag, 20)
+            distance = #(playerCoords - endCoords)
 
         if entityHit ~= 0 and entityHit ~= lastEntity then
             local success, result = pcall(GetEntityType, entityHit)
@@ -326,21 +339,23 @@ local function startTargeting()
             menuChanged = false
         end
 
-        if toggleHotkey and IsPauseMenuActive() then
-            state.setActive(false)
-        end
+            if toggleHotkey and IsPauseMenuActive() then
+                state.setActive(false)
+            end
 
-        if not hasTarget or hasTarget == 1 then
-            flag = flag == 511 and 26 or 511
-        end
+            if not hasTarget or hasTarget == 1 then
+                flag = flag == 511 and 26 or 511
+            end
 
-        Wait(hit and 20 or 30)
+            Wait(hit and 20 or 30)
+        end
     end
 
     if lastEntity and debug then
         SetEntityDrawOutline(lastEntity, false)
     end
 
+    isMenuOpen = false
     state.setNuiFocus(false)
     SendNuiMessage('{"event": "visible", "state": false}')
     table.wipe(currentTarget)
@@ -434,6 +449,7 @@ RegisterNUICallback('select', function(data, cb)
 
             options:wipe()
         else
+            isMenuOpen = false
             state.setNuiFocus(false)
         end
 
@@ -458,3 +474,9 @@ RegisterNUICallback('select', function(data, cb)
         state.setActive(false)
     end
 end)
+
+RegisterNUICallback('setMenuOpen', function(data, cb)
+    isMenuOpen = data == true
+    cb(1)
+end)
+

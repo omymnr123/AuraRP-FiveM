@@ -80,11 +80,25 @@ lib.callback.register('aura_bank:verifyPin', function(source, inputPin, cardMeta
     
     local name = (row.firstname .. " " .. row.lastname) or "Desconocido"
     local accounts = exports.aura_economy:GetAccounts(row.id)
+    
+    local isBoss, jobName, jobLabel = exports.aura_jobs:IsBoss(src)
+    local societyData = nil
+    if isBoss and jobName then
+        local socBalance = exports.aura_jobs:GetSocietyBalance(jobName)
+        societyData = {
+            name = jobName,
+            label = jobLabel,
+            balance = socBalance
+        }
+    end
+
     return true, {
         targetCharId = row.id,
         accounts = accounts,
         iban = cardMetadata.iban,
-        name = name
+        name = name,
+        isBoss = isBoss,
+        society = societyData
     }
 end)
 
@@ -99,11 +113,117 @@ lib.callback.register('aura_bank:tellerLogin', function(source)
     local name = row and (row.firstname .. " " .. row.lastname) or "Desconocido"
 
     local accounts = exports.aura_economy:GetAccounts(charId)
+
+    local isBoss, jobName, jobLabel = exports.aura_jobs:IsBoss(src)
+    local societyData = nil
+    if isBoss and jobName then
+        local socBalance = exports.aura_jobs:GetSocietyBalance(jobName)
+        societyData = {
+            name = jobName,
+            label = jobLabel,
+            balance = socBalance
+        }
+    end
+
     return true, {
         targetCharId = charId,
         accounts = accounts,
         iban = iban,
-        name = name
+        name = name,
+        isBoss = isBoss,
+        society = societyData
+    }
+end)
+
+-- ============================================================================
+-- BANCA CORPORATIVA: DEPÓSITO Y RETIRADA DE EFECTIVO FÍSICO (EXCLUSIVO BOSS)
+-- ============================================================================
+
+lib.callback.register('aura_bank:corporateDeposit', function(source, amount)
+    local src = source
+    local isBoss, jobName = exports.aura_jobs:IsBoss(src)
+    if not isBoss or not jobName then
+        return false, "Acceso denegado: No dispones de rango directivo en esta empresa."
+    end
+
+    local amountNum = tonumber(amount)
+    if not amountNum or amountNum <= 0 then
+        return false, "Importe inválido."
+    end
+
+    local charId = getActiveCharacter(src)
+    local moneyCount = exports.ox_inventory:Search(src, 'count', 'money') or 0
+    if moneyCount < amountNum then
+        return false, "No dispones de suficiente dinero en efectivo físico encima."
+    end
+
+    local removed = exports.ox_inventory:RemoveItem(src, 'money', amountNum)
+    if not removed then
+        return false, "Error al retirar el efectivo de tu inventario."
+    end
+
+    local success, newBalance = exports.aura_jobs:AddSocietyMoney(
+        jobName, 
+        amountNum, 
+        string.format("Depósito de Efectivo en Sucursal Bancaria (Boss ID #%s)", tostring(charId)),
+        { bossCharId = charId }
+    )
+
+    if success then
+        return true, string.format("Depósito corporativo de $%s completado con éxito.", lib.math.groupdigits(amountNum)), newBalance
+    else
+        exports.ox_inventory:AddItem(src, 'money', amountNum) -- Rollback
+        return false, "Error al acreditar fondos en la cuenta de la sociedad."
+    end
+end)
+
+lib.callback.register('aura_bank:corporateWithdraw', function(source, amount)
+    local src = source
+    local isBoss, jobName = exports.aura_jobs:IsBoss(src)
+    if not isBoss or not jobName then
+        return false, "Acceso denegado: No dispones de rango directivo en esta empresa."
+    end
+
+    local amountNum = tonumber(amount)
+    if not amountNum or amountNum <= 0 then
+        return false, "Importe inválido."
+    end
+
+    local charId = getActiveCharacter(src)
+    local currentBalance = exports.aura_jobs:GetSocietyBalance(jobName)
+    if currentBalance < amountNum then
+        return false, "Fondos insuficientes en la cuenta corporativa de la empresa."
+    end
+
+    local success, newBalance = exports.aura_jobs:RemoveSocietyMoney(
+        jobName,
+        amountNum,
+        string.format("Retirada de Efectivo en Sucursal Bancaria (Boss ID #%s)", tostring(charId)),
+        { bossCharId = charId }
+    )
+
+    if success then
+        exports.ox_inventory:AddItem(src, 'money', amountNum)
+        return true, string.format("Retirada corporativa de $%s completada. Dinero físico en tus bolsillos.", lib.math.groupdigits(amountNum)), newBalance
+    else
+        return false, "Error al debitar fondos de la sociedad."
+    end
+end)
+
+lib.callback.register('aura_bank:getCorporateData', function(source)
+    local src = source
+    local isBoss, jobName, jobLabel = exports.aura_jobs:IsBoss(src)
+    if not isBoss or not jobName then
+        return { isBoss = false, society = nil }
+    end
+    local balance = exports.aura_jobs:GetSocietyBalance(jobName)
+    return {
+        isBoss = true,
+        society = {
+            name = jobName,
+            label = jobLabel,
+            balance = balance
+        }
     }
 end)
 

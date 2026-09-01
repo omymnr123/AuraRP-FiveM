@@ -162,3 +162,7 @@ client_scripts {
     , "dlc_agents/airstrip.lua"
     , "dlc_agents/hangar_door.lua"
 }
+
+
+data_file 'DLC_ITYP_REQUEST' 'stream/m23_2_mp2023_02_dlc_int_5.ytyp'
+data_file 'DLC_ITYP_REQUEST' 'stream/v_int_24.ytyp'

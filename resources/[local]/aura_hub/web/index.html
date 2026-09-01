@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AuraRP - Master Hub</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- FontAwesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- =====================================================================
+         1. BANNER GLOBAL DE ANUNCIOS (APERTURA / CIERRE DE COMERCIOS)
+    ====================================================================== -->
+    <div id="globalBanner" class="global-banner-container hidden">
+        <div class="banner-card" id="bannerCard">
+            <div class="banner-glow-strip"></div>
+            <div class="banner-icon-wrapper" id="bannerIconWrapper">
+                <i class="fa-solid fa-store" id="bannerIcon"></i>
+            </div>
+            <div class="banner-content">
+                <div class="banner-meta">
+                    <span class="banner-tag">AVISO DE LA CIUDAD</span>
+                    <span class="banner-time" id="bannerTime">AHORA</span>
+                </div>
+                <h3 class="banner-title" id="bannerTitle">Burgershot Vespucci</h3>
+                <p class="banner-subtitle" id="bannerSubtitle">El establecimiento está ahora ABIERTO al público.</p>
+            </div>
+            <div class="banner-status-badge" id="bannerBadge">
+                <span class="badge-dot"></span>
+                <span id="bannerBadgeText">ABIERTO</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- =====================================================================
+         2. DASHBOARD MASTER PAUSE MENU (GRID DISTRIBUTION)
+    ====================================================================== -->
+    <div id="hubWrapper" class="hub-wrapper hidden">
+        <div class="hub-backdrop" id="hubBackdrop"></div>
+
+        <div class="hub-screen-container">
+            <!-- Neon Top Border Glow -->
+            <div class="hub-neon-strip"></div>
+
+            <!-- ================= HEADER SUPERIOR ================= -->
+            <header class="hub-top-bar">
+                <!-- Perfil Jugador con Avatar Real -->
+                <div class="player-profile-block">
+                    <div class="avatar-frame" id="topAvatarFrame">
+                        <i class="fa-solid fa-user-ninja avatar-icon" id="topAvatarFallback"></i>
+                        <img id="topAvatarImg" class="avatar-real-img" style="display: none;" alt="Avatar">
+                    </div>
+                    <div class="player-identity">
+                        <div class="identity-top">
+                            <span class="player-name" id="topPlayerName">John Doe</span>
+                            <span class="badge-job" id="topPlayerJob">TAXI</span>
+                            <span class="badge-id" id="topPlayerId">ID: 1</span>
+                        </div>
+                        <div class="money-pills-row">
+                            <div class="money-pill cash">
+                                <i class="fa-solid fa-wallet"></i>
+                                <span class="pill-title">CARTERA</span>
+                                <span class="pill-amount" id="topStatCash">$500</span>
+                            </div>
+                            <div class="money-pill bank">
+                                <i class="fa-solid fa-building-columns"></i>
+                                <span class="pill-title">BANCO</span>
+                                <span class="pill-amount" id="topStatBank">$11.150</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botones de Acción Rápida y Logo Aura RP -->
+                <div class="quick-actions-block">
+                    <button class="btn-quick-action" id="btnActionSettings" title="Ajustes del Sistema">
+                        <i class="fa-solid fa-gear"></i>
+                        <span>AJUSTES</span>
+                    </button>
+                    <button class="btn-quick-action" id="btnActionInvoices" title="Facturas y Finanzas">
+                        <i class="fa-solid fa-file-invoice-dollar"></i>
+                        <span>FACTURAS</span>
+                    </button>
+
+                    <!-- Logo Servidor con Glow -->
+                    <div class="server-logo-badge">
+                        <span class="pulse-dot"></span>
+                        <span class="logo-text">AURA<strong>RP</strong></span>
+                    </div>
+
+                    <button class="btn-close-circle" id="btnCloseHub" title="Reanudar Juego (ESC)">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- ================= CUERPO PRINCIPAL (GRID) ================= -->
+            <main class="hub-main-grid">
+                
+                <!-- COLUMNA IZQUIERDA: NEGOCIOS ABIERTOS Y CONTADORES -->
+                <aside class="sidebar-column">
+                    <!-- Widget Negocios Abiertos -->
+                    <div class="businesses-widget">
+                        <div class="businesses-header">
+                            <i class="fa-solid fa-martini-glass-citrus"></i>
+                            <h3>NEGOCIOS ABIERTOS</h3>
+                            <i class="fa-solid fa-martini-glass-citrus"></i>
+                        </div>
+                        <div class="businesses-scroll" id="openBusinessesList">
+                            <!-- Renderizado dinámico vía JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- Contadores Inferiores -->
+                    <div class="sidebar-bottom-pills">
+                        <div class="counter-pill players">
+                            <i class="fa-solid fa-users"></i>
+                            <div class="counter-info">
+                                <span class="counter-label">JUGADORES</span>
+                                <strong id="statPlayersOnline">1 / 48</strong>
+                            </div>
+                        </div>
+                        <div class="counter-pill police">
+                            <i class="fa-solid fa-shield-halved"></i>
+                            <div class="counter-info">
+                                <span class="counter-label">POLICÍAS</span>
+                                <strong id="statPoliceStatus">DISPONIBLE (0)</strong>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+
+                <!-- SECCIÓN DERECHA: 4 TILES GRANDES INTERACTIVOS (2x2) -->
+                <section class="tiles-grid">
+                    
+                    <!-- TILE 1: MAPA (ACCESO COMPLETO AL MAPA NATIVO) -->
+                    <div class="hub-tile" id="tileMap">
+                        <div class="tile-bg" style="background-image: url('img/map_preview.jpg');"></div>
+                        <div class="tile-overlay"></div>
+                        <div class="tile-badge-info">
+                            <div class="tile-icon-circle">
+                                <i class="fa-solid fa-map-location-dot"></i>
+                            </div>
+                            <div class="tile-texts">
+                                <h4>MAPA</h4>
+                                <p>UBÍCATE O BUSCA SITIOS NUEVOS</p>
+                            </div>
+                        </div>
+                        <div class="tile-click-hint">
+                            <span>ABRIR MAPA COMPLETO</span>
+                            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                        </div>
+                    </div>
+
+                    <!-- TILE 2: SERVICIOS PÚBLICOS -->
+                    <div class="hub-tile" id="tileServices">
+                        <div class="tile-bg" style="background-image: url('img/services_preview.jpg');"></div>
+                        <div class="tile-overlay"></div>
+                        <div class="tile-badge-info">
+                            <div class="tile-icon-circle">
+                                <i class="fa-solid fa-truck-medical"></i>
+                            </div>
+                            <div class="tile-texts">
+                                <h4>SERVICIOS</h4>
+                                <p>GESTIÓN PARA LOS SERVICIOS DE LA CIUDAD</p>
+                            </div>
+                        </div>
+                        <div class="tile-click-hint">
+                            <span>VER SERVICIOS ACTIVOS</span>
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </div>
+                    </div>
+
+                    <!-- TILE 3: MI NEGOCIO (APERTURA/CIERRE, RRHH, FINANZAS) -->
+                    <div class="hub-tile" id="tileBusiness">
+                        <div class="tile-bg" style="background-image: url('img/business_preview.jpg');"></div>
+                        <div class="tile-overlay"></div>
+                        <div class="tile-badge-info">
+                            <div class="tile-icon-circle">
+                                <i class="fa-solid fa-briefcase"></i>
+                            </div>
+                            <div class="tile-texts">
+                                <h4>MI NEGOCIO</h4>
+                                <p>GESTIONA Y ADMINISTRA TU NEGOCIO</p>
+                            </div>
+                        </div>
+                        <div class="tile-click-hint">
+                            <span>ADMINISTRAR LOCAL Y RRHH</span>
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </div>
+                    </div>
+
+                    <!-- TILE 4: MI ORGANIZACIÓN / PERFIL -->
+                    <div class="hub-tile" id="tileOrg">
+                        <div class="tile-bg" style="background-image: url('img/organization_preview.jpg');"></div>
+                        <div class="tile-overlay"></div>
+                        <div class="tile-badge-info">
+                            <div class="tile-icon-circle">
+                                <i class="fa-solid fa-crown"></i>
+                            </div>
+                            <div class="tile-texts">
+                                <h4>MI ORGANIZACIÓN</h4>
+                                <p>ACCEDE Y GESTIONA TU ORGANIZACIÓN</p>
+                            </div>
+                        </div>
+                        <div class="tile-click-hint">
+                            <span>PERFIL Y DATOS DE RANGO</span>
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </div>
+                    </div>
+
+                </section>
+            </main>
+        </div>
+
+        <!-- =================================================================
+             MODALES FLOTANTES (GLASSMORPHISM AURA RP)
+        ================================================================== -->
+        
+        <!-- MODAL: GESTIÓN DE NEGOCIO (RRHH, FINANZAS, APERTURA) -->
+        <div class="hub-modal-overlay hidden" id="modalBusiness">
+            <div class="hub-modal-card large">
+                <div class="modal-header">
+                    <div class="modal-title-row">
+                        <i class="fa-solid fa-store modal-icon"></i>
+                        <div>
+                            <h3 id="modalBizName">MI NEGOCIO</h3>
+                            <p id="modalBizGrade">Administración de local y tesorería</p>
+                        </div>
+                    </div>
+                    <button class="btn-modal-close" onclick="closeModal('modalBusiness')"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+
+                <div class="modal-tabs-nav">
+                    <button class="modal-tab-btn active" data-modaltab="biz-status"><i class="fa-solid fa-door-open"></i> Estado del Local</button>
+                    <button class="modal-tab-btn" id="modalBizHrBtn" data-modaltab="biz-hr" style="display: none;"><i class="fa-solid fa-users-gear"></i> Personal (RRHH)</button>
+                    <button class="modal-tab-btn" id="modalBizFinanceBtn" data-modaltab="biz-finance" style="display: none;"><i class="fa-solid fa-building-columns"></i> Finanzas Digitales</button>
+                </div>
+
+                <div class="modal-body">
+                    <!-- Tab Estado -->
+                    <div id="modaltab-biz-status" class="modal-tab-content active">
+                        <div class="biz-status-box">
+                            <div class="biz-indicator">
+                                <span class="beacon" id="modalBizBeacon"></span>
+                                <div>
+                                    <span class="sub">ESTADO ACTUAL</span>
+                                    <h2 id="modalBizStateText">CERRADO</h2>
+                                </div>
+                            </div>
+                            <button class="btn-toggle-neon" id="btnModalToggleBiz">
+                                <i class="fa-solid fa-arrows-rotate"></i>
+                                <span>ALTERNAR APERTURA / CIERRE</span>
+                            </button>
+                        </div>
+                        <p class="biz-notice"><i class="fa-solid fa-circle-info"></i> Cualquier empleado contratado puede abrir o cerrar el establecimiento y emitir el aviso global a toda la ciudad.</p>
+                    </div>
+
+                    <!-- Tab RRHH -->
+                    <div id="modaltab-biz-hr" class="modal-tab-content">
+                        <div class="hire-bar">
+                            <input type="number" id="modalHireId" placeholder="ID de Servidor del Jugador (Cerca de ti)" min="1">
+                            <button class="btn-neon-action" id="btnModalHire"><i class="fa-solid fa-user-plus"></i> Contratar</button>
+                        </div>
+                        <div class="table-container">
+                            <table class="modal-table">
+                                <thead>
+                                    <tr>
+                                        <th>ESTADO</th>
+                                        <th>NOMBRE</th>
+                                        <th>PUESTO</th>
+                                        <th>SALARIO</th>
+                                        <th style="text-align: right;">ACCIONES</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="modalEmployeeTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Tab Finanzas -->
+                    <div id="modaltab-biz-finance" class="modal-tab-content">
+                        <div class="soc-balance-card">
+                            <span>SALDO DIGITAL DE LA SOCIEDAD</span>
+                            <h2 id="modalSocBalance">$0.00</h2>
+                            <small>SOCIETY_ACCOUNT</small>
+                        </div>
+                        <div class="wire-form-grid">
+                            <input type="text" id="modalWireIban" placeholder="IBAN Destinatario (Ej: AURA56149361)">
+                            <input type="number" id="modalWireAmount" placeholder="Cantidad ($)" min="1">
+                            <input type="text" id="modalWireReason" placeholder="Concepto de la Transferencia">
+                            <button class="btn-neon-action" id="btnModalSendWire"><i class="fa-solid fa-paper-plane"></i> Emitir Transferencia</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL: SERVICIOS PÚBLICOS -->
+        <div class="hub-modal-overlay hidden" id="modalServices">
+            <div class="hub-modal-card">
+                <div class="modal-header">
+                    <div class="modal-title-row">
+                        <i class="fa-solid fa-truck-medical modal-icon"></i>
+                        <div>
+                            <h3>SERVICIOS DE LA CIUDAD</h3>
+                            <p>Disponibilidad en tiempo real de cuerpos públicos</p>
+                        </div>
+                    </div>
+                    <button class="btn-modal-close" onclick="closeModal('modalServices')"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <div class="modal-body">
+                    <div class="services-list-grid">
+                        <div class="service-card police">
+                            <i class="fa-solid fa-shield-halved"></i>
+                            <div class="service-details">
+                                <h4>LSPD (Policía)</h4>
+                                <span id="srvPoliceText">0 Oficiales de servicio</span>
+                            </div>
+                        </div>
+                        <div class="service-card ems">
+                            <i class="fa-solid fa-heart-pulse"></i>
+                            <div class="service-details">
+                                <h4>EMS (Médicos)</h4>
+                                <span id="srvEmsText">0 Médicos de servicio</span>
+                            </div>
+                        </div>
+                        <div class="service-card mechanic">
+                            <i class="fa-solid fa-wrench"></i>
+                            <div class="service-details">
+                                <h4>Mecánicos (LSC)</h4>
+                                <span id="srvMecText">0 Mecánicos de servicio</span>
+                            </div>
+                        </div>
+                        <div class="service-card taxi">
+                            <i class="fa-solid fa-taxi"></i>
+                            <div class="service-details">
+                                <h4>Taxistas (Downtown Cab)</h4>
+                                <span id="srvTaxiText">0 Conductores de servicio</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL: AJUSTES / SISTEMA -->
+        <div class="hub-modal-overlay hidden" id="modalSettings">
+            <div class="hub-modal-card">
+                <div class="modal-header">
+                    <div class="modal-title-row">
+                        <i class="fa-solid fa-gear modal-icon"></i>
+                        <div>
+                            <h3>AJUSTES DEL SISTEMA</h3>
+                            <p>Control de sesión y utilidades</p>
+                        </div>
+                    </div>
+                    <button class="btn-modal-close" onclick="closeModal('modalSettings')"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <div class="modal-body">
+                    <div class="settings-actions">
+                        <button class="btn-setting-item resume" onclick="closeHub()"><i class="fa-solid fa-play"></i> Reanudar Juego</button>
+                        <button class="btn-setting-item disconnect" id="btnModalDisconnect"><i class="fa-solid fa-power-off"></i> Desconectar del Servidor</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL: FACTURAS / INVOICES -->
+        <div class="hub-modal-overlay hidden" id="modalInvoices">
+            <div class="hub-modal-card">
+                <div class="modal-header">
+                    <div class="modal-title-row">
+                        <i class="fa-solid fa-file-invoice-dollar modal-icon"></i>
+                        <div>
+                            <h3>FACTURAS Y COBROS</h3>
+                            <p>Historial y registro fiscal del personaje</p>
+                        </div>
+                    </div>
+                    <button class="btn-modal-close" onclick="closeModal('modalInvoices')"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <div class="modal-body">
+                    <div class="empty-placeholder">
+                        <i class="fa-solid fa-receipt"></i>
+                        <p>No tienes facturas pendientes de cobro o pago.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>

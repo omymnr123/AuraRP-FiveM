@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aura RP - Terminal POS & Tienda 24/7</title>
+    <!-- Tipografía Google Fonts: Outfit & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Iconografía FontAwesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- =====================================================================
+         1. TERMINAL POS (FACTURACIÓN FÍSICA ENTRE JUGADORES)
+    ====================================================================== -->
+    <div id="posContainer" class="pos-wrapper hidden">
+        <div class="pos-backdrop" id="posBackdrop"></div>
+
+        <div class="pos-card" id="posCard">
+            <div class="pos-glow-bar"></div>
+
+            <div class="pos-header">
+                <div class="pos-brand">
+                    <span class="pulse-dot"></span>
+                    <i class="fa-solid fa-bolt-lightning brand-icon"></i>
+                    <span class="brand-text">AURA<strong>POS</strong></span>
+                </div>
+                <button class="btn-icon-close" id="btnCloseIcon" title="Cerrar (ESC)">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="meta-section">
+                <div class="meta-business">
+                    <span class="meta-sub">ESTABLECIMIENTO</span>
+                    <h2 id="businessName" class="business-name">Burgershot Vespucci</h2>
+                </div>
+                <div class="meta-employee">
+                    <span class="meta-sub">ATENDIDO POR</span>
+                    <span id="employeeName" class="employee-name">John Doe</span>
+                </div>
+            </div>
+
+            <div class="receipt-container">
+                <div class="ticket-cut top"></div>
+
+                <div class="receipt-header">
+                    <div class="receipt-tag">
+                        <i class="fa-solid fa-receipt"></i>
+                        <span>FACTURA FISCAL</span>
+                    </div>
+                    <span id="registerCode" class="register-code">#TILL-01</span>
+                </div>
+
+                <div class="concept-group">
+                    <span class="concept-label">CONCEPTO DEL COBRO</span>
+                    <p id="billConcept" class="concept-value">Menú Doble Bleeder + Refresco XXL</p>
+                </div>
+
+                <div class="receipt-separator"></div>
+
+                <div class="total-group">
+                    <div class="total-info">
+                        <span class="total-title">TOTAL A LIQUIDAR</span>
+                        <span class="total-taxes">Tasas e impuestos incluidos</span>
+                    </div>
+                    <div class="total-price">
+                        <span class="currency">$</span>
+                        <span id="billAmount" class="price-value">0</span>
+                    </div>
+                </div>
+
+                <div class="ticket-cut bottom"></div>
+            </div>
+
+            <div class="action-group">
+                <button class="btn-action btn-card" id="btnPayCard">
+                    <div class="btn-highlight"></div>
+                    <div class="btn-left">
+                        <div class="btn-icon-wrapper card-icon">
+                            <i class="fa-solid fa-credit-card"></i>
+                        </div>
+                        <div class="btn-copy">
+                            <span class="btn-main-text">PAGAR CON TARJETA</span>
+                            <span class="btn-sub-text">Débito directo de tu cuenta bancaria</span>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-chevron-right btn-arrow"></i>
+                </button>
+
+                <button class="btn-action btn-cash" id="btnPayCash">
+                    <div class="btn-highlight"></div>
+                    <div class="btn-left">
+                        <div class="btn-icon-wrapper cash-icon">
+                            <i class="fa-solid fa-money-bill-wave"></i>
+                        </div>
+                        <div class="btn-copy">
+                            <span class="btn-main-text">PAGAR EN EFECTIVO</span>
+                            <span class="btn-sub-text">Depósito en el cajón de la registradora</span>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-chevron-right btn-arrow"></i>
+                </button>
+
+                <button class="btn-cancel" id="btnCancel">
+                    <i class="fa-solid fa-ban"></i>
+                    <span>Cancelar Operación</span>
+                </button>
+            </div>
+
+            <div id="statusBar" class="status-box hidden">
+                <i id="statusIcon" class="fa-solid fa-circle-notch fa-spin"></i>
+                <span id="statusMessage">Procesando pago seguro...</span>
+            </div>
+
+            <div class="pos-footer">
+                <i class="fa-solid fa-shield-halved"></i>
+                <span>Transacción encriptada auditada por Aura Economy v2</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- =====================================================================
+         2. TIENDA AUTÓNOMA 24/7 (HORARIO DE CIERRE & STOCK LIMITADO)
+    ====================================================================== -->
+    <div id="store247Container" class="store-wrapper hidden">
+        <div class="store-backdrop" id="storeBackdrop"></div>
+
+        <div class="store-card" id="storeCard">
+            <!-- Glow superior neón -->
+            <div class="store-glow-bar"></div>
+
+            <!-- Cabecera de la Tienda 24/7 -->
+            <div class="store-header">
+                <div class="store-header-left">
+                    <div class="store-title-row">
+                        <h2 id="storeBusinessName">Tequi-la-la Bar</h2>
+                        <span class="badge-247">24/7</span>
+                    </div>
+                    <p class="store-description">
+                        Bienvenido a <span id="storeDescBizName">este establecimiento</span>, esta tienda está disponible en horario de cierre como un servicio 24/7, con nuestros mejores productos preparados por nuestros empleados y con stock limitado.
+                    </p>
+                </div>
+                <button class="btn-store-close" id="btnStoreClose" title="Cerrar (ESC)">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Barra de Categorías / Filtros -->
+            <div class="store-categories-bar" id="storeCategoriesBar">
+                <button class="btn-category active" data-category="all">
+                    <i class="fa-solid fa-box"></i>
+                    <span>Todos</span>
+                </button>
+                <button class="btn-category" data-category="alcohol">
+                    <i class="fa-solid fa-beer-mug-empty"></i>
+                    <span>Bebidas / Alcohol</span>
+                </button>
+                <button class="btn-category" data-category="food">
+                    <i class="fa-solid fa-burger"></i>
+                    <span>Comida</span>
+                </button>
+                <button class="btn-category" data-category="drink">
+                    <i class="fa-solid fa-bottle-water"></i>
+                    <span>Refrescos / Agua</span>
+                </button>
+            </div>
+
+            <!-- Cuerpo Principal: Grid de Productos + Sidebar Carrito -->
+            <div class="store-main-layout">
+                
+                <!-- Rejilla de Productos Disponibles -->
+                <div class="store-products-scroll">
+                    <div class="store-products-grid" id="storeProductsGrid">
+                        <!-- Renderizado dinámico vía JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Barra Lateral: TÚ CARRITO -->
+                <aside class="store-cart-sidebar">
+                    <div class="cart-header">
+                        <h3>TÚ CARRITO</h3>
+                        <p>Revisa tus productos seleccionados y procede al pago seguro</p>
+                    </div>
+
+                    <!-- Lista de Productos en Carrito -->
+                    <div class="cart-items-list" id="cartItemsList">
+                        <!-- Renderizado dinámico -->
+                    </div>
+
+                    <!-- Resumen y Acciones de Pago -->
+                    <div class="cart-footer">
+                        <div class="cart-total-section">
+                            <span class="total-label">TOTAL A PAGAR</span>
+                            <div class="total-price-box">
+                                <span class="currency">$</span>
+                                <span id="cartTotalPrice" class="amount">0</span>
+                            </div>
+                        </div>
+
+                        <div class="cart-actions-grid">
+                            <button class="btn-checkout card" id="btnCheckoutCard">
+                                <i class="fa-solid fa-credit-card"></i>
+                                <span>Tarjeta</span>
+                            </button>
+                            <button class="btn-checkout cash" id="btnCheckoutCash">
+                                <i class="fa-solid fa-money-bill-wave"></i>
+                                <span>Efectivo</span>
+                            </button>
+                        </div>
+                    </div>
+                </aside>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications Container -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- Script de Control -->
+    <script src="js/app.js"></script>
+</body>
+</html>

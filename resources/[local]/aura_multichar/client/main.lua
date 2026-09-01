@@ -28,6 +28,7 @@ local function generateMugshots(chars, cb)
             -- Spawn detrás de la cámara para que el motor gráfico lo renderice bien sin que el jugador lo vea
             local hiddenPed = CreatePed(4, model, Config.CamCoords.x + (i * 1.5), Config.CamCoords.y - 5.0, Config.CamCoords.z, 0.0, false, false)
             SetEntityCollision(hiddenPed, false, false)
+            SetModelAsNoLongerNeeded(model)
             
             if char.metadata and char.metadata.appearance then
                 pcall(function() exports['fivem-appearance']:setPedAppearance(hiddenPed, char.metadata.appearance) end)
@@ -101,6 +102,7 @@ local function spawnCharPed(gender, metadata)
     while not HasModelLoaded(model) do Wait(0) end
 
     spawnedPed = CreatePed(4, model, Config.PedCoords.x, Config.PedCoords.y, Config.PedCoords.z, Config.PedCoords.w, false, false)
+    SetModelAsNoLongerNeeded(model)
     SetEntityHeading(spawnedPed, Config.PedCoords.w)
     FreezeEntityPosition(spawnedPed, true)
     SetEntityInvincible(spawnedPed, true)
@@ -124,36 +126,14 @@ local function spawnCharPed(gender, metadata)
     end
 end
 
-local function closeMenu()
-    isMenuOpen = false
-    SetNuiFocus(false, false)
-    SendNUIMessage({action = "hideUI"})
-    
-    DoScreenFadeOut(500)
-    Wait(1000)
-    
-    if spawnedPed then
-        DeleteEntity(spawnedPed)
-        spawnedPed = nil
-    end
 
-    cleanMugshots()
-
-    if cam then
-        RenderScriptCams(false, true, 1000, true, false)
-        DestroyCam(cam, false)
-        cam = nil
-    end
-    ClearFocus()
-    
-    DoScreenFadeIn(1000)
-end
 
 -- Interceptar el inicio y forzar la selección de personaje
 CreateThread(function()
     while true do
         Wait(100)
         if NetworkIsPlayerActive(PlayerId()) then
+            pcall(function() exports.spawnmanager:setAutoSpawn(false) end)
             TriggerEvent('aura_multichar:openMenu')
             break
         end
@@ -163,6 +143,7 @@ end)
 AddEventHandler('aura_multichar:openMenu', function()
     if isMenuOpen then return end
     isMenuOpen = true
+    pcall(function() exports.spawnmanager:setAutoSpawn(false) end)
     
     -- Desactivar hud
     DisplayHud(false)
@@ -178,6 +159,8 @@ AddEventHandler('aura_multichar:openMenu', function()
                 characters = updatedChars,
                 maxSlots = Config.MaxCharacters
             })
+            ShutdownLoadingScreenNui()
+            ShutdownLoadingScreen()
         end)
     end)
 end)
@@ -247,46 +230,74 @@ RegisterNetEvent('aura_multichar:backToCreation', function()
 end)
 
 RegisterNUICallback('selectCharacter', function(data, cb)
-    closeMenu()
-    
-    lib.callback('aura_multichar:selectCharacter', false, function(charData)
-        if not charData then return end
-        
-        -- Default coordinates if last_location is missing (Aeropuerto de Los Santos)
-        local spawnCoords = charData.metadata.last_location or {x = -1037.8, y = -2737.9, z = 20.17, heading = 330.0}
-        
-        -- Spawn Ped Real en el mundo
-        local ped = PlayerPedId()
-        SetEntityCoords(ped, spawnCoords.x, spawnCoords.y, spawnCoords.z, false, false, false, false)
-        SetEntityHeading(ped, spawnCoords.heading or 330.0)
-        FreezeEntityPosition(ped, true)
-        
-        -- Check if it's a new character without appearance
-        local isNew = (not charData.metadata.appearance or next(charData.metadata.appearance) == nil)
-        
-        if isNew then
-            -- Trigger aura_appearance character creation
-            TriggerEvent('aura_appearance:startCustomization', charData.gender)
-        else
-            -- Apply existing appearance
-            TriggerEvent('aura_appearance:applyAppearance', charData.metadata.appearance)
-            
-            -- Asegurar que el ped esté colocado y listo en el mundo
-            CreateThread(function()
-                Wait(200)
-                local currentPed = PlayerPedId()
-                SetEntityCoords(currentPed, spawnCoords.x, spawnCoords.y, spawnCoords.z, false, false, false, false)
-                SetEntityHeading(currentPed, spawnCoords.heading or 330.0)
-                FreezeEntityPosition(currentPed, false)
-            end)
-        end
-        
-        DisplayHud(true)
-        DisplayRadar(true)
-        TriggerEvent('aura_multichar:client:characterLoaded', charData)
-    end, data.id)
-
     cb('ok')
+    CreateThread(function()
+        isMenuOpen = false
+
+        DoScreenFadeOut(500)
+        Wait(500)
+
+        SetNuiFocus(false, false)
+        SendNUIMessage({action = "hideUI"})
+
+        if cam then
+            RenderScriptCams(false, false, 0, true, true)
+            DestroyCam(cam, false)
+            cam = nil
+        end
+        ClearFocus()
+
+        if spawnedPed then
+            DeleteEntity(spawnedPed)
+            spawnedPed = nil
+        end
+        cleanMugshots()
+        
+        lib.callback('aura_multichar:selectCharacter', false, function(charData)
+            if not charData then return end
+            
+            local spawnCoords = charData.metadata.last_location or {x = -1037.8, y = -2737.9, z = 20.17, heading = 330.0}
+            
+            local hash = `mp_m_freemode_01`
+            if charData.gender and tonumber(charData.gender) == 1 then
+                hash = `mp_f_freemode_01`
+            end
+            
+            RequestModel(hash)
+            while not HasModelLoaded(hash) do Wait(0) end
+            
+            SetPlayerModel(PlayerId(), hash)
+            SetModelAsNoLongerNeeded(hash)
+            
+            local ped = PlayerPedId()
+            
+            RequestCollisionAtCoord(spawnCoords.x, spawnCoords.y, spawnCoords.z)
+            SetEntityCoordsNoOffset(ped, spawnCoords.x, spawnCoords.y, spawnCoords.z, false, false, false, true)
+            SetEntityHeading(ped, spawnCoords.heading or 330.0)
+            
+            local timer = GetGameTimer() + 5000
+            while not HasCollisionLoadedAroundEntity(ped) and GetGameTimer() < timer do 
+                Wait(0)
+            end
+            
+            SetEntityCoordsNoOffset(ped, spawnCoords.x, spawnCoords.y, spawnCoords.z, false, false, false, true)
+            FreezeEntityPosition(ped, false)
+            
+            local isNew = (not charData.metadata.appearance or next(charData.metadata.appearance) == nil)
+            if isNew then
+                TriggerEvent('aura_appearance:startCustomization', charData.gender)
+            else
+                TriggerEvent('aura_appearance:applyAppearance', charData.metadata.appearance)
+            end
+            
+            DisplayHud(true)
+            DisplayRadar(true)
+            TriggerEvent('aura_multichar:client:characterLoaded', charData)
+            
+            DoScreenFadeIn(1000)
+            TriggerEvent('aura_core:client:playerSpawned')
+        end, data.id)
+    end)
 end)
 
 RegisterNUICallback('deleteCharacter', function(data, cb)

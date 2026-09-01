@@ -62,6 +62,7 @@
                 <button class="nav-btn" data-tab="history"><i class="fas fa-history"></i> Historial</button>
                 <button class="nav-btn" data-tab="savings"><i class="fas fa-piggy-bank"></i> Ahorros</button>
                 <button class="nav-btn" data-tab="cards"><i class="fas fa-credit-card"></i> Tarjetas</button>
+                <button class="nav-btn" id="nav-btn-corporate" data-tab="corporate" style="display: none;"><i class="fas fa-briefcase"></i> Corporativo</button>
             </nav>
 
             <!-- Main Content Area -->
@@ -250,6 +251,65 @@
                                 <span>Coste de emisión: $500.00 (Deducido del saldo Corriente)</span>
                             </div>
                             <button class="btn" style="background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2);" id="btn-request-card">Solicitar Tarjeta Física</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CORPORATE TAB (BOSS EXCLUSIVE) -->
+                <div id="tab-corporate" class="tab-content">
+                    <div class="action-panel panel">
+                        <div class="panel-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <div>
+                                <h3 id="corp-company-name" style="color: var(--aura-turquoise); font-size: 20px;">CUENTA CORPORATIVA</h3>
+                                <p style="color: var(--text-muted); font-size: 13px;">Gestión de tesorería y efectivo físico para la sociedad empresarial.</p>
+                            </div>
+                            <span class="badge" style="background: rgba(64, 224, 208, 0.15); color: var(--aura-turquoise); border: 1px solid var(--aura-turquoise);">DIRECTORIO</span>
+                        </div>
+
+                        <div class="bank-card" style="background: linear-gradient(135deg, rgba(15,23,42,0.9) 0%, rgba(30,58,138,0.7) 50%, rgba(255,0,127,0.3) 100%); border: 1px solid rgba(64, 224, 208, 0.4); box-shadow: 0 10px 30px rgba(0,0,0,0.5); margin-bottom: 25px;">
+                            <div class="card-header">
+                                <h3 id="corp-card-title">AURA CORPORATE</h3>
+                                <div class="card-type">
+                                    <span class="badge" style="background: rgba(255,0,127,0.2); color: #ff9ebb; border: 1px solid #ff007f;">FONDOS SOCIEDAD</span>
+                                </div>
+                            </div>
+                            <div class="card-number" id="corp-society-name" style="letter-spacing: 2px; color: var(--aura-turquoise);">
+                                SOCIETY_ACCOUNT
+                            </div>
+                            <div class="card-footer">
+                                <div class="card-holder">
+                                    <span>EMPRESA TITULAR</span>
+                                    <h4 id="corp-society-holder">CARGANDO...</h4>
+                                </div>
+                                <div class="card-balance">
+                                    <span>SALDO TOTAL</span>
+                                    <h2 id="corp-balance" style="color: #fff; text-shadow: 0 0 15px rgba(64, 224, 208, 0.5);">$0.00</h2>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <!-- Deposit Physical Cash to Society -->
+                            <div class="savings-action-box" style="border-color: rgba(64, 224, 208, 0.4);">
+                                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                                    <i class="fas fa-arrow-down" style="color: var(--aura-turquoise);"></i>
+                                    <h4 style="color: var(--aura-turquoise);">Ingresar Efectivo Físico</h4>
+                                </div>
+                                <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px;">Deposita dinero físico de tus bolsillos a la cuenta de la sociedad.</p>
+                                <input type="number" id="corp-deposit-amount" placeholder="Cantidad ($)" class="form-group" style="width:100%; padding: 14px; border-radius:12px; background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.1); color:#fff; margin-bottom: 15px; outline: none;">
+                                <button class="btn btn-success" id="btn-corp-deposit" style="width: 100%;">Ingresar a Sociedad</button>
+                            </div>
+
+                            <!-- Withdraw Physical Cash from Society -->
+                            <div class="savings-action-box" style="border-color: rgba(255, 0, 127, 0.4);">
+                                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                                    <i class="fas fa-arrow-up" style="color: var(--aura-pink);"></i>
+                                    <h4 style="color: var(--aura-pink);">Retirar Efectivo Físico</h4>
+                                </div>
+                                <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px;">Retira fondos de la sociedad en billetes físicos directos a tu inventario.</p>
+                                <input type="number" id="corp-withdraw-amount" placeholder="Cantidad ($)" class="form-group" style="width:100%; padding: 14px; border-radius:12px; background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.1); color:#fff; margin-bottom: 15px; outline: none;">
+                                <button class="btn btn-danger" id="btn-corp-withdraw" style="background: rgba(255,0,127,0.2); color: #ff9ebb; border: 1px solid var(--aura-pink); width: 100%;">Retirar Efectivo</button>
+                            </div>
                         </div>
                     </div>
                 </div>

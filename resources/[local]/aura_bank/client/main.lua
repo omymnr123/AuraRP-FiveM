@@ -26,7 +26,9 @@ local function openTellerMenu()
             cash = data.accounts.cash or 0,
             bank = data.accounts.bank or 0,
             savings = data.accounts.savings or 0,
-            name = data.name or "Desconocido"
+            name = data.name or "Desconocido",
+            isBoss = data.isBoss or false,
+            society = data.society or nil
         }
     })
 end
@@ -90,6 +92,7 @@ CreateThread(function()
         lib.requestModel(data.model)
         -- Restamos 1.0 a Z para que toque el suelo si la coordenada fue tomada de un jugador
         local ped = CreatePed(4, data.model, data.coords.x, data.coords.y, data.coords.z - 1.0, data.heading, false, true)
+        SetEntityAsMissionEntity(ped, true, true)
         SetEntityHeading(ped, data.heading)
         FreezeEntityPosition(ped, true)
         SetEntityInvincible(ped, true)
@@ -154,7 +157,9 @@ RegisterNUICallback('submitPin', function(data, cb)
                 cash = response.accounts.cash or 0,
                 bank = response.accounts.bank or 0,
                 savings = response.accounts.savings or 0,
-                name = response.name or "Desconocido"
+                name = response.name or "Desconocido",
+                isBoss = response.isBoss or false,
+                society = response.society or nil
             }
         })
     else
@@ -164,6 +169,33 @@ RegisterNUICallback('submitPin', function(data, cb)
     
     currentPendingCard = nil
     cb('ok')
+end)
+
+RegisterNUICallback('corporateDeposit', function(data, cb)
+    local amount = tonumber(data.amount)
+    if not amount or amount <= 0 then
+        cb({ success = false, message = "Importe inválido" })
+        return
+    end
+
+    local success, msg, newBalance = lib.callback.await('aura_bank:corporateDeposit', false, amount)
+    cb({ success = success, message = msg, newBalance = newBalance })
+end)
+
+RegisterNUICallback('corporateWithdraw', function(data, cb)
+    local amount = tonumber(data.amount)
+    if not amount or amount <= 0 then
+        cb({ success = false, message = "Importe inválido" })
+        return
+    end
+
+    local success, msg, newBalance = lib.callback.await('aura_bank:corporateWithdraw', false, amount)
+    cb({ success = success, message = msg, newBalance = newBalance })
+end)
+
+RegisterNUICallback('fetchCorporateData', function(data, cb)
+    local data = lib.callback.await('aura_bank:getCorporateData', false)
+    cb(data)
 end)
 
 RegisterNUICallback('doTransaction', function(data, cb)

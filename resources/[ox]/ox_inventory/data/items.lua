@@ -264,4 +264,109 @@ return {
 		weight = 80,
 		description = 'Fragmentos de hierro y acero reciclable para uso en herrería, mecánica o artesanía.',
 	},
+
+	['beer'] = {
+		label = 'Cerveza Pißwasser',
+		weight = 330,
+		description = 'Botellín de cerveza rubia bien fría. Calma la sed y aporta un toque de euforia.',
+		client = {
+			anim = { dict = 'mp_player_intdrink', clip = 'loop_bottle' },
+			prop = { model = `prop_amb_beer_bottle`, pos = vec3(0.01, 0.01, 0.06), rot = vec3(5.0, 5.0, -180.5) },
+			usetime = 2500,
+			notification = 'Has bebido una cerveza Pißwasser bien fría'
+		},
+		server = {
+			export = 'aura_status.consumeItem'
+		}
+	},
+
+	['whiskey'] = {
+		label = 'Whisky Richards',
+		weight = 250,
+		description = 'Vaso de whisky de malta con hielo servido en copa corta.',
+		client = {
+			anim = { dict = 'mp_player_intdrink', clip = 'loop_bottle' },
+			prop = { model = `prop_drink_whisky`, pos = vec3(0.01, 0.01, 0.06), rot = vec3(5.0, 5.0, -180.5) },
+			usetime = 2500,
+			notification = 'Has bebido un trago de whisky añejo'
+		},
+		server = {
+			export = 'aura_status.consumeItem'
+		}
+	},
+
+	['tequila_shot'] = {
+		label = 'Chupito de Tequila',
+		weight = 100,
+		description = 'Chupito de tequila dorado mexicano de alta graduación con limón y sal.',
+		client = {
+			anim = { dict = 'mp_player_intdrink', clip = 'loop_bottle' },
+			prop = { model = `prop_tequila_shot`, pos = vec3(0.01, 0.01, 0.06), rot = vec3(5.0, 5.0, -180.5) },
+			usetime = 2000,
+			notification = 'Has tomado un chupito de Tequila de golpe'
+		},
+		server = {
+			export = 'aura_status.consumeItem'
+		}
+	},
+
+	['cocktail'] = {
+		label = 'Cóctel Tropical',
+		weight = 300,
+		description = 'Cóctel refrescante de frutas con licor elaborado por el barman.',
+		client = {
+			anim = { dict = 'mp_player_intdrink', clip = 'loop_bottle' },
+			prop = { model = `prop_cocktail_glass`, pos = vec3(0.01, 0.01, 0.06), rot = vec3(5.0, 5.0, -180.5) },
+			usetime = 2500,
+			notification = 'Has disfrutado de un cóctel dulce y refrescante'
+		},
+		server = {
+			export = 'aura_status.consumeItem'
+		}
+	},
+
+	['chips'] = {
+		label = 'Patatas Fritas',
+		weight = 150,
+		description = 'Bolsa de patatas fritas crujientes con sal marina.',
+		client = {
+			anim = 'eating',
+			prop = 'burger',
+			usetime = 2000,
+			notification = 'Has comido unas patatas fritas crujientes'
+		},
+		server = {
+			export = 'aura_status.consumeItem'
+		}
+	},
+
+	['sandwich'] = {
+		label = 'Sándwich Tostado',
+		weight = 200,
+		description = 'Sándwich mixto recién tostado de jamón y queso fundido.',
+		client = {
+			anim = 'eating',
+			prop = 'burger',
+			usetime = 2500,
+			notification = 'Has comido un delicioso sándwich tostado'
+		},
+		server = {
+			export = 'aura_status.consumeItem'
+		}
+	},
+
+	['coffee'] = {
+		label = 'Café Expreso',
+		weight = 150,
+		description = 'Taza de café solo caliente recién molido. Activa los sentidos y despeja la mente.',
+		client = {
+			anim = { dict = 'mp_player_intdrink', clip = 'loop_bottle' },
+			prop = { model = `prop_fib_coffee`, pos = vec3(0.01, 0.01, 0.06), rot = vec3(5.0, 5.0, -180.5) },
+			usetime = 2500,
+			notification = 'Has bebido un café aromático y caliente'
+		},
+		server = {
+			export = 'aura_status.consumeItem'
+		}
+	},
 }

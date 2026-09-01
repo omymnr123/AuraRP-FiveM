@@ -23,7 +23,15 @@ Config.MaxArmor = 100 -- Armadura máxima
 
 Config.Consumables = {
     ['burger'] = { type = 'hunger', amount = 30, anim = { dict = 'mp_player_inteat@burger', clip = 'mp_player_int_eat_burger' }, prop = 'prop_cs_burger_01' },
+    ['testburger'] = { type = 'hunger', amount = 45, anim = { dict = 'mp_player_inteat@burger', clip = 'mp_player_int_eat_burger' }, prop = 'prop_cs_burger_01' },
+    ['chips'] = { type = 'hunger', amount = 20, anim = { dict = 'mp_player_inteat@burger', clip = 'mp_player_int_eat_burger' }, prop = 'prop_cs_burger_01' },
+    ['sandwich'] = { type = 'hunger', amount = 35, anim = { dict = 'mp_player_inteat@burger', clip = 'mp_player_int_eat_burger' }, prop = 'prop_cs_burger_01' },
     ['water'] = { type = 'thirst', amount = 40, anim = { dict = 'mp_player_intdrink', clip = 'loop_bottle' }, prop = 'prop_ld_flow_bottle' },
     ['sprunk'] = { type = 'thirst', amount = 35, anim = { dict = 'mp_player_intdrink', clip = 'loop_bottle' }, prop = 'prop_ld_can_01' },
     ['cola'] = { type = 'thirst', amount = 35, anim = { dict = 'mp_player_intdrink', clip = 'loop_bottle' }, prop = 'prop_ecola_can' },
+    ['coffee'] = { type = 'thirst', amount = 30, anim = { dict = 'mp_player_intdrink', clip = 'loop_bottle' }, prop = 'prop_fib_coffee' },
+    ['beer'] = { type = 'thirst', amount = 25, anim = { dict = 'mp_player_intdrink', clip = 'loop_bottle' }, prop = 'prop_amb_beer_bottle' },
+    ['whiskey'] = { type = 'thirst', amount = 20, anim = { dict = 'mp_player_intdrink', clip = 'loop_bottle' }, prop = 'prop_drink_whisky' },
+    ['tequila_shot'] = { type = 'thirst', amount = 15, anim = { dict = 'mp_player_intdrink', clip = 'loop_bottle' }, prop = 'prop_tequila_shot' },
+    ['cocktail'] = { type = 'thirst', amount = 30, anim = { dict = 'mp_player_intdrink', clip = 'loop_bottle' }, prop = 'prop_cocktail_glass' },
 }
