@@ -360,6 +360,67 @@ RegisterCommand('setjob', function(source, args)
     end
 end, true)
 
+-- Comando para Jefes: /contratar [ID]
+RegisterCommand('contratar', function(source, args)
+    if source == 0 then return end
+    
+    local isBoss, jobName, jobLabel = IsBoss(source)
+    if not isBoss then
+        TriggerClientEvent('ox_lib:notify', source, { title = 'Acceso Denegado', description = 'No eres jefe de ninguna empresa.', type = 'error' })
+        return
+    end
+
+    local targetSrc = tonumber(args[1])
+    if not targetSrc then
+        TriggerClientEvent('ox_lib:notify', source, { title = 'Sintaxis', description = 'Uso: /contratar [ID]', type = 'inform' })
+        return
+    end
+    
+    local targetData = GetJob(targetSrc)
+    if not targetData then
+        TriggerClientEvent('ox_lib:notify', source, { title = 'Error', description = 'Jugador no encontrado.', type = 'error' })
+        return
+    end
+
+    local success, err = SetJob(targetSrc, jobName, 1) -- Grado 1 por defecto
+    if success then
+        TriggerClientEvent('ox_lib:notify', source, { title = 'Gestión', description = 'Has contratado a un nuevo empleado.', type = 'success' })
+    end
+end, false)
+
+-- Comando para Jefes: /despedir [ID]
+RegisterCommand('despedir', function(source, args)
+    if source == 0 then return end
+    
+    local isBoss, jobName, jobLabel = IsBoss(source)
+    if not isBoss then
+        TriggerClientEvent('ox_lib:notify', source, { title = 'Acceso Denegado', description = 'No eres jefe de ninguna empresa.', type = 'error' })
+        return
+    end
+
+    local targetSrc = tonumber(args[1])
+    if not targetSrc then
+        TriggerClientEvent('ox_lib:notify', source, { title = 'Sintaxis', description = 'Uso: /despedir [ID]', type = 'inform' })
+        return
+    end
+
+    local targetData = GetJob(targetSrc)
+    if not targetData or targetData.name ~= jobName then
+        TriggerClientEvent('ox_lib:notify', source, { title = 'Error', description = 'Ese jugador no trabaja en tu empresa.', type = 'error' })
+        return
+    end
+
+    if targetData.isBoss and targetSrc ~= source then
+        TriggerClientEvent('ox_lib:notify', source, { title = 'Error', description = 'No puedes despedir a otro jefe.', type = 'error' })
+        return
+    end
+
+    local success, err = SetJob(targetSrc, 'unemployed', 0)
+    if success then
+        TriggerClientEvent('ox_lib:notify', source, { title = 'Gestión', description = 'Has despedido al empleado correctamente.', type = 'success' })
+    end
+end, false)
+
 -- Callback para cliente ox_lib
 lib.callback.register('aura_jobs:getJobData', function(source)
     return GetJob(source)

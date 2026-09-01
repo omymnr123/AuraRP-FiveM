@@ -17,14 +17,16 @@ server_scripts {
     'server/main.lua',
     'server/paycheck.lua',
     'server/billing.lua',
-    'server/vendors.lua'
+    'server/vendors.lua',
+    'server/doors.lua'
 }
 
 client_scripts {
     'client/main.lua',
     'client/billing.lua',
     'client/vendors.lua',
-    'client/blips.lua'
+    'client/blips.lua',
+    'client/doors.lua'
 }
 
 ui_page 'web/index.html'

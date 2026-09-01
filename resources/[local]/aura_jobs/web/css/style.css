@@ -1114,3 +1114,26 @@ html, body {
     to { transform: translateX(0); opacity: 1; }
 }
 
+/* ============================================================================
+   DOORLOCK FLOATING UI
+============================================================================ */
+.doorlock-wrapper {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    font-size: 26px;
+    pointer-events: none;
+    z-index: 9999;
+    
+    /* Degradado de Turquesa a Rosa (AuraRP) */
+    background: linear-gradient(135deg, #00f2fe 0%, #ff0844 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    
+    /* Glow effect usando drop-shadow */
+    filter: drop-shadow(0 0 10px rgba(0, 242, 254, 0.7));
+    transition: opacity 0.2s ease-out, transform 0.1s linear;
+}
+
+.doorlock-wrapper.hidden {
+    opacity: 0;
+}

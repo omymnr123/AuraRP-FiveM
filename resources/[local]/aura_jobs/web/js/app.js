@@ -519,6 +519,27 @@ window.addEventListener('message', function(event) {
         openStore247(item.data);
     } else if (item.action === 'close247Store') {
         store247Container.classList.add('hidden');
+    } else if (item.action === 'updateDoorlock') {
+        const ui = document.getElementById('doorlockUI');
+        const icon = document.getElementById('doorlockIcon');
+        if (ui && icon) {
+            ui.classList.remove('hidden');
+            ui.style.left = item.x + '%';
+            ui.style.top = item.y + '%';
+            
+            if (item.locked) {
+                icon.className = 'fa-solid fa-lock';
+                icon.style.color = '#ff0844'; // Rosa/Rojo para bloqueado
+            } else {
+                icon.className = 'fa-solid fa-lock-open';
+                icon.style.color = '#00f2fe'; // Turquesa para abierto
+            }
+        }
+    } else if (item.action === 'hideDoorlock') {
+        const ui = document.getElementById('doorlockUI');
+        if (ui && !ui.classList.contains('hidden')) {
+            ui.classList.add('hidden');
+        }
     }
 });
 

@@ -148,18 +148,19 @@ Config.Jobs = {
         }
     },
 
-    ['pearls'] = {
-        label = 'Pearls Seafood Restaurant',
+    ['salieri'] = {
+        label = "Salieri Club",
         isBusiness = true,
         canDuty = true,
         grades = {
-            [0] = { name = 'Lavaplatos', salary = 500 },
-            [1] = { name = 'Camarero', salary = 750 },
-            [2] = { name = 'Chef de Cocina', salary = 1100 },
-            [3] = { name = 'Maître', salary = 1450 },
-            [4] = { name = 'Gerente', salary = 2100, isBoss = true }
+            [0] = { name = 'Lavaplatos', salary = 450 },
+            [1] = { name = 'Camarero', salary = 700 },
+            [2] = { name = 'Barman Coctelero', salary = 1000 },
+            [3] = { name = 'Seguridad / Encargado', salary = 1400 },
+            [4] = { name = 'Director / Dueño', salary = 2200, isBoss = true }
         }
     },
+
     ['morningwoodliquor'] = {
         label = "Rob's Liquor (Morningwood)",
         isBusiness = true,
@@ -312,10 +313,10 @@ Config.BusinessVendors = {
         blip = {
             enabled = true,
             coords = vec3(-561.74, 280.53, 82.18),
-            sprite = 93,       -- Copa de cóctel / Hostelería
+            sprite = 93,      -- Copa de cóctel / Hostelería
             scale = 0.8,
-            openColor = 48,    -- Morado / Neón
-            closedColor = 39,  -- Gris cuando está cerrado
+            openColor = 48,   -- Morado / Neón
+            closedColor = 39, -- Gris cuando está cerrado
             name = 'Tequi-la-la Bar'
         },
         items = {
@@ -339,10 +340,10 @@ Config.BusinessVendors = {
         blip = {
             enabled = true,
             coords = vec3(-1220.57, -907.40, 12.33),
-            sprite = 93,       -- Copa / Hostelería
+            sprite = 93,      -- Copa / Hostelería
             scale = 0.8,
-            openColor = 5,     -- Amarillo Burgershot
-            closedColor = 39,  -- Gris cuando está cerrado
+            openColor = 5,    -- Amarillo Burgershot
+            closedColor = 39, -- Gris cuando está cerrado
             name = 'Burgershot Vespucci'
         },
         items = {
@@ -364,10 +365,10 @@ Config.BusinessVendors = {
         blip = {
             enabled = true,
             coords = vec3(-1392.54, -606.32, 30.32),
-            sprite = 93,       -- Copa de cóctel / Hostelería
+            sprite = 93,      -- Copa de cóctel / Hostelería
             scale = 0.8,
-            openColor = 27,    -- Violeta / Neón
-            closedColor = 39,  -- Gris cuando está cerrado
+            openColor = 27,   -- Violeta / Neón
+            closedColor = 39, -- Gris cuando está cerrado
             name = 'Bahama Mamas Club'
         },
         items = {
@@ -390,10 +391,10 @@ Config.BusinessVendors = {
         blip = {
             enabled = true,
             coords = vec3(125.23, -1281.55, 29.28),
-            sprite = 93,       -- Copa de cóctel / Hostelería
+            sprite = 93,      -- Copa de cóctel / Hostelería
             scale = 0.8,
-            openColor = 8,     -- Rosa Neón
-            closedColor = 39,  -- Gris cuando está cerrado
+            openColor = 8,    -- Rosa Neón
+            closedColor = 39, -- Gris cuando está cerrado
             name = 'Vanilla Unicorn'
         },
         items = {
@@ -416,10 +417,10 @@ Config.BusinessVendors = {
         blip = {
             enabled = true,
             coords = vec3(1986.04, 3048.36, 47.22),
-            sprite = 93,       -- Copa de cóctel / Hostelería
+            sprite = 93,      -- Copa de cóctel / Hostelería
             scale = 0.8,
-            openColor = 5,     -- Amarillo
-            closedColor = 39,  -- Gris cuando está cerrado
+            openColor = 5,    -- Amarillo
+            closedColor = 39, -- Gris cuando está cerrado
             name = 'Yellow Jack Inn'
         },
         items = {
@@ -444,10 +445,10 @@ Config.BusinessVendors = {
         blip = {
             enabled = true,
             coords = vec3(-1566.23, -968.23, 13.02),
-            sprite = 93,       -- Copa de cóctel / Hostelería
+            sprite = 93,      -- Copa de cóctel / Hostelería
             scale = 0.8,
-            openColor = 27,    -- Morado / Eléctrico
-            closedColor = 39,  -- Gris cuando está cerrado
+            openColor = 27,   -- Morado / Eléctrico
+            closedColor = 39, -- Gris cuando está cerrado
             name = 'Discoteca Marc Vazou'
         },
         items = {
@@ -473,20 +474,20 @@ Config.BusinessVendors = {
         blip = {
             enabled = true,
             coords = vec3(-160.07, 6319.79, 31.60),
-            sprite = 52,       -- Icono de Supermercado / Tienda 24/7
+            sprite = 52,      -- Icono de Supermercado / Tienda 24/7
             scale = 0.8,
-            openColor = 2,     -- Verde cuando está abierto
-            closedColor = 39,  -- Gris cuando está cerrado
+            openColor = 2,    -- Verde cuando está abierto
+            closedColor = 39, -- Gris cuando está cerrado
             name = 'Paleto Bay Liquor'
         },
         items = {
-            { name = 'whiskey',      label = 'Whisky Richards',     price = 20, category = 'alcohol', icon = 'whiskey-glass' },
-            { name = 'beer',         label = 'Cerveza Pißwasser',   price = 10, category = 'alcohol', icon = 'beer-mug-empty' },
-            { name = 'tequila_shot', label = 'Chupito de Tequila',  price = 15, category = 'alcohol', icon = 'wine-glass' },
-            { name = 'cocktail',     label = 'Cóctel Tropical',     price = 18, category = 'alcohol', icon = 'martini-glass-citrus' },
-            { name = 'cola',         label = 'Lata de eCola',        price = 5,  category = 'drink',   icon = 'mug-hot' },
-            { name = 'water',        label = 'Botella de Agua',     price = 5,  category = 'drink',   icon = 'bottle-water' },
-            { name = 'chips',        label = 'Patatas Fritas',      price = 8,  category = 'food',    icon = 'bowl-food' }
+            { name = 'whiskey',      label = 'Whisky Richards',    price = 20, category = 'alcohol', icon = 'whiskey-glass' },
+            { name = 'beer',         label = 'Cerveza Pißwasser',  price = 10, category = 'alcohol', icon = 'beer-mug-empty' },
+            { name = 'tequila_shot', label = 'Chupito de Tequila', price = 15, category = 'alcohol', icon = 'wine-glass' },
+            { name = 'cocktail',     label = 'Cóctel Tropical',    price = 18, category = 'alcohol', icon = 'martini-glass-citrus' },
+            { name = 'cola',         label = 'Lata de eCola',      price = 5,  category = 'drink',   icon = 'mug-hot' },
+            { name = 'water',        label = 'Botella de Agua',    price = 5,  category = 'drink',   icon = 'bottle-water' },
+            { name = 'chips',        label = 'Patatas Fritas',     price = 8,  category = 'food',    icon = 'bowl-food' }
         }
     },
 
@@ -503,20 +504,20 @@ Config.BusinessVendors = {
         blip = {
             enabled = true,
             coords = vec3(-297.59, 6271.26, 31.51),
-            sprite = 93,       -- Copa de cóctel / Hostelería
+            sprite = 93,      -- Copa de cóctel / Hostelería
             scale = 0.8,
-            openColor = 5,     -- Amarillo Hen House
-            closedColor = 39,  -- Gris cuando está cerrado
+            openColor = 5,    -- Amarillo Hen House
+            closedColor = 39, -- Gris cuando está cerrado
             name = 'The Hen House Bar'
         },
         items = {
-            { name = 'beer',         label = 'Cerveza Pißwasser',    price = 10, category = 'alcohol', icon = 'beer-mug-empty' },
-            { name = 'whiskey',      label = 'Whisky de Taberna',    price = 18, category = 'alcohol', icon = 'whiskey-glass' },
-            { name = 'cocktail',     label = 'Cóctel Hen House',     price = 20, category = 'alcohol', icon = 'martini-glass-citrus' },
-            { name = 'tequila_shot', label = 'Chupito de Tequila',   price = 15, category = 'alcohol', icon = 'wine-glass' },
-            { name = 'sandwich',     label = 'Sándwich Rústico',     price = 12, category = 'food',    icon = 'utensils' },
-            { name = 'water',        label = 'Botella de Agua',      price = 4,  category = 'drink',   icon = 'bottle-water' },
-            { name = 'chips',        label = 'Patatas Fritas',       price = 8,  category = 'food',    icon = 'bowl-food' }
+            { name = 'beer',         label = 'Cerveza Pißwasser',  price = 10, category = 'alcohol', icon = 'beer-mug-empty' },
+            { name = 'whiskey',      label = 'Whisky de Taberna',  price = 18, category = 'alcohol', icon = 'whiskey-glass' },
+            { name = 'cocktail',     label = 'Cóctel Hen House',   price = 20, category = 'alcohol', icon = 'martini-glass-citrus' },
+            { name = 'tequila_shot', label = 'Chupito de Tequila', price = 15, category = 'alcohol', icon = 'wine-glass' },
+            { name = 'sandwich',     label = 'Sándwich Rústico',   price = 12, category = 'food',    icon = 'utensils' },
+            { name = 'water',        label = 'Botella de Agua',    price = 4,  category = 'drink',   icon = 'bottle-water' },
+            { name = 'chips',        label = 'Patatas Fritas',     price = 8,  category = 'food',    icon = 'bowl-food' }
         }
     },
 
@@ -540,12 +541,12 @@ Config.BusinessVendors = {
             name = "Rob's Liquor"
         },
         items = {
-            { name = 'whiskey',      label = 'Whisky Richards',     price = 20, category = 'alcohol', icon = 'whiskey-glass' },
-            { name = 'beer',         label = 'Cerveza Pißwasser',   price = 10, category = 'alcohol', icon = 'beer-mug-empty' },
-            { name = 'tequila_shot', label = 'Chupito de Tequila',  price = 15, category = 'alcohol', icon = 'wine-glass' },
-            { name = 'cola',         label = 'Lata de eCola',        price = 5,  category = 'drink',   icon = 'mug-hot' },
-            { name = 'water',        label = 'Botella de Agua',     price = 5,  category = 'drink',   icon = 'bottle-water' },
-            { name = 'chips',        label = 'Patatas Fritas',      price = 8,  category = 'food',    icon = 'bowl-food' }
+            { name = 'whiskey',      label = 'Whisky Richards',    price = 20, category = 'alcohol', icon = 'whiskey-glass' },
+            { name = 'beer',         label = 'Cerveza Pißwasser',  price = 10, category = 'alcohol', icon = 'beer-mug-empty' },
+            { name = 'tequila_shot', label = 'Chupito de Tequila', price = 15, category = 'alcohol', icon = 'wine-glass' },
+            { name = 'cola',         label = 'Lata de eCola',      price = 5,  category = 'drink',   icon = 'mug-hot' },
+            { name = 'water',        label = 'Botella de Agua',    price = 5,  category = 'drink',   icon = 'bottle-water' },
+            { name = 'chips',        label = 'Patatas Fritas',     price = 8,  category = 'food',    icon = 'bowl-food' }
         }
     },
 
@@ -569,12 +570,12 @@ Config.BusinessVendors = {
             name = "Rob's Liquor"
         },
         items = {
-            { name = 'whiskey',      label = 'Whisky Richards',     price = 20, category = 'alcohol', icon = 'whiskey-glass' },
-            { name = 'beer',         label = 'Cerveza Pißwasser',   price = 10, category = 'alcohol', icon = 'beer-mug-empty' },
-            { name = 'tequila_shot', label = 'Chupito de Tequila',  price = 15, category = 'alcohol', icon = 'wine-glass' },
-            { name = 'cola',         label = 'Lata de eCola',        price = 5,  category = 'drink',   icon = 'mug-hot' },
-            { name = 'water',        label = 'Botella de Agua',     price = 5,  category = 'drink',   icon = 'bottle-water' },
-            { name = 'chips',        label = 'Patatas Fritas',      price = 8,  category = 'food',    icon = 'bowl-food' }
+            { name = 'whiskey',      label = 'Whisky Richards',    price = 20, category = 'alcohol', icon = 'whiskey-glass' },
+            { name = 'beer',         label = 'Cerveza Pißwasser',  price = 10, category = 'alcohol', icon = 'beer-mug-empty' },
+            { name = 'tequila_shot', label = 'Chupito de Tequila', price = 15, category = 'alcohol', icon = 'wine-glass' },
+            { name = 'cola',         label = 'Lata de eCola',      price = 5,  category = 'drink',   icon = 'mug-hot' },
+            { name = 'water',        label = 'Botella de Agua',    price = 5,  category = 'drink',   icon = 'bottle-water' },
+            { name = 'chips',        label = 'Patatas Fritas',     price = 8,  category = 'food',    icon = 'bowl-food' }
         }
     },
 
@@ -598,12 +599,12 @@ Config.BusinessVendors = {
             name = "Rob's Liquor"
         },
         items = {
-            { name = 'whiskey',      label = 'Whisky Richards',     price = 20, category = 'alcohol', icon = 'whiskey-glass' },
-            { name = 'beer',         label = 'Cerveza Pißwasser',   price = 10, category = 'alcohol', icon = 'beer-mug-empty' },
-            { name = 'tequila_shot', label = 'Chupito de Tequila',  price = 15, category = 'alcohol', icon = 'wine-glass' },
-            { name = 'cola',         label = 'Lata de eCola',        price = 5,  category = 'drink',   icon = 'mug-hot' },
-            { name = 'water',        label = 'Botella de Agua',     price = 5,  category = 'drink',   icon = 'bottle-water' },
-            { name = 'chips',        label = 'Patatas Fritas',      price = 8,  category = 'food',    icon = 'bowl-food' }
+            { name = 'whiskey',      label = 'Whisky Richards',    price = 20, category = 'alcohol', icon = 'whiskey-glass' },
+            { name = 'beer',         label = 'Cerveza Pißwasser',  price = 10, category = 'alcohol', icon = 'beer-mug-empty' },
+            { name = 'tequila_shot', label = 'Chupito de Tequila', price = 15, category = 'alcohol', icon = 'wine-glass' },
+            { name = 'cola',         label = 'Lata de eCola',      price = 5,  category = 'drink',   icon = 'mug-hot' },
+            { name = 'water',        label = 'Botella de Agua',    price = 5,  category = 'drink',   icon = 'bottle-water' },
+            { name = 'chips',        label = 'Patatas Fritas',     price = 8,  category = 'food',    icon = 'bowl-food' }
         }
     },
 
@@ -627,12 +628,12 @@ Config.BusinessVendors = {
             name = "Ace Liquor"
         },
         items = {
-            { name = 'whiskey',      label = 'Whisky Richards',     price = 20, category = 'alcohol', icon = 'whiskey-glass' },
-            { name = 'beer',         label = 'Cerveza Pißwasser',   price = 10, category = 'alcohol', icon = 'beer-mug-empty' },
-            { name = 'tequila_shot', label = 'Chupito de Tequila',  price = 15, category = 'alcohol', icon = 'wine-glass' },
-            { name = 'cola',         label = 'Lata de eCola',        price = 5,  category = 'drink',   icon = 'mug-hot' },
-            { name = 'water',        label = 'Botella de Agua',     price = 5,  category = 'drink',   icon = 'bottle-water' },
-            { name = 'chips',        label = 'Patatas Fritas',      price = 8,  category = 'food',    icon = 'bowl-food' }
+            { name = 'whiskey',      label = 'Whisky Richards',    price = 20, category = 'alcohol', icon = 'whiskey-glass' },
+            { name = 'beer',         label = 'Cerveza Pißwasser',  price = 10, category = 'alcohol', icon = 'beer-mug-empty' },
+            { name = 'tequila_shot', label = 'Chupito de Tequila', price = 15, category = 'alcohol', icon = 'wine-glass' },
+            { name = 'cola',         label = 'Lata de eCola',      price = 5,  category = 'drink',   icon = 'mug-hot' },
+            { name = 'water',        label = 'Botella de Agua',    price = 5,  category = 'drink',   icon = 'bottle-water' },
+            { name = 'chips',        label = 'Patatas Fritas',     price = 8,  category = 'food',    icon = 'bowl-food' }
         }
     },
 
@@ -656,14 +657,81 @@ Config.BusinessVendors = {
             name = "Rob's Liquor"
         },
         items = {
-            { name = 'whiskey',      label = 'Whisky Richards',     price = 20, category = 'alcohol', icon = 'whiskey-glass' },
-            { name = 'beer',         label = 'Cerveza Pißwasser',   price = 10, category = 'alcohol', icon = 'beer-mug-empty' },
-            { name = 'tequila_shot', label = 'Chupito de Tequila',  price = 15, category = 'alcohol', icon = 'wine-glass' },
-            { name = 'cola',         label = 'Lata de eCola',        price = 5,  category = 'drink',   icon = 'mug-hot' },
-            { name = 'water',        label = 'Botella de Agua',     price = 5,  category = 'drink',   icon = 'bottle-water' },
-            { name = 'chips',        label = 'Patatas Fritas',      price = 8,  category = 'food',    icon = 'bowl-food' }
+            { name = 'whiskey',      label = 'Whisky Richards',    price = 20, category = 'alcohol', icon = 'whiskey-glass' },
+            { name = 'beer',         label = 'Cerveza Pißwasser',  price = 10, category = 'alcohol', icon = 'beer-mug-empty' },
+            { name = 'tequila_shot', label = 'Chupito de Tequila', price = 15, category = 'alcohol', icon = 'wine-glass' },
+            { name = 'cola',         label = 'Lata de eCola',      price = 5,  category = 'drink',   icon = 'mug-hot' },
+            { name = 'water',        label = 'Botella de Agua',    price = 5,  category = 'drink',   icon = 'bottle-water' },
+            { name = 'chips',        label = 'Patatas Fritas',     price = 8,  category = 'food',    icon = 'bowl-food' }
         }
-    }
+    },
+
+    ['salieri'] = {
+        job = 'salieri',
+        label = 'Salieri Club',
+        pedModel = 's_m_y_barman_01',
+        coords = vec3(322.11, -1095.43, 29.39),
+        heading = 88.48,
+        scenario = 'WORLD_HUMAN_STAND_IMPARTIAL',
+        society = 'salieri',
+        maxWeight = 300000,
+        slots = 50,
+        blip = {
+            enabled = true,
+            coords = vec3(322.11, -1095.43, 29.39),
+            sprite = 93,      -- Copa de cóctel / Hostelería
+            scale = 0.8,
+            openColor = 5,    -- Amarillo Hen House
+            closedColor = 39, -- Gris cuando está cerrado
+            name = 'Salieri Club'
+        },
+        items = {
+            { name = 'beer',         label = 'Cerveza Pißwasser',  price = 10, category = 'alcohol', icon = 'beer-mug-empty' },
+            { name = 'whiskey',      label = 'Whisky de Taberna',  price = 18, category = 'alcohol', icon = 'whiskey-glass' },
+            { name = 'cocktail',     label = 'Cóctel Hen House',   price = 20, category = 'alcohol', icon = 'martini-glass-citrus' },
+            { name = 'tequila_shot', label = 'Chupito de Tequila', price = 15, category = 'alcohol', icon = 'wine-glass' },
+            { name = 'sandwich',     label = 'Sándwich Rústico',   price = 12, category = 'food',    icon = 'utensils' },
+            { name = 'water',        label = 'Botella de Agua',    price = 4,  category = 'drink',   icon = 'bottle-water' },
+            { name = 'chips',        label = 'Patatas Fritas',     price = 8,  category = 'food',    icon = 'bowl-food' }
+        }
+    },
 }
 
+-- ============================================================================
+-- SISTEMA DE CERRADURAS DE PUERTAS (DOORLOCKS)
+-- ============================================================================
+Config.Doors = {
+    -- Ejemplo: Puerta de Vazou (Ajustar coords y hash según el MLO)
+    ['vazou_main'] = {
+        job = 'vazou',                           -- Job que puede abrirla/cerrarla
+        model = `v_ilev_ss_door04`,              -- Hash del modelo de la puerta
+        coords = vec3(-1564.44, -974.61, 13.02), -- Coordenadas exactas de la puerta
+        distance = 2.0,                          -- Distancia de interacción
+        locked = true                            -- Estado por defecto
+    },
 
+    ['vazou_secundaria'] = {
+        job = 'vazou',                           -- Job que puede abrirla/cerrarla
+        model = `v_ilev_ss_door04`,              -- Hash del modelo de la puerta
+        coords = vec3(-1558.66, -972.22, 13.02), -- Coordenadas exactas de la puerta
+        distance = 2.0,                          -- Distancia de interacción
+        locked = true                            -- Estado por defecto
+    },
+
+    ['salieri_main'] = {
+        job = 'salieri',                        -- Job que puede abrirla/cerrarla
+        model = `v_ilev_ss_door04`,             -- Hash del modelo de la puerta
+        coords = vec3(322.11, -1095.43, 29.39), -- Coordenadas exactas de la puerta
+        distance = 2.0,                         -- Distancia de interacción
+        locked = true                           -- Estado por defecto
+    },
+
+    -- Ejemplo: Puerta de The Hen House
+    ['henhouse_main'] = {
+        job = 'henhouse',
+        model = `v_ilev_ss_door04`,
+        coords = vec3(-297.59, 6271.26, 31.51),
+        distance = 2.0,
+        locked = true
+    }
+}
