@@ -21,19 +21,6 @@ CreateThread(function()
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
     ]]
     MySQL.query(createGalleryTable)
-
-    -- Asegurar que la columna es LONGTEXT por si ya existía como TEXT (para soportar base64 sin truncamiento)
-    pcall(function()
-        MySQL.query("ALTER TABLE `aura_phone_gallery` MODIFY COLUMN `media_url` LONGTEXT NOT NULL;")
-    end)
-
-    local addAvatarColumn = [[
-        ALTER TABLE `aura_phone_contacts` 
-        ADD COLUMN IF NOT EXISTS `avatar_url` TEXT DEFAULT NULL;
-    ]]
-    pcall(function()
-        MySQL.query(addAvatarColumn)
-    end)
 end)
 
 -- Obtener todas las fotos de la galería del jugador

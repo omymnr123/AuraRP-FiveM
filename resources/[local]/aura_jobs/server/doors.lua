@@ -32,17 +32,8 @@ local function InitDoors()
             `distance` FLOAT NOT NULL DEFAULT 2.5
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
     ]], {}, function()
-        -- Auto-migración en caliente: asegurar que todas las columnas existan si la tabla ya existía
-        MySQL.query([[
-            ALTER TABLE `aura_doors`
-                ADD COLUMN IF NOT EXISTS `job` VARCHAR(50) NOT NULL DEFAULT '',
-                ADD COLUMN IF NOT EXISTS `coords_x` DOUBLE NOT NULL DEFAULT 0,
-                ADD COLUMN IF NOT EXISTS `coords_y` DOUBLE NOT NULL DEFAULT 0,
-                ADD COLUMN IF NOT EXISTS `coords_z` DOUBLE NOT NULL DEFAULT 0,
-                ADD COLUMN IF NOT EXISTS `distance` FLOAT NOT NULL DEFAULT 2.5;
-        ]], {}, function()
-            -- 1. Cargar puertas existentes en Base de Datos
-            MySQL.query('SELECT * FROM aura_doors', {}, function(results)
+        -- 1. Cargar puertas existentes en Base de Datos
+        MySQL.query('SELECT * FROM aura_doors', {}, function(results)
                 DynamicDoors = {}
                 if results then
                     for i = 1, #results do
@@ -112,7 +103,6 @@ local function InitDoors()
                     print(string.format("[Aura Jobs] Sistema de Puertas inicializado con %d cerraduras activas.", GetTableSize(DynamicDoors)))
                 end
             end)
-        end)
     end)
 end
 

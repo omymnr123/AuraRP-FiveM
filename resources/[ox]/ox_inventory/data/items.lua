@@ -232,6 +232,17 @@ return {
 		}
 	},
 
+	['armor'] = {
+		label = 'Chaleco Balístico',
+		weight = 3000,
+		stack = false,
+		description = 'Blindaje balístico ligero de fibra de aramida que absorbe impactos de bala.',
+		client = {
+			anim = { dict = 'clothingshirt', clip = 'try_shirt_positive_d' },
+			usetime = 3500
+		}
+	},
+
 	['clothing'] = {
 		label = 'Prendas de Ropa',
 		weight = 500,
@@ -369,4 +380,93 @@ return {
 			export = 'aura_status.consumeItem'
 		}
 	},
+
+	-- ============================================================================
+	-- EQUIPAMIENTO POLICIAL Y EMERGENCIAS (LSPD / BCSO)
+	-- ============================================================================
+	['handcuffs'] = {
+		label = 'Esposas Reglamentarias',
+		weight = 250,
+		stack = true,
+		close = true,
+		description = 'Grilletes metálicos de alta resistencia con doble trinquete para la custodia de sospechosos.',
+		client = {
+			image = 'WEAPON_HANDCUFFS.png'
+		}
+	},
+
+	['armor'] = {
+		label = 'Chaleco Balístico',
+		weight = 3000,
+		stack = false,
+		description = 'Blindaje balístico ligero de fibra de aramida que absorbe impactos de bala.',
+		client = {
+			image = 'armour.png',
+			anim = { dict = 'clothingshirt', clip = 'try_shirt_positive_d' },
+			usetime = 3500,
+			notification = 'Te has colocado el chaleco balístico reglamentario'
+		}
+	},
+
+	['police_badge'] = {
+		label = 'Placa Policial LSPD',
+		weight = 50,
+		stack = false,
+		description = 'Insignia y credencial oficial metálica del Departamento de Policía.',
+		client = {
+			image = 'card_id.png'
+		}
+	},
+
+	['bodycam'] = {
+		label = 'Cámara Corporal Axon',
+		weight = 180,
+		stack = false,
+		description = 'Cámara corporal táctica de alta definición para el registro de intervenciones policiales.',
+		client = {
+			image = 'usb_black.png'
+		}
+	},
+
+	['medikit'] = {
+		label = 'Botiquín Táctico IFAK',
+		weight = 1000,
+		description = 'Kit individual de primeros auxilios táctico con gasas hemostáticas y vendajes compresivos.',
+		client = {
+			image = 'medikit.png',
+			anim = { dict = 'missheistdockssetup1clipboard@idle_a', clip = 'idle_a', flag = 49 },
+			usetime = 4000,
+			notification = 'Has utilizado un botiquín táctico de primeros auxilios'
+		}
+	},
+
+	['spikestrip'] = {
+		label = 'Banda de Clavos Portátil',
+		weight = 3500,
+		stack = true,
+		description = 'Dispositivo policial de púas de acero para desinflar neumáticos durante persecuciones.',
+		client = {
+			image = 'scrapmetal.png'
+		}
+	},
+
+	['evidence_bag'] = {
+		label = 'Bolsa de Evidencias Forense',
+		weight = 20,
+		stack = true,
+		description = 'Bolsa estéril de polietileno precintable para custodia y análisis de pruebas forenses.',
+		client = {
+			image = 'paperbag.png'
+		}
+	},
+
+	['breathalyzer'] = {
+		label = 'Alcoholímetro Digital',
+		weight = 200,
+		stack = false,
+		description = 'Dispositivo de precisión para medir el nivel de alcohol en aire espirado.',
+		client = {
+			image = 'phone.png'
+		}
+	}
 }

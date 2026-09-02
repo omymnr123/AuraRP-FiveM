@@ -98,10 +98,6 @@ local function InitializeMarket()
           KEY `idx_tx_uuid` (`transaction_id`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;]])
 
-        pcall(function()
-            MySQL.query.await([[ALTER TABLE `characters` ADD COLUMN IF NOT EXISTS `accounts` LONGTEXT NOT NULL DEFAULT '{"cash":0,"bank":5000,"black_money":0}' COMMENT 'JSON: cash, bank, black_money' CHECK (JSON_VALID(`accounts`));]])
-        end)
-
         -- 1. Cargar datos existentes de la base de datos
         local dbItems = MySQL.query.await('SELECT * FROM aura_market_items')
         local loadedMap = {}

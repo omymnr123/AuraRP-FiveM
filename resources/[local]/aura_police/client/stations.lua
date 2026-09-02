@@ -9,7 +9,7 @@ local function InitStationPoints()
         if stationData.armory then
             exports.ox_target:addBoxZone({
                 coords = stationData.armory.coords,
-                size = vec3(1.5, 1.5, 2.0),
+                size = vec3(2.5, 2.5, 2.5),
                 rotation = 0.0,
                 debug = Config.Debug,
                 options = {
@@ -17,12 +17,22 @@ local function InitStationPoints()
                         name = 'aura_police_armory_loadout_' .. stationKey,
                         icon = 'fa-solid fa-gun',
                         label = 'Retirar Dotación Reglamentaria',
-                        distance = 2.0,
+                        distance = 2.8,
                         canInteract = function()
                             local pState = LocalPlayer.state
-                            return pState.job == 'police' and pState.job_duty == true
+                            return pState.job == 'police'
                         end,
                         onSelect = function()
+                            local pState = LocalPlayer.state
+                            if not pState.job_duty then
+                                lib.notify({
+                                    title = 'Armería Policial',
+                                    description = 'Debes entrar EN SERVICIO para retirar tu armamento reglamentario.',
+                                    type = 'error'
+                                })
+                                return
+                            end
+
                             lib.callback('aura_police:server:claimArmoryLoadout', false, function(success, message)
                                 lib.notify({
                                     title = 'Armería Policial',
@@ -33,16 +43,22 @@ local function InitStationPoints()
                         end
                     },
                     {
-                        name = 'aura_police_armory_stash_' .. stationKey,
-                        icon = 'fa-solid fa-box-archive',
-                        label = 'Abrir Almacén de Armería',
-                        distance = 2.0,
+                        name = 'aura_police_armory_return_' .. stationKey,
+                        icon = 'fa-solid fa-trash-can-arrow-up',
+                        label = 'Buzón de Devolución de Dotación (Auto-Vaciado 1 min)',
+                        distance = 2.8,
                         canInteract = function()
                             local pState = LocalPlayer.state
-                            return pState.job == 'police' and pState.job_duty == true
+                            return pState.job == 'police'
                         end,
                         onSelect = function()
-                            exports.ox_inventory:openInventory('stash', stationData.armory.stashId)
+                            local disposalStash = (stationData.armory and stationData.armory.returnStashId) or ('police_disposal_' .. stationKey)
+                            lib.notify({
+                                title = 'Buzón de Devolución',
+                                description = 'Deposita tu dotación. Todo objeto depositado aquí será eliminado en 1 minuto.',
+                                type = 'inform'
+                            })
+                            exports.ox_inventory:openInventory('stash', disposalStash)
                         end
                     }
                 }
@@ -53,7 +69,7 @@ local function InitStationPoints()
         if stationData.evidence then
             exports.ox_target:addBoxZone({
                 coords = stationData.evidence.coords,
-                size = vec3(1.5, 1.5, 2.0),
+                size = vec3(2.5, 2.5, 2.5),
                 rotation = 0.0,
                 debug = Config.Debug,
                 options = {
@@ -61,12 +77,22 @@ local function InitStationPoints()
                         name = 'aura_police_evidence_' .. stationKey,
                         icon = 'fa-solid fa-boxes-stacked',
                         label = 'Abrir Depósito de Evidencias (Confiscaciones)',
-                        distance = 2.0,
+                        distance = 2.8,
                         canInteract = function()
                             local pState = LocalPlayer.state
-                            return pState.job == 'police' and pState.job_duty == true
+                            return pState.job == 'police'
                         end,
                         onSelect = function()
+                            local pState = LocalPlayer.state
+                            if not pState.job_duty then
+                                lib.notify({
+                                    title = 'Depósito de Evidencias',
+                                    description = 'Debes entrar EN SERVICIO como policía para acceder a las evidencias.',
+                                    type = 'error'
+                                })
+                                return
+                            end
+
                             exports.ox_inventory:openInventory('stash', stationData.evidence.stashId)
                         end
                     }
@@ -78,7 +104,7 @@ local function InitStationPoints()
         if stationData.wardrobe then
             exports.ox_target:addBoxZone({
                 coords = stationData.wardrobe.coords,
-                size = vec3(1.5, 1.5, 2.0),
+                size = vec3(2.5, 2.5, 2.5),
                 rotation = 0.0,
                 debug = Config.Debug,
                 options = {
@@ -86,13 +112,12 @@ local function InitStationPoints()
                         name = 'aura_police_wardrobe_' .. stationKey,
                         icon = 'fa-solid fa-shirt',
                         label = 'Abrir Vestuario (Uniformes LSPD)',
-                        distance = 2.0,
+                        distance = 2.8,
                         canInteract = function()
                             local pState = LocalPlayer.state
-                            return pState.job == 'police' and pState.job_duty == true
+                            return pState.job == 'police'
                         end,
                         onSelect = function()
-                            -- Trigger a illenium-appearance si está disponible
                             TriggerEvent('illenium-appearance:client:openJobOutfitsMenu')
                         end
                     }
@@ -104,7 +129,7 @@ local function InitStationPoints()
         if stationData.garage then
             exports.ox_target:addBoxZone({
                 coords = stationData.garage.interact,
-                size = vec3(2.0, 2.0, 2.0),
+                size = vec3(3.0, 3.0, 3.0),
                 rotation = 0.0,
                 debug = Config.Debug,
                 options = {
@@ -112,12 +137,22 @@ local function InitStationPoints()
                         name = 'aura_police_garage_' .. stationKey,
                         icon = 'fa-solid fa-car',
                         label = 'Garaje Policial (Vehículos de Patrulla)',
-                        distance = 2.5,
+                        distance = 3.0,
                         canInteract = function()
                             local pState = LocalPlayer.state
-                            return pState.job == 'police' and pState.job_duty == true
+                            return pState.job == 'police'
                         end,
                         onSelect = function()
+                            local pState = LocalPlayer.state
+                            if not pState.job_duty then
+                                lib.notify({
+                                    title = 'Garaje Policial',
+                                    description = 'Debes entrar EN SERVICIO para solicitar un vehículo de patrulla.',
+                                    type = 'error'
+                                })
+                                return
+                            end
+
                             local grade = LocalPlayer.state.job_grade or 0
                             local menuOptions = {}
 
@@ -173,7 +208,7 @@ local function InitStationPoints()
         if stationData.helipad then
             exports.ox_target:addBoxZone({
                 coords = stationData.helipad.interact,
-                size = vec3(2.0, 2.0, 2.0),
+                size = vec3(3.0, 3.0, 3.0),
                 rotation = 0.0,
                 debug = Config.Debug,
                 options = {
@@ -181,12 +216,22 @@ local function InitStationPoints()
                         name = 'aura_police_helipad_' .. stationKey,
                         icon = 'fa-solid fa-helicopter',
                         label = 'Helipuerto Policial (Air-1)',
-                        distance = 2.5,
+                        distance = 3.0,
                         canInteract = function()
                             local pState = LocalPlayer.state
-                            return pState.job == 'police' and pState.job_duty == true
+                            return pState.job == 'police'
                         end,
                         onSelect = function()
+                            local pState = LocalPlayer.state
+                            if not pState.job_duty then
+                                lib.notify({
+                                    title = 'Helipuerto Policial',
+                                    description = 'Debes entrar EN SERVICIO para solicitar apoyo aéreo.',
+                                    type = 'error'
+                                })
+                                return
+                            end
+
                             local grade = LocalPlayer.state.job_grade or 0
                             local menuOptions = {}
 

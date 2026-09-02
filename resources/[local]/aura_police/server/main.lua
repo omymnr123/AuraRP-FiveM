@@ -5,26 +5,39 @@
 
 local CuffedPlayers = {}   -- [src] = true
 local EscortedPlayers = {} -- [suspectSrc] = copSrc
+local DisposalStashes = {} -- [stashId] = true (Stashes con auto-vaciado a los 60s)
 
 -- ============================================================================
--- 1. REGISTRO DE STASHES CENTRALIZADOS (ARMERÍAS Y DEPÓSITOS DE EVIDENCIAS)
+-- 1. REGISTRO DE STASHES CENTRALIZADOS (ARMERÍAS, DEVOLUCIÓN Y EVIDENCIAS)
 -- ============================================================================
 
 local function RegisterPoliceStashes()
     for stationId, stationData in pairs(Config.Stations) do
-        -- Armería
+        -- 1. Armería
         if stationData.armory then
             exports.ox_inventory:RegisterStash(
                 stationData.armory.stashId,
                 stationData.label .. " - Armería",
                 stationData.armory.slots or 50,
-                stationData.armory.maxWeight or 500000,
+                stationData.armory.maxWeight or 1000000,
+                nil,
+                { ['police'] = 0 }
+            )
+
+            -- 2. Buzón de Devolución de Dotación (Auto-Vaciado en 1 minuto)
+            local disposalId = stationData.armory.returnStashId or ('police_disposal_' .. stationId)
+            DisposalStashes[disposalId] = true
+            exports.ox_inventory:RegisterStash(
+                disposalId,
+                stationData.label .. " - Buzón de Devolución (Auto-Vaciado 1 min)",
+                50,
+                1000000,
                 nil,
                 { ['police'] = 0 }
             )
         end
 
-        -- Depósito de Evidencias
+        -- 3. Depósito de Evidencias
         if stationData.evidence then
             exports.ox_inventory:RegisterStash(
                 stationData.evidence.stashId,
@@ -37,10 +50,54 @@ local function RegisterPoliceStashes()
         end
     end
 
+    -- Stash de prueba para NPC Dummy de desarrollo
+    exports.ox_inventory:RegisterStash(
+        'police_test_dummy',
+        'Sospechoso - Pertenencias (Test Dummy)',
+        30,
+        100000,
+        nil,
+        { ['police'] = 0 }
+    )
+
     if Config.Debug then
-        print("[Aura Police] Stashes de Armerías y Evidencias registrados en ox_inventory.")
+        print("[Aura Police] Stashes de Armerías, Devolución, Evidencias y Test Dummy registrados en ox_inventory.")
     end
 end
+
+-- ============================================================================
+-- MOTOR DE AUTO-VACIADO EXCLUSIVO PARA BUZONES DE DEVOLUCIÓN (CADA 60 SEGUNDOS)
+-- ============================================================================
+CreateThread(function()
+    while true do
+        Wait(60000) -- Ejecuta cada 1 minuto
+        for stashId in pairs(DisposalStashes) do
+            local items = exports.ox_inventory:GetInventoryItems(stashId)
+            if items and next(items) then
+                exports.ox_inventory:ClearInventory(stashId)
+                if Config.Debug then
+                    print(string.format("[Aura Police] Auto-vaciado completado en buzón: %s", stashId))
+                end
+            end
+        end
+    end
+end)
+
+RegisterNetEvent('aura_police:server:prepareDummyStash', function()
+    local src = source
+    if not IsCopOnDuty(src) then return end
+    
+    -- Inicializar con items de sospechoso si está vacío
+    local items = exports.ox_inventory:GetInventoryItems('police_test_dummy')
+    if not items or #items == 0 then
+        exports.ox_inventory:AddItem('police_test_dummy', 'lockpick', 2)
+        exports.ox_inventory:AddItem('police_test_dummy', 'phone', 1)
+        exports.ox_inventory:AddItem('police_test_dummy', 'money', 450)
+        exports.ox_inventory:AddItem('police_test_dummy', 'bandage', 3)
+    end
+
+    TriggerClientEvent('aura_police:client:openDummyInventory', src)
+end)
 
 AddEventHandler('onResourceStart', function(res)
     if GetCurrentResourceName() ~= res then return end
@@ -199,11 +256,17 @@ lib.callback.register('aura_police:server:claimArmoryLoadout', function(source)
     end
 
     -- Entregar ítems reglamentarios al inventario del agente
+    local givenCount = 0
     for _, item in ipairs(targetLoadout) do
-        exports.ox_inventory:AddItem(src, item.name, item.count)
+        local success, resp = exports.ox_inventory:AddItem(src, item.name, item.count)
+        if success then
+            givenCount = givenCount + 1
+        else
+            print(string.format("[Aura Police Armory] Aviso: No se pudo entregar '%s' x%d al jugador %d: %s", item.name, item.count, src, tostring(resp)))
+        end
     end
 
-    return true, "Equipamiento y armamento reglamentario retirado correctamente."
+    return true, string.format("Dotación reglamentaria entregada (%d equipos/armas retiradas).", givenCount)
 end)
 
 -- ============================================================================

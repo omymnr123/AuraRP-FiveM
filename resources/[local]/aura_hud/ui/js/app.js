@@ -29,13 +29,24 @@ const rings = {
     }
 };
 
-// Ocultar voz por defecto al iniciar
-window.addEventListener('DOMContentLoaded', () => {
-    setVisibility(rings.voice.item, false);
-});
+// Inicialización: ocultar todos los indicadores dinámicos por defecto
+function initializeHUD() {
+    for (const key in rings) {
+        if (rings[key] && rings[key].item) {
+            setVisibility(rings[key].item, false);
+        }
+    }
+}
+
+if (document.readyState === 'loading') {
+    window.addEventListener('DOMContentLoaded', initializeHUD);
+} else {
+    initializeHUD();
+}
 
 // Función para ocultar/mostrar elementos fluidamente
 function setVisibility(item, isVisible) {
+    if (!item) return;
     if (isVisible) {
         item.style.width = '44px';
         item.style.margin = ''; 
@@ -49,19 +60,97 @@ function setVisibility(item, isVisible) {
     }
 }
 
+// Variables de estado para el sistema de Armadura Dinámica
+let lastArmor = null;
+let armorHideTimeout = null;
+
+// Manejo inteligente del indicador de armadura
+function updateArmor(percent) {
+    if (!rings.armor || !rings.armor.circle || !rings.armor.item) return;
+    
+    percent = Number(percent);
+    if (isNaN(percent)) percent = 0;
+    percent = Math.max(0, Math.min(100, Math.round(percent)));
+    
+    // Calcular offset del anillo (100% = 0, 0% = 113.097)
+    const offset = CIRCUMFERENCE - (percent / 100) * CIRCUMFERENCE;
+    rings.armor.circle.style.strokeDashoffset = offset;
+    
+    // Estado de peligro (rojo pulsante) si está en estado crítico (1% - 20%)
+    if (percent > 0 && percent <= 20) {
+        rings.armor.item.classList.add('danger-state');
+    } else {
+        rings.armor.item.classList.remove('danger-state');
+    }
+    
+    // 1. Armadura en 0% (Sin chaleco o chaleco roto)
+    if (percent === 0) {
+        if (armorHideTimeout) {
+            clearTimeout(armorHideTimeout);
+            armorHideTimeout = null;
+        }
+        if (lastArmor !== null && lastArmor > 0) {
+            // Permitir ver cómo se vacía el círculo antes de desvanecerse
+            setTimeout(() => {
+                if (lastArmor === 0) {
+                    setVisibility(rings.armor.item, false);
+                }
+            }, 350);
+        } else {
+            setVisibility(rings.armor.item, false);
+        }
+        lastArmor = 0;
+        return;
+    }
+    
+    // 2. Armadura al 100% (Chaleco nuevo puesto o lleno)
+    if (percent >= 100) {
+        if (lastArmor === null || lastArmor < 100) {
+            // Mostrar cómo se llena el círculo al 100%
+            setVisibility(rings.armor.item, true);
+            
+            if (armorHideTimeout) clearTimeout(armorHideTimeout);
+            // Mantener visible durante 3 segundos para confirmación visual y luego ocultar suavemente
+            armorHideTimeout = setTimeout(() => {
+                if (lastArmor >= 100) {
+                    setVisibility(rings.armor.item, false);
+                }
+            }, 3000);
+        }
+        lastArmor = 100;
+        return;
+    }
+    
+    // 3. Armadura desgastada entre 1% y 99% (Permanecer visible mostrando escudo restante)
+    if (armorHideTimeout) {
+        clearTimeout(armorHideTimeout);
+        armorHideTimeout = null;
+    }
+    setVisibility(rings.armor.item, true);
+    lastArmor = percent;
+}
+
 // Función ultra rápida para actualizar un anillo
 function updateRing(type, percent) {
     if (!rings[type]) return;
     
-    // Lógica dinámica de HUD Inteligente
     if (type === 'armor') {
-        setVisibility(rings[type].item, percent > 0);
-    } else if (type === 'hunger' || type === 'thirst') {
+        updateArmor(percent);
+        return;
+    }
+    
+    // Asegurar número y límites válidos
+    percent = Number(percent);
+    if (isNaN(percent)) percent = 100;
+    percent = Math.max(0, Math.min(100, percent));
+    
+    // Lógica dinámica de HUD Inteligente para resto de atributos
+    if (type === 'hunger' || type === 'thirst') {
         setVisibility(rings[type].item, percent <= 70);
     } else if (type === 'health') {
         setVisibility(rings[type].item, percent <= 95);
     } else if (type === 'stamina') {
-        setVisibility(rings[type].item, percent < 100);
+        setVisibility(rings[type].item, percent < 99);
     }
 
     // Calcular offset
@@ -69,13 +158,11 @@ function updateRing(type, percent) {
     const offset = CIRCUMFERENCE - (percent / 100) * CIRCUMFERENCE;
     rings[type].circle.style.strokeDashoffset = offset;
 
-    // Añadir clase de peligro si el nivel es bajo (< 20%)
-    if (type !== 'armor') {
-        if (percent <= 20) {
-            rings[type].item.classList.add('danger-state');
-        } else {
-            rings[type].item.classList.remove('danger-state');
-        }
+    // Añadir clase de peligro si el nivel es bajo (<= 20%)
+    if (percent <= 20) {
+        rings[type].item.classList.add('danger-state');
+    } else {
+        rings[type].item.classList.remove('danger-state');
     }
 }
 

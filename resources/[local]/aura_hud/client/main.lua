@@ -1,20 +1,24 @@
 local HUD_VISIBLE = false
 local wasTalking = false
 
--- Mostrar el HUD cuando el jugador hace spawn o se inicializa
-CreateThread(function()
-    Wait(1000)
-    
-    -- Pedir la posición guardada al servidor antes de mostrar
+local function ShowHUD()
     TriggerServerEvent('aura_hud:server:RequestPosition')
-    
-    Wait(500) -- Dar tiempo a recibir la respuesta
-    
     SendNUIMessage({
         action = 'showHUD'
     })
     HUD_VISIBLE = true
+end
+
+-- Mostrar el HUD cuando el jugador hace spawn o se inicializa
+CreateThread(function()
+    Wait(1000)
+    ShowHUD()
 end)
+
+AddEventHandler('playerSpawned', ShowHUD)
+RegisterNetEvent('aura_core:client:playerSpawned', ShowHUD)
+RegisterNetEvent('aura_core:playerSpawnedAndReady', ShowHUD)
+RegisterNetEvent('aura_multichar:client:characterLoaded', ShowHUD)
 
 -- Obtener dimensiones del minimapa de GTA V (Resolución Responsiva)
 function GetMinimapAnchor()

@@ -31,9 +31,11 @@ CREATE TABLE IF NOT EXISTS `aura_doors` (
   PRIMARY KEY (`door_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
--- Volcando datos para la tabla aurarp.aura_doors: ~5 rows (aproximadamente)
+-- Volcando datos para la tabla aurarp.aura_doors: ~7 rows (aproximadamente)
 INSERT INTO `aura_doors` (`door_id`, `is_locked`, `job`, `coords_x`, `coords_y`, `coords_z`, `distance`) VALUES
 	('henhouse_main', 1, 'henhouse', -297.5899963378906, 6271.259765625, 31.510000228881836, 2),
+	('police_capitan', 1, 'police', 447.19122314453125, -980.4000244140625, 30.6783447265625, 2.5),
+	('police_main', 1, 'police', 434.75604248046875, -981.9296875, 30.6951904296875, 2.5),
 	('salieri_1', 1, 'salieri', 316.5758361816406, -1092.6065673828125, 29.4146728515625, 2.5),
 	('salieri_main', 1, 'salieri', 316.82000732421875, -1092.6199951171875, 29.420000076293945, 2),
 	('vazou_main', 1, 'vazou', -1564.43994140625, -974.6099853515625, 13.020000457763672, 2),
@@ -116,7 +118,7 @@ CREATE TABLE IF NOT EXISTS `aura_phone_contacts` (
   CONSTRAINT `aura_phone_contacts_ibfk_1` FOREIGN KEY (`owner_number`) REFERENCES `characters` (`phone_number`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Volcando datos para la tabla aurarp.aura_phone_contacts: ~1 rows (aproximadamente)
+-- Volcando datos para la tabla aurarp.aura_phone_contacts: ~0 rows (aproximadamente)
 INSERT INTO `aura_phone_contacts` (`id`, `owner_number`, `contact_number`, `contact_name`, `is_favorite`, `note`, `avatar_url`) VALUES
 	(1, '555-8966', '5232123', 'new', 0, '', NULL);
 
@@ -131,7 +133,7 @@ CREATE TABLE IF NOT EXISTS `aura_phone_gallery` (
   KEY `idx_owner_gallery` (`owner_number`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Volcando datos para la tabla aurarp.aura_phone_gallery: ~1 rows (aproximadamente)
+-- Volcando datos para la tabla aurarp.aura_phone_gallery: ~0 rows (aproximadamente)
 INSERT INTO `aura_phone_gallery` (`id`, `owner_number`, `media_url`, `media_type`, `created_at`) VALUES
 	(1, '555-8966', 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=800&q=80', 'image', '2026-08-31 15:04:03');
 
@@ -294,7 +296,7 @@ CREATE TABLE IF NOT EXISTS `aura_transactions` (
   KEY `idx_tx_uuid` (`transaction_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=90 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Volcando datos para la tabla aurarp.aura_transactions: ~89 rows (aproximadamente)
+-- Volcando datos para la tabla aurarp.aura_transactions: ~11 rows (aproximadamente)
 INSERT INTO `aura_transactions` (`id`, `transaction_id`, `character_id`, `target_character_id`, `account`, `type`, `amount`, `balance_before`, `balance_after`, `fee`, `reason`, `metadata`, `created_at`) VALUES
 	(1, 'TX-1788119036-11-f3ed8221', 11, NULL, 'bank', 'WITHDRAW', 500, 5000, 4500, 0, 'Emisión de Tarjeta de Crédito', NULL, '2026-08-30 19:43:56'),
 	(2, 'TX-1788119131-11-62a01561', 11, NULL, 'bank', 'WITHDRAW', 500, 4500, 4000, 0, 'Retirada ATM', '{"executor":11}', '2026-08-30 19:45:31'),
@@ -360,7 +362,7 @@ CREATE TABLE IF NOT EXISTS `characters` (
 
 -- Volcando datos para la tabla aurarp.characters: ~1 rows (aproximadamente)
 INSERT INTO `characters` (`id`, `citizenid`, `slot`, `firstname`, `lastname`, `nationality`, `dob`, `gender`, `metadata`, `created_at`, `last_played`, `accounts`, `inventory`, `job`, `job_grade`, `job_duty`, `jail_time`, `iban`, `pin`, `phone_number`, `phone_settings`) VALUES
-	(11, 'HLWWIZKU', 1, 'test', 'uno', 'Angola', '1990-12-11', 0, '{"armor":0,"last_location":{"x":1858.07470703125,"y":3680.24169921875,"z":33.761962890625,"heading":150.23622131347657},"bank":5000,"cash":1000,"health":200,"appearance":{"model":"mp_m_freemode_01","headBlend":{"skinThird":0,"skinMix":0,"shapeFirst":0,"shapeThird":0,"skinFirst":0,"skinSecond":0,"shapeSecond":0,"shapeMix":0,"thirdMix":0},"eyeColor":0,"tattoos":[],"faceFeatures":{"neckThickness":0,"eyeBrownForward":0,"noseBoneTwist":0,"eyesOpening":0,"cheeksWidth":0,"chinBoneSize":0,"chinBoneLowering":0,"jawBoneWidth":0,"chinHole":0,"cheeksBoneHigh":0,"lipsThickness":0,"nosePeakSize":0,"noseWidth":0,"jawBoneBackSize":0,"noseBoneHigh":0,"eyeBrownHigh":0,"nosePeakHigh":0,"chinBoneLenght":0,"nosePeakLowering":0,"cheeksBoneWidth":0},"props":[{"prop_id":0,"texture":-1,"drawable":-1},{"prop_id":1,"texture":-1,"drawable":-1},{"prop_id":2,"texture":-1,"drawable":-1},{"prop_id":6,"texture":-1,"drawable":-1},{"prop_id":7,"texture":-1,"drawable":-1}],"headOverlays":{"eyebrows":{"secondColor":0,"opacity":0,"color":0,"style":0},"blush":{"secondColor":0,"opacity":0,"color":0,"style":0},"sunDamage":{"secondColor":0,"opacity":0,"color":0,"style":0},"moleAndFreckles":{"secondColor":0,"opacity":0,"color":0,"style":0},"complexion":{"secondColor":0,"opacity":0,"color":0,"style":0},"ageing":{"secondColor":0,"opacity":0,"color":0,"style":0},"makeUp":{"secondColor":0,"opacity":0,"color":0,"style":0},"blemishes":{"secondColor":0,"opacity":0,"color":0,"style":0},"lipstick":{"secondColor":0,"opacity":0,"color":0,"style":0},"bodyBlemishes":{"secondColor":0,"opacity":0,"color":0,"style":0},"chestHair":{"secondColor":0,"opacity":0,"color":0,"style":0},"beard":{"secondColor":0,"opacity":0,"color":0,"style":0}},"components":[{"texture":0,"component_id":0,"drawable":0},{"texture":0,"component_id":1,"drawable":0},{"texture":0,"component_id":2,"drawable":0},{"texture":0,"component_id":3,"drawable":0},{"texture":0,"component_id":4,"drawable":0},{"texture":0,"component_id":5,"drawable":0},{"texture":0,"component_id":6,"drawable":0},{"texture":0,"component_id":7,"drawable":0},{"texture":0,"component_id":8,"drawable":0},{"texture":0,"component_id":9,"drawable":0},{"texture":0,"component_id":10,"drawable":0},{"texture":0,"component_id":11,"drawable":0}],"hair":{"texture":0,"style":0,"color":0,"highlight":0}}}', '2026-08-29 13:56:37', '2026-09-02 12:02:53', '{"cash":500,"bank":4400,"black_money":0}', '[{"metadata":{"description":"IBAN: AURA56149361\\nTitular ID: 11","iban":"AURA56149361","owner":11},"count":1,"name":"credit_card","slot":1},{"count":500,"name":"money","slot":2},{"count":1,"name":"phone","slot":3}]', 'police', 6, 1, 0, 'AURA56149361', '6444', '555-8966', '{"ringtone":"ringtone.mp3","security":{"pin_code":"","face_id":true},"message_tone":"sms.mp3","volume_msg":80,"notifications":{"messages":true,"bank":true,"calls":true},"volume_ring":80,"frame_color":"#555566","device_name":"Otto","wallpaper_url":"https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=2564&auto=format&fit=crop"}');
+	(11, 'HLWWIZKU', 1, 'test', 'uno', 'Angola', '1990-12-11', 0, '{"bank":5000,"appearance":{"model":"mp_m_freemode_01","headBlend":{"skinFirst":0,"shapeThird":0,"shapeMix":0,"shapeSecond":0,"thirdMix":0,"shapeFirst":0,"skinThird":0,"skinMix":0,"skinSecond":0},"tattoos":[],"components":[{"component_id":0,"drawable":0,"texture":0},{"component_id":1,"drawable":0,"texture":0},{"component_id":2,"drawable":0,"texture":0},{"component_id":3,"drawable":0,"texture":0},{"component_id":4,"drawable":0,"texture":0},{"component_id":5,"drawable":0,"texture":0},{"component_id":6,"drawable":0,"texture":0},{"component_id":7,"drawable":0,"texture":0},{"component_id":8,"drawable":0,"texture":0},{"component_id":9,"drawable":0,"texture":0},{"component_id":10,"drawable":0,"texture":0},{"component_id":11,"drawable":0,"texture":0}],"faceFeatures":{"nosePeakLowering":0,"eyeBrownForward":0,"chinBoneLowering":0,"neckThickness":0,"noseWidth":0,"noseBoneHigh":0,"cheeksWidth":0,"chinBoneLenght":0,"chinHole":0,"eyesOpening":0,"lipsThickness":0,"nosePeakHigh":0,"cheeksBoneHigh":0,"eyeBrownHigh":0,"jawBoneBackSize":0,"nosePeakSize":0,"noseBoneTwist":0,"chinBoneSize":0,"jawBoneWidth":0,"cheeksBoneWidth":0},"hair":{"highlight":0,"style":0,"texture":0,"color":0},"props":[{"prop_id":0,"texture":-1,"drawable":-1},{"prop_id":1,"texture":-1,"drawable":-1},{"prop_id":2,"texture":-1,"drawable":-1},{"prop_id":6,"texture":-1,"drawable":-1},{"prop_id":7,"texture":-1,"drawable":-1}],"headOverlays":{"makeUp":{"opacity":0,"style":0,"secondColor":0,"color":0},"blush":{"opacity":0,"style":0,"secondColor":0,"color":0},"blemishes":{"opacity":0,"style":0,"secondColor":0,"color":0},"complexion":{"opacity":0,"style":0,"secondColor":0,"color":0},"lipstick":{"opacity":0,"style":0,"secondColor":0,"color":0},"bodyBlemishes":{"opacity":0,"style":0,"secondColor":0,"color":0},"ageing":{"opacity":0,"style":0,"secondColor":0,"color":0},"beard":{"opacity":0,"style":0,"secondColor":0,"color":0},"eyebrows":{"opacity":0,"style":0,"secondColor":0,"color":0},"moleAndFreckles":{"opacity":0,"style":0,"secondColor":0,"color":0},"sunDamage":{"opacity":0,"style":0,"secondColor":0,"color":0},"chestHair":{"opacity":0,"style":0,"secondColor":0,"color":0}},"eyeColor":0},"last_location":{"z":43.6864013671875,"heading":280.6299133300781,"x":433.6615295410156,"y":-985.8329467773438},"cash":1000,"armor":0,"health":200}', '2026-08-29 13:56:37', '2026-09-02 13:08:08', '{"cash":500,"bank":4400,"black_money":0}', '[{"count":1,"metadata":{"owner":11,"description":"IBAN: AURA56149361\\nTitular ID: 11","iban":"AURA56149361"},"slot":1,"name":"credit_card"},{"count":500,"slot":2,"name":"money"},{"count":1,"slot":3,"name":"phone"}]', 'police', 6, 1, 0, 'AURA56149361', '6444', '555-8966', '{"ringtone":"ringtone.mp3","security":{"pin_code":"","face_id":true},"message_tone":"sms.mp3","volume_msg":80,"notifications":{"messages":true,"bank":true,"calls":true},"volume_ring":80,"frame_color":"#555566","device_name":"Otto","wallpaper_url":"https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=2564&auto=format&fit=crop"}');
 
 -- Volcando estructura para tabla aurarp.management_outfits
 CREATE TABLE IF NOT EXISTS `management_outfits` (
@@ -433,7 +435,7 @@ CREATE TABLE IF NOT EXISTS `players` (
 
 -- Volcando datos para la tabla aurarp.players: ~1 rows (aproximadamente)
 INSERT INTO `players` (`id`, `license`, `citizenid`, `metadata`, `created_at`, `last_updated`, `last_login`) VALUES
-	(1, 'license:fb83002da5edb49dd7bdb39c170a8c8af7cf5298', 'HLWWIZKU', '{"permissions":"user","status":{"hunger":100,"thirst":100},"position":{"x":0.0,"z":0.0,"y":0.0},"money":{"cash":500,"bank":1500}}', '2026-08-28 18:31:20', '2026-09-02 10:55:33', '2026-09-02 10:55:33');
+	(1, 'license:fb83002da5edb49dd7bdb39c170a8c8af7cf5298', 'HLWWIZKU', '{"permissions":"user","status":{"hunger":100,"thirst":100},"position":{"x":0.0,"z":0.0,"y":0.0},"money":{"cash":500,"bank":1500}}', '2026-08-28 18:31:20', '2026-09-02 13:00:10', '2026-09-02 13:00:10');
 
 -- Volcando estructura para tabla aurarp.playerskins
 CREATE TABLE IF NOT EXISTS `playerskins` (

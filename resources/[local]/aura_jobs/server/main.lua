@@ -24,10 +24,13 @@ local function LoadPlayerJob(src, charId)
     local cid = charId or GetCharacterId(src)
     if not cid then return end
 
-    local row = MySQL.single.await('SELECT job, job_grade, job_duty FROM characters WHERE id = ?', { cid })
+    local row = MySQL.single.await('SELECT job, job_grade FROM characters WHERE id = ?', { cid })
     local jobName = (row and row.job) or 'unemployed'
     local jobGrade = (row and tonumber(row.job_grade)) or 0
-    local jobDuty = (row and (row.job_duty == 1 or row.job_duty == true)) or false
+    
+    -- Todos los personajes se conectan SIEMPRE fuera de servicio por diseño
+    local jobDuty = false
+    MySQL.update('UPDATE characters SET job_duty = 0 WHERE id = ?', { cid })
 
     -- Validación contra la tabla de configuración
     local jobConfig = Config.Jobs[jobName]

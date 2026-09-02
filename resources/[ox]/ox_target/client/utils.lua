@@ -52,8 +52,8 @@ local drawZoneSprites = GetConvarInt('ox_target:drawSprite', 24)
 local SetDrawOrigin = SetDrawOrigin
 local DrawSprite = DrawSprite
 local ClearDrawOrigin = ClearDrawOrigin
-local colour = vector(155, 155, 155, 175)
-local hover = vector(98, 135, 236, 255)
+local colour = vector(0, 242, 254, 210)
+local hover = vector(255, 0, 127, 255)
 local currentZones = {}
 local previousZones = {}
 local drawZones = {}
@@ -123,12 +123,22 @@ function utils.drawZoneSprites(dict, texture)
 
     for i = 1, drawN do
         local zone = drawZones[i]
+        local isHovered = zone.colour == hover
         local spriteColour = zone.colour or colour
 
         if zone.drawSprite ~= false then
             SetDrawOrigin(zone.coords.x, zone.coords.y, zone.coords.z)
-            DrawSprite(dict, texture, 0, 0, width, height, 0, spriteColour.r, spriteColour.g, spriteColour.b,
-                spriteColour.a)
+            
+            if isHovered then
+                -- Efecto Glow / Halo dinámico en hover (Turquesa y Fucsia Neón)
+                DrawSprite(dict, texture, 0, 0, width * 1.6, height * 1.6, 0, 255, 0, 127, 100)
+                DrawSprite(dict, texture, 0, 0, width * 1.25, height * 1.25, 0, 0, 242, 254, 180)
+                DrawSprite(dict, texture, 0, 0, width, height, 0, 255, 255, 255, 255)
+            else
+                -- Estado reposo con resplandor turquesa suave
+                DrawSprite(dict, texture, 0, 0, width * 1.2, height * 1.2, 0, 0, 242, 254, 75)
+                DrawSprite(dict, texture, 0, 0, width, height, 0, spriteColour.r, spriteColour.g, spriteColour.b, spriteColour.a)
+            end
         end
     end
 

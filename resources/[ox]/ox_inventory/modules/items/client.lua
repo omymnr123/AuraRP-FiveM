@@ -99,7 +99,7 @@ Item('bandage', function(data, slot)
 	end)
 end)
 
-Item('armour', function(data, slot)
+local function UseArmour(data, slot)
 	if GetPedArmour(cache.ped) < 100 then
 		ox_inventory:useItem(data, function(data)
 			if data then
@@ -108,7 +108,10 @@ Item('armour', function(data, slot)
 			end
 		end)
 	end
-end)
+end
+
+Item('armour', UseArmour)
+Item('armor', UseArmour)
 
 client.parachute = false
 Item('parachute', function(data, slot)
