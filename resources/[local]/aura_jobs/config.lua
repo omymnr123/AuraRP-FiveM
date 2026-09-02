@@ -721,7 +721,7 @@ Config.Doors = {
     ['salieri_main'] = {
         job = 'salieri',                        -- Job que puede abrirla/cerrarla
         model = `v_ilev_ss_door04`,             -- Hash del modelo de la puerta
-        coords = vec3(322.11, -1095.43, 29.39), -- Coordenadas exactas de la puerta
+        coords = vec3(316.82, -1092.62, 29.42), -- Coordenadas exactas de la puerta
         distance = 2.0,                         -- Distancia de interacción
         locked = true                           -- Estado por defecto
     },

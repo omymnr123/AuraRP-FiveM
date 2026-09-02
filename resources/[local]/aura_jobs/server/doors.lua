@@ -2,67 +2,116 @@
 -- AURA JOBS: SERVER DOORLOCK CONTROLLER (DATABASE & IN-GAME ADMIN SYSTEM)
 -- ============================================================================
 
-local DynamicDoors = {} -- [doorId] = { job = 'vazou', coords = vec3(...), distance = 2.5, locked = true }
+local DynamicDoors = {} -- [doorId] = { job = 'vazou', coords = vector3(...), distance = 2.5, locked = true }
+
+local function parseVector3(coords, y, z)
+    if type(coords) == 'vector3' then
+        return coords
+    elseif type(coords) == 'table' then
+        local cx = tonumber(coords.x or coords[1]) or 0.0
+        local cy = tonumber(coords.y or coords[2]) or 0.0
+        local cz = tonumber(coords.z or coords[3]) or 0.0
+        return vector3(cx, cy, cz)
+    else
+        local cx = tonumber(coords) or 0.0
+        local cy = tonumber(y) or 0.0
+        local cz = tonumber(z) or 0.0
+        return vector3(cx, cy, cz)
+    end
+end
 
 local function InitDoors()
     MySQL.query([[
         CREATE TABLE IF NOT EXISTS `aura_doors` (
             `door_id` VARCHAR(50) PRIMARY KEY,
-            `job` VARCHAR(50) NOT NULL,
-            `coords_x` DOUBLE NOT NULL,
-            `coords_y` DOUBLE NOT NULL,
-            `coords_z` DOUBLE NOT NULL,
+            `job` VARCHAR(50) NOT NULL DEFAULT '',
+            `coords_x` DOUBLE NOT NULL DEFAULT 0,
+            `coords_y` DOUBLE NOT NULL DEFAULT 0,
+            `coords_z` DOUBLE NOT NULL DEFAULT 0,
             `is_locked` TINYINT(1) NOT NULL DEFAULT 1,
             `distance` FLOAT NOT NULL DEFAULT 2.5
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
     ]], {}, function()
-        -- 1. Cargar puertas existentes en Base de Datos
-        MySQL.query('SELECT * FROM aura_doors', {}, function(results)
-            DynamicDoors = {}
-            if results then
-                for i = 1, #results do
-                    local row = results[i]
-                    DynamicDoors[row.door_id] = {
-                        job = row.job,
-                        coords = vec3(row.coords_x, row.coords_y, row.coords_z),
-                        distance = tonumber(row.distance) or 2.5,
-                        locked = row.is_locked == 1
-                    }
-                    GlobalState['doorlock_' .. row.door_id] = (row.is_locked == 1)
-                end
-            end
-
-            -- 2. Migrar/Añadir las puertas estáticas de Config.Doors si no existen en DB
-            if Config.Doors then
-                for doorId, doorData in pairs(Config.Doors) do
-                    if not DynamicDoors[doorId] then
-                        DynamicDoors[doorId] = {
-                            job = doorData.job,
-                            coords = doorData.coords,
-                            distance = doorData.distance or 2.5,
-                            locked = doorData.locked ~= false
-                        }
-                        GlobalState['doorlock_' .. doorId] = (doorData.locked ~= false)
+        -- Auto-migración en caliente: asegurar que todas las columnas existan si la tabla ya existía
+        MySQL.query([[
+            ALTER TABLE `aura_doors`
+                ADD COLUMN IF NOT EXISTS `job` VARCHAR(50) NOT NULL DEFAULT '',
+                ADD COLUMN IF NOT EXISTS `coords_x` DOUBLE NOT NULL DEFAULT 0,
+                ADD COLUMN IF NOT EXISTS `coords_y` DOUBLE NOT NULL DEFAULT 0,
+                ADD COLUMN IF NOT EXISTS `coords_z` DOUBLE NOT NULL DEFAULT 0,
+                ADD COLUMN IF NOT EXISTS `distance` FLOAT NOT NULL DEFAULT 2.5;
+        ]], {}, function()
+            -- 1. Cargar puertas existentes en Base de Datos
+            MySQL.query('SELECT * FROM aura_doors', {}, function(results)
+                DynamicDoors = {}
+                if results then
+                    for i = 1, #results do
+                        local row = results[i]
+                        local c = parseVector3(row.coords_x, row.coords_y, row.coords_z)
                         
-                        MySQL.insert('INSERT INTO aura_doors (door_id, job, coords_x, coords_y, coords_z, is_locked, distance) VALUES (?, ?, ?, ?, ?, ?, ?)', {
-                            doorId,
-                            doorData.job,
-                            doorData.coords.x,
-                            doorData.coords.y,
-                            doorData.coords.z,
-                            doorData.locked and 1 or 0,
-                            doorData.distance or 2.5
-                        })
+                        -- Si la fila en DB proviene de un esquema antiguo sin coordenadas o job, recuperar de Config.Doors
+                        if (not row.job or row.job == '') and Config.Doors and Config.Doors[row.door_id] then
+                            local cfgDoor = Config.Doors[row.door_id]
+                            local cfgCoords = parseVector3(cfgDoor.coords)
+                            row.job = cfgDoor.job
+                            c = cfgCoords
+                            row.distance = cfgDoor.distance or 2.5
+
+                            MySQL.update('UPDATE aura_doors SET job = ?, coords_x = ?, coords_y = ?, coords_z = ?, distance = ? WHERE door_id = ?', {
+                                cfgDoor.job,
+                                cfgCoords.x,
+                                cfgCoords.y,
+                                cfgCoords.z,
+                                cfgDoor.distance or 2.5,
+                                row.door_id
+                            })
+                        end
+
+                        if row.job and row.job ~= '' then
+                            DynamicDoors[row.door_id] = {
+                                job = row.job,
+                                coords = c,
+                                distance = tonumber(row.distance) or 2.5,
+                                locked = row.is_locked == 1
+                            }
+                            GlobalState['doorlock_' .. row.door_id] = (row.is_locked == 1)
+                        end
                     end
                 end
-            end
 
-            GlobalState['dynamic_doors'] = DynamicDoors
-            TriggerClientEvent('aura_jobs:client:syncDoors', -1, DynamicDoors)
+                -- 2. Migrar/Añadir las puertas estáticas de Config.Doors si no existen en DB
+                if Config.Doors then
+                    for doorId, doorData in pairs(Config.Doors) do
+                        if not DynamicDoors[doorId] then
+                            local c = parseVector3(doorData.coords)
+                            DynamicDoors[doorId] = {
+                                job = doorData.job,
+                                coords = c,
+                                distance = tonumber(doorData.distance) or 2.5,
+                                locked = doorData.locked ~= false
+                            }
+                            GlobalState['doorlock_' .. doorId] = (doorData.locked ~= false)
+                            
+                            MySQL.insert('INSERT INTO aura_doors (door_id, job, coords_x, coords_y, coords_z, is_locked, distance) VALUES (?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE job = VALUES(job), coords_x = VALUES(coords_x), coords_y = VALUES(coords_y), coords_z = VALUES(coords_z), distance = VALUES(distance)', {
+                                doorId,
+                                doorData.job,
+                                c.x,
+                                c.y,
+                                c.z,
+                                doorData.locked and 1 or 0,
+                                doorData.distance or 2.5
+                            })
+                        end
+                    end
+                end
 
-            if Config.Debug then
-                print(string.format("[Aura Jobs] Sistema de Puertas inicializado con %d cerraduras activas.", GetTableSize(DynamicDoors)))
-            end
+                GlobalState['dynamic_doors'] = DynamicDoors
+                TriggerClientEvent('aura_jobs:client:syncDoors', -1, DynamicDoors)
+
+                if Config.Debug then
+                    print(string.format("[Aura Jobs] Sistema de Puertas inicializado con %d cerraduras activas.", GetTableSize(DynamicDoors)))
+                end
+            end)
         end)
     end)
 end

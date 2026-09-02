@@ -59,3 +59,16 @@ CREATE TABLE IF NOT EXISTS `aura_vendor_transactions` (
   INDEX `idx_vendor_created` (`created_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- 6. Tabla de Cerraduras de Puertas por Negocio
+CREATE TABLE IF NOT EXISTS `aura_doors` (
+  `door_id` VARCHAR(50) NOT NULL,
+  `job` VARCHAR(50) NOT NULL DEFAULT '',
+  `coords_x` DOUBLE NOT NULL DEFAULT 0,
+  `coords_y` DOUBLE NOT NULL DEFAULT 0,
+  `coords_z` DOUBLE NOT NULL DEFAULT 0,
+  `is_locked` TINYINT(1) NOT NULL DEFAULT 1,
+  `distance` FLOAT NOT NULL DEFAULT 2.5,
+  PRIMARY KEY (`door_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+

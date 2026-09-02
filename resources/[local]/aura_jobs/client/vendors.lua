@@ -32,7 +32,7 @@ local function InitVendorPoints()
     for vendorKey, vendorConfig in pairs(Config.BusinessVendors) do
         local coords = vendorConfig.coords
         local heading = coords.w or vendorConfig.heading or 85.0
-        local pointCoords = vec3(coords.x, coords.y, coords.z)
+        local pointCoords = vector3(coords.x, coords.y, coords.z)
 
         local point = lib.points.new({
             coords = pointCoords,

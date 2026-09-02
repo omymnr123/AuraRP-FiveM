@@ -2,26 +2,43 @@
 -- AURA JOBS: CLIENT DOORLOCK CONTROLLER (DATABASE & REAL-TIME DYNAMIC SYNC)
 -- ============================================================================
 
-local ActiveDoors = {} -- [doorId] = { job = 'vazou', coords = vec3(...), distance = 2.5, locked = true, foundEntities = {} }
+local ActiveDoors = {} -- [doorId] = { job = 'vazou', coords = vector3(...), distance = 2.5, locked = true, foundEntities = {} }
 local currentClosestDoor = nil
 local registeredInSystem = {} -- [doorSystemId] = true
+
+local function parseVector3(coords, y, z)
+    if type(coords) == 'vector3' then
+        return coords
+    elseif type(coords) == 'table' then
+        local cx = tonumber(coords.x or coords[1]) or 0.0
+        local cy = tonumber(coords.y or coords[2]) or 0.0
+        local cz = tonumber(coords.z or coords[3]) or 0.0
+        return vector3(cx, cy, cz)
+    else
+        local cx = tonumber(coords) or 0.0
+        local cy = tonumber(y) or 0.0
+        local cz = tonumber(z) or 0.0
+        return vector3(cx, cy, cz)
+    end
+end
 
 -- Sincronizar tabla de puertas recibida desde el servidor
 local function UpdateActiveDoors(doorsTable)
     if not doorsTable then return end
     for doorId, doorData in pairs(doorsTable) do
+        local c = parseVector3(doorData.coords)
         if not ActiveDoors[doorId] then
             ActiveDoors[doorId] = {
                 job = doorData.job,
-                coords = type(doorData.coords) == 'vector3' and doorData.coords or vec3(doorData.coords.x, doorData.coords.y, doorData.coords.z),
-                distance = doorData.distance or 2.5,
+                coords = c,
+                distance = tonumber(doorData.distance) or 2.5,
                 locked = doorData.locked ~= false,
                 foundEntities = {}
             }
         else
             ActiveDoors[doorId].job = doorData.job
-            ActiveDoors[doorId].coords = type(doorData.coords) == 'vector3' and doorData.coords or vec3(doorData.coords.x, doorData.coords.y, doorData.coords.z)
-            ActiveDoors[doorId].distance = doorData.distance or 2.5
+            ActiveDoors[doorId].coords = c
+            ActiveDoors[doorId].distance = tonumber(doorData.distance) or 2.5
             ActiveDoors[doorId].locked = doorData.locked ~= false
         end
     end
@@ -110,7 +127,7 @@ local function InitDoors()
                 end
 
                 -- Renderizado de interfaz 3D-flotante del Candado NUI (Centrado en el marco de la puerta)
-                local drawCoords = vec3(doorData.coords.x, doorData.coords.y, doorData.coords.z + 0.1)
+                local drawCoords = vector3(doorData.coords.x, doorData.coords.y, doorData.coords.z + 0.1)
                 local onScreen, x, y = GetScreenCoordFromWorldCoord(drawCoords.x, drawCoords.y, drawCoords.z)
                 if onScreen then
                     SendNUIMessage({

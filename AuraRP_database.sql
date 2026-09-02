@@ -22,15 +22,22 @@ USE `aurarp`;
 -- Volcando estructura para tabla aurarp.aura_doors
 CREATE TABLE IF NOT EXISTS `aura_doors` (
   `door_id` varchar(50) NOT NULL,
+  `job` varchar(50) NOT NULL DEFAULT '',
+  `coords_x` double NOT NULL DEFAULT 0,
+  `coords_y` double NOT NULL DEFAULT 0,
+  `coords_z` double NOT NULL DEFAULT 0,
   `is_locked` tinyint(1) NOT NULL DEFAULT 1,
+  `distance` float NOT NULL DEFAULT 2.5,
   PRIMARY KEY (`door_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Volcando datos para la tabla aurarp.aura_doors: ~3 rows (aproximadamente)
-INSERT INTO `aura_doors` (`door_id`, `is_locked`) VALUES
-	('henhouse_main', 1),
-	('vazou_main', 1),
-	('vazou_secundaria', 1);
+-- Volcando datos para la tabla aurarp.aura_doors: ~4 rows (aproximadamente)
+INSERT INTO `aura_doors` (`door_id`, `job`, `coords_x`, `coords_y`, `coords_z`, `is_locked`, `distance`) VALUES
+	('vazou_main', 'vazou', -1564.44, -974.61, 13.02, 1, 2.0),
+	('vazou_secundaria', 'vazou', -1558.66, -972.22, 13.02, 1, 2.0),
+	('salieri_main', 'salieri', 322.11, -1095.43, 29.39, 1, 2.0),
+	('henhouse_main', 'henhouse', -297.59, 6271.26, 31.51, 1, 2.0)
+ON DUPLICATE KEY UPDATE `job` = VALUES(`job`), `coords_x` = VALUES(`coords_x`), `coords_y` = VALUES(`coords_y`), `coords_z` = VALUES(`coords_z`), `distance` = VALUES(`distance`);
 
 -- Volcando estructura para tabla aurarp.aura_market_items
 CREATE TABLE IF NOT EXISTS `aura_market_items` (
