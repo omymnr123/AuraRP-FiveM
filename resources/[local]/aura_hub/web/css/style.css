@@ -1125,3 +1125,757 @@ html, body {
     border-color: var(--pink-hot);
     color: #ff9ebb;
 }
+
+/* ============================================================================
+   POLICE MDT (TERMINAL TÁCTICA LSPD) - GLASSMORPHISM & NEON PALETTE
+   ============================================================================ */
+
+.btn-police-mdt {
+    background: linear-gradient(135deg, rgba(0, 242, 254, 0.18) 0%, rgba(79, 172, 254, 0.22) 100%) !important;
+    border: 1px solid rgba(0, 242, 254, 0.45) !important;
+    box-shadow: 0 0 15px rgba(0, 242, 254, 0.25) !important;
+}
+
+.btn-police-mdt:hover {
+    background: linear-gradient(135deg, rgba(0, 242, 254, 0.3) 0%, rgba(79, 172, 254, 0.4) 100%) !important;
+    border-color: #00f2fe !important;
+    box-shadow: 0 0 22px rgba(0, 242, 254, 0.5) !important;
+    transform: translateY(-2px);
+}
+
+.btn-duty-toggle {
+    background: rgba(255, 77, 109, 0.15) !important;
+    border: 1px solid rgba(255, 77, 109, 0.4) !important;
+    color: #ff9ebb !important;
+    transition: var(--transition-fast) !important;
+}
+
+.btn-duty-toggle.on-duty {
+    background: rgba(0, 255, 157, 0.15) !important;
+    border: 1px solid rgba(0, 255, 157, 0.4) !important;
+    color: #a7f3d0 !important;
+}
+
+.btn-duty-toggle:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 15px rgba(0, 242, 254, 0.3);
+}
+
+.duty-pill {
+    border-color: rgba(255, 77, 109, 0.35) !important;
+    transition: var(--transition-fast);
+}
+
+.duty-pill:hover {
+    transform: translateY(-2px);
+    border-color: #00f2fe !important;
+    box-shadow: 0 0 15px rgba(0, 242, 254, 0.3);
+}
+
+.pulse-dot-cyan {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #00f2fe;
+    box-shadow: 0 0 10px #00f2fe;
+    animation: pulseCyanAnim 1.6s infinite ease-in-out;
+}
+
+@keyframes pulseCyanAnim {
+    0% { opacity: 0.4; transform: scale(0.9); }
+    50% { opacity: 1; transform: scale(1.3); }
+    100% { opacity: 0.4; transform: scale(0.9); }
+}
+
+/* MODAL MDT CARD OVERRIDES */
+.mdt-card {
+    width: 94vw !important;
+    max-width: 1240px !important;
+    height: 88vh !important;
+    max-height: 88vh !important;
+    display: flex !important;
+    flex-direction: column !important;
+    background: rgba(8, 14, 28, 0.94) !important;
+    border: 1px solid rgba(0, 242, 254, 0.35) !important;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 40px rgba(0, 242, 254, 0.15) !important;
+}
+
+.mdt-header {
+    border-bottom: 1px solid rgba(0, 242, 254, 0.2) !important;
+    padding-bottom: 14px !important;
+}
+
+.mdt-badge-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(0, 242, 254, 0.3) 0%, rgba(30, 58, 138, 0.5) 100%);
+    border: 1px solid rgba(0, 242, 254, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: #00f2fe;
+    box-shadow: 0 0 15px rgba(0, 242, 254, 0.3);
+}
+
+.mdt-title-line {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.mdt-status-live {
+    font-size: 10px;
+    font-weight: 800;
+    color: #00f2fe;
+    background: rgba(0, 242, 254, 0.1);
+    border: 1px solid rgba(0, 242, 254, 0.3);
+    padding: 3px 8px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    letter-spacing: 0.5px;
+}
+
+.mdt-header-right {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.mdt-soc-pill {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(0, 242, 254, 0.3);
+    border-radius: var(--radius-md);
+    padding: 6px 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.mdt-soc-pill .sub {
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--text-muted);
+}
+
+.mdt-soc-pill strong {
+    font-size: 15px;
+    font-weight: 900;
+    color: #00f2fe;
+    text-shadow: 0 0 10px rgba(0, 242, 254, 0.4);
+}
+
+/* TABS DE NAVEGACIÓN MDT */
+.mdt-nav-tabs {
+    display: flex;
+    gap: 8px;
+    padding: 10px 24px;
+    background: rgba(0, 0, 0, 0.25);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+
+.mdt-nav-tabs::-webkit-scrollbar {
+    display: none;
+}
+
+.mdt-tab-btn {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-md);
+    padding: 9px 16px;
+    color: var(--text-muted);
+    font-size: 11px;
+    font-weight: 800;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: var(--transition-fast);
+    white-space: nowrap;
+}
+
+.mdt-tab-btn i {
+    font-size: 13px;
+}
+
+.mdt-tab-btn:hover {
+    background: rgba(0, 242, 254, 0.12);
+    border-color: rgba(0, 242, 254, 0.35);
+    color: #ffffff;
+}
+
+.mdt-tab-btn.active {
+    background: linear-gradient(135deg, rgba(0, 242, 254, 0.25) 0%, rgba(30, 58, 138, 0.4) 100%);
+    border-color: #00f2fe;
+    color: #00f2fe;
+    box-shadow: 0 0 15px rgba(0, 242, 254, 0.3);
+}
+
+/* CONTENIDO DE PESTAÑAS MDT */
+.mdt-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 24px;
+    display: flex;
+    flex-direction: column;
+}
+
+.mdt-tab-pane {
+    display: none;
+    flex: 1;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.mdt-tab-pane.active {
+    display: flex;
+}
+
+/* BARRA DE BÚSQUEDA MDT */
+.mdt-search-bar {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.search-input-wrapper {
+    flex: 1;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search-input-wrapper i {
+    position: absolute;
+    left: 16px;
+    color: var(--text-muted);
+    font-size: 14px;
+}
+
+.search-input-wrapper input {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.45);
+    border: 1px solid rgba(0, 242, 254, 0.3);
+    border-radius: var(--radius-md);
+    padding: 12px 16px 12px 44px;
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 600;
+    transition: var(--transition-fast);
+}
+
+.search-input-wrapper input:focus {
+    border-color: #00f2fe;
+    box-shadow: 0 0 15px rgba(0, 242, 254, 0.35);
+    background: rgba(0, 0, 0, 0.6);
+}
+
+/* BOTONES DE ACCIÓN MDT */
+.btn-mdt-action {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: var(--radius-md);
+    padding: 12px 20px;
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: var(--transition-fast);
+    white-space: nowrap;
+}
+
+.btn-mdt-action.cyan {
+    background: linear-gradient(135deg, rgba(0, 242, 254, 0.25) 0%, rgba(0, 198, 255, 0.3) 100%);
+    border-color: rgba(0, 242, 254, 0.6);
+    color: #00f2fe;
+    box-shadow: 0 0 15px rgba(0, 242, 254, 0.25);
+}
+
+.btn-mdt-action.cyan:hover {
+    background: linear-gradient(135deg, rgba(0, 242, 254, 0.4) 0%, rgba(0, 198, 255, 0.5) 100%);
+    border-color: #00f2fe;
+    box-shadow: 0 0 25px rgba(0, 242, 254, 0.5);
+    transform: translateY(-1px);
+}
+
+.btn-mdt-action.red {
+    background: linear-gradient(135deg, rgba(255, 8, 68, 0.25) 0%, rgba(255, 42, 85, 0.35) 100%);
+    border-color: rgba(255, 8, 68, 0.6);
+    color: #ff4d6d;
+    box-shadow: 0 0 15px rgba(255, 8, 68, 0.25);
+}
+
+.btn-mdt-action.red:hover {
+    background: linear-gradient(135deg, rgba(255, 8, 68, 0.4) 0%, rgba(255, 42, 85, 0.5) 100%);
+    border-color: #ff0844;
+    box-shadow: 0 0 25px rgba(255, 8, 68, 0.5);
+    transform: translateY(-1px);
+}
+
+.btn-mdt-action.small {
+    padding: 6px 12px;
+    font-size: 11px;
+}
+
+.btn-mdt-action.full-width {
+    width: 100%;
+}
+
+/* TARJETAS DE RESULTADOS MDT */
+.mdt-empty-state {
+    padding: 60px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    color: var(--text-muted);
+}
+
+.mdt-empty-state i {
+    font-size: 48px;
+    color: rgba(0, 242, 254, 0.3);
+}
+
+.mdt-empty-state p {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.mdt-citizen-card {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(0, 242, 254, 0.3);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 12px;
+}
+
+.mdt-citizen-card.has-warrant {
+    border-color: #ff0844;
+    box-shadow: 0 0 20px rgba(255, 8, 68, 0.3);
+}
+
+.mdt-citizen-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding-bottom: 12px;
+}
+
+.mdt-citizen-identity {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.mdt-citizen-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    background: rgba(0, 242, 254, 0.15);
+    border: 1px solid rgba(0, 242, 254, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    color: #00f2fe;
+}
+
+.mdt-citizen-identity h3 {
+    font-size: 18px;
+    font-weight: 900;
+    color: #ffffff;
+    margin-bottom: 4px;
+}
+
+.mdt-citizen-identity .cid-tag {
+    font-size: 11px;
+    font-weight: 700;
+    color: #00f2fe;
+    background: rgba(0, 242, 254, 0.1);
+    padding: 2px 8px;
+    border-radius: 6px;
+    border: 1px solid rgba(0, 242, 254, 0.25);
+}
+
+.warrant-badge-warning {
+    background: linear-gradient(135deg, #ff0844 0%, #ff4d6d 100%);
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 900;
+    padding: 6px 14px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 0 15px rgba(255, 8, 68, 0.5);
+    animation: pulseCyanAnim 1.4s infinite;
+}
+
+.mdt-citizen-info-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+}
+
+.mdt-info-box {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: var(--radius-md);
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+}
+
+.mdt-info-box span {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--text-muted);
+}
+
+.mdt-info-box strong {
+    font-size: 13px;
+    font-weight: 800;
+    color: #ffffff;
+    margin-top: 2px;
+}
+
+.license-pill {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 800;
+    width: fit-content;
+}
+
+.license-pill.valid {
+    background: rgba(0, 255, 157, 0.15);
+    color: #00ff9d;
+    border: 1px solid rgba(0, 255, 157, 0.4);
+}
+
+.license-pill.invalid {
+    background: rgba(255, 8, 68, 0.15);
+    color: #ff4d6d;
+    border: 1px solid rgba(255, 8, 68, 0.4);
+}
+
+.mdt-citizen-bottom-actions {
+    display: flex;
+    gap: 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding-top: 12px;
+}
+
+/* VEHICLE CARD */
+.mdt-vehicle-card {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(0, 242, 254, 0.3);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.mdt-vehicle-card.is-bolo {
+    border-color: #ff0844;
+    box-shadow: 0 0 20px rgba(255, 8, 68, 0.35);
+}
+
+/* LAYOUTS MULTI-COLUMNA (FINES, JAIL, WARRANTS) */
+.mdt-fines-layout,
+.mdt-jail-layout,
+.mdt-warrants-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    flex: 1;
+}
+
+.mdt-fines-form-card,
+.mdt-presets-card,
+.mdt-jail-form-card,
+.mdt-inmates-card,
+.mdt-warrant-form-card,
+.mdt-warrants-list-card {
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(0, 242, 254, 0.2);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.mdt-fines-form-card h4,
+.mdt-presets-card h4,
+.mdt-jail-form-card h4,
+.mdt-inmates-card h4,
+.mdt-warrant-form-card h4,
+.mdt-warrants-list-card h4 {
+    font-size: 14px;
+    font-weight: 900;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.sub-desc {
+    font-size: 11px;
+    color: var(--text-muted);
+    line-height: 1.4;
+}
+
+.mdt-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.mdt-form-grid .full-width {
+    grid-column: span 2;
+}
+
+.mdt-select {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(0, 242, 254, 0.3);
+    border-radius: var(--radius-md);
+    padding: 10px 12px;
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.mdt-presets-scroll,
+.mdt-warrants-scroll,
+.mdt-dispatch-scroll {
+    overflow-y: auto;
+    max-height: 480px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-right: 4px;
+}
+
+.fine-preset-item {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius-md);
+    padding: 10px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    transition: var(--transition-fast);
+}
+
+.fine-preset-item:hover {
+    background: rgba(0, 242, 254, 0.1);
+    border-color: rgba(0, 242, 254, 0.4);
+    transform: translateX(4px);
+}
+
+.fine-preset-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.fine-preset-code {
+    font-size: 10px;
+    font-weight: 800;
+    color: #00f2fe;
+}
+
+.fine-preset-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.fine-preset-amount {
+    font-size: 14px;
+    font-weight: 900;
+    color: #00ff9d;
+    background: rgba(0, 255, 157, 0.1);
+    border: 1px solid rgba(0, 255, 157, 0.3);
+    padding: 4px 10px;
+    border-radius: 6px;
+}
+
+/* WARRANTS ITEMS */
+.warrant-item-card {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 8, 68, 0.35);
+    border-radius: var(--radius-md);
+    padding: 12px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.warrant-item-info h5 {
+    font-size: 13px;
+    font-weight: 800;
+    color: #ffffff;
+    margin-bottom: 2px;
+}
+
+.warrant-item-info p {
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+.severity-pill {
+    font-size: 9px;
+    font-weight: 900;
+    padding: 2px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+}
+
+.severity-pill.low { background: rgba(250, 204, 21, 0.2); color: #facc15; }
+.severity-pill.medium { background: rgba(251, 146, 60, 0.2); color: #fb923c; }
+.severity-pill.high { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+.severity-pill.urgent { background: rgba(255, 8, 68, 0.35); color: #ff0844; border: 1px solid #ff0844; }
+
+/* ROSTER POLICIAL */
+.mdt-roster-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding-bottom: 10px;
+}
+
+.mdt-tag.cyan {
+    background: rgba(0, 242, 254, 0.15);
+    color: #00f2fe;
+    border: 1px solid rgba(0, 242, 254, 0.4);
+    font-size: 11px;
+    font-weight: 800;
+    padding: 4px 10px;
+    border-radius: 20px;
+}
+
+.mdt-roster-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    overflow-y: auto;
+}
+
+.officer-roster-card {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(0, 242, 254, 0.25);
+    border-radius: var(--radius-md);
+    padding: 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.officer-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: rgba(0, 242, 254, 0.15);
+    border: 1px solid rgba(0, 242, 254, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #00f2fe;
+    font-size: 18px;
+}
+
+.officer-roster-details h5 {
+    font-size: 13px;
+    font-weight: 800;
+    color: #ffffff;
+}
+
+.officer-roster-details span {
+    font-size: 10px;
+    color: #00f2fe;
+    font-weight: 700;
+}
+
+/* DESPACHO 911 */
+.mdt-dispatch-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding-bottom: 10px;
+}
+
+.dispatch-call-card {
+    background: rgba(0, 0, 0, 0.45);
+    border: 1px solid rgba(0, 242, 254, 0.25);
+    border-radius: var(--radius-md);
+    padding: 12px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: var(--transition-fast);
+}
+
+.dispatch-call-card:hover {
+    border-color: #00f2fe;
+    background: rgba(0, 242, 254, 0.06);
+}
+
+.dispatch-code-pill {
+    font-size: 11px;
+    font-weight: 900;
+    color: #00f2fe;
+    background: rgba(0, 242, 254, 0.12);
+    border: 1px solid rgba(0, 242, 254, 0.3);
+    padding: 4px 8px;
+    border-radius: 6px;
+    margin-right: 10px;
+}
+
+/* RRHH & GESTIÓN DE PLANTILLA MDT */
+.mdt-staff-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding-bottom: 12px;
+}
+
+.mdt-staff-title-block h4 {
+    font-size: 15px;
+    font-weight: 900;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.mdt-hire-bar {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 12px 16px;
+    border-radius: var(--radius-md);
+    border: 1px solid rgba(0, 242, 254, 0.2);
+}

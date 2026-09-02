@@ -360,6 +360,43 @@ RegisterCommand('setjob', function(source, args)
     end
 end, true)
 
+-- Comando Administrativo dedicado para asignar Jefe de Policía: /setpolicechief [id] o /setjefepolicia [id]
+local function HandleSetPoliceChief(source, args)
+    if source ~= 0 and not IsPlayerAceAllowed(tostring(source), 'command.setpolicechief') and not IsPlayerAceAllowed(tostring(source), 'command.setjob') and not IsPlayerAceAllowed(tostring(source), 'group.admin') then
+        if source ~= 0 then
+            TriggerClientEvent('ox_lib:notify', source, { title = 'Acceso Denegado', description = 'No tienes permisos de administrador.', type = 'error' })
+        end
+        return
+    end
+
+    local targetSrc = tonumber(args[1])
+    if not targetSrc or not GetPlayerName(tostring(targetSrc)) then
+        local msg = "Uso: /setpolicechief [ID_Servidor] o /setjefepolicia [ID_Servidor]"
+        if source == 0 then print(msg) else TriggerClientEvent('ox_lib:notify', source, { title = 'Sintaxis', description = msg, type = 'inform' }) end
+        return
+    end
+
+    local success, err = SetJob(targetSrc, 'police', 6)
+    if success then
+        local targetName = GetPlayerName(tostring(targetSrc))
+        local msg = string.format("¡%s (ID %d) ha sido nombrado JEFE DE POLICÍA (LSPD - Grado 6) exitosamente!", targetName, targetSrc)
+        if source == 0 then print(msg) else TriggerClientEvent('ox_lib:notify', source, { title = 'Jefe Policial Asignado', description = msg, type = 'success', duration = 8000 }) end
+        TriggerClientEvent('ox_lib:notify', targetSrc, {
+            title = 'Nombramiento Oficial LSPD',
+            description = 'Has sido nombrado JEFE DE POLICÍA de Los Santos por la administración del servidor.',
+            type = 'success',
+            duration = 10000
+        })
+    else
+        local msg = string.format("Error al asignar Jefe de Policía: %s", tostring(err))
+        if source == 0 then print(msg) else TriggerClientEvent('ox_lib:notify', source, { title = 'Error', description = msg, type = 'error' }) end
+    end
+end
+
+RegisterCommand('setpolicechief', HandleSetPoliceChief, true)
+RegisterCommand('setjefepolicia', HandleSetPoliceChief, true)
+RegisterCommand('darjefepolicia', HandleSetPoliceChief, true)
+
 -- Comando para Jefes: /contratar [ID]
 RegisterCommand('contratar', function(source, args)
     if source == 0 then return end

@@ -240,6 +240,120 @@ RegisterNUICallback('disconnect', function(_, cb)
     cb('ok')
 end)
 
+RegisterNUICallback('toggleDuty', function(_, cb)
+    lib.callback('aura_hub:server:toggleDuty', false, function(success, newDuty)
+        cb({ success = success, newDuty = newDuty })
+    end)
+end)
+
+-- ============================================================================
+-- NUI CALLBACKS: MDT POLICIAL LSPD
+-- ============================================================================
+
+RegisterNUICallback('getPoliceMdtOverview', function(_, cb)
+    lib.callback('aura_hub:server:getPoliceMdtOverview', false, function(success, data)
+        cb({ success = success, data = data })
+    end)
+end)
+
+RegisterNUICallback('policeSearchCitizen', function(data, cb)
+    lib.callback('aura_hub:server:policeSearchCitizen', false, function(success, results)
+        cb({ success = success, results = results })
+    end, data.query)
+end)
+
+RegisterNUICallback('policeSearchVehicle', function(data, cb)
+    lib.callback('aura_hub:server:policeSearchVehicle', false, function(success, result)
+        cb({ success = success, result = result })
+    end, data.plate)
+end)
+
+RegisterNUICallback('policeToggleVehicleBolo', function(data, cb)
+    lib.callback('aura_hub:server:policeToggleVehicleBolo', false, function(success, message, isBolo)
+        cb({ success = success, message = message, isBolo = isBolo })
+    end, { plate = data.plate, reason = data.reason })
+end)
+
+RegisterNUICallback('policeIssueFine', function(data, cb)
+    lib.callback('aura_hub:server:policeIssueFine', false, function(success, message)
+        cb({ success = success, message = message })
+    end, data)
+end)
+
+RegisterNUICallback('policeJailSuspect', function(data, cb)
+    lib.callback('aura_hub:server:policeJailSuspect', false, function(success, message)
+        cb({ success = success, message = message })
+    end, data)
+end)
+
+RegisterNUICallback('policeGetWarrants', function(_, cb)
+    lib.callback('aura_hub:server:policeGetWarrants', false, function(success, warrants)
+        cb({ success = success, warrants = warrants })
+    end)
+end)
+
+RegisterNUICallback('policeCreateWarrant', function(data, cb)
+    lib.callback('aura_hub:server:policeCreateWarrant', false, function(success, message)
+        cb({ success = success, message = message })
+    end, data)
+end)
+
+RegisterNUICallback('policeDeleteWarrant', function(data, cb)
+    lib.callback('aura_hub:server:policeDeleteWarrant', false, function(success, message)
+        cb({ success = success, message = message })
+    end, data.warrantId)
+end)
+
+RegisterNUICallback('policeGetActiveInmates', function(_, cb)
+    lib.callback('aura_hub:server:policeGetActiveInmates', false, function(success, inmates)
+        cb({ success = success, inmates = inmates })
+    end)
+end)
+
+RegisterNUICallback('policeGetDispatchHistory', function(_, cb)
+    lib.callback('aura_police:server:getDispatchHistory', false, function(calls)
+        cb({ success = true, calls = calls or {} })
+    end)
+end)
+
+RegisterNUICallback('policeGetStaff', function(_, cb)
+    lib.callback('aura_hub:server:policeGetStaff', false, function(success, data)
+        cb({ success = success, data = data })
+    end)
+end)
+
+RegisterNUICallback('policeHireOfficer', function(data, cb)
+    lib.callback('aura_hub:server:policeHireOfficer', false, function(success, message)
+        cb({ success = success, message = message })
+    end, data.targetSrc)
+end)
+
+RegisterNUICallback('policeSetOfficerGrade', function(data, cb)
+    lib.callback('aura_hub:server:policeSetOfficerGrade', false, function(success, message)
+        cb({ success = success, message = message })
+    end, { targetCharId = data.targetCharId, newGrade = data.newGrade })
+end)
+
+RegisterNUICallback('policeFireOfficer', function(data, cb)
+    lib.callback('aura_hub:server:policeFireOfficer', false, function(success, message)
+        cb({ success = success, message = message })
+    end, data.targetCharId)
+end)
+
+RegisterNUICallback('setGpsWaypoint', function(data, cb)
+    if data and data.x and data.y then
+        SetNewWaypoint(tonumber(data.x) + 0.0, tonumber(data.y) + 0.0)
+        lib.notify({
+            title = 'GPS Táctico Policial',
+            description = 'Ruta fijada hacia la ubicación de la llamada de emergencia 911.',
+            type = 'success'
+        })
+        cb({ success = true })
+    else
+        cb({ success = false, message = "Coordenadas inválidas" })
+    end
+end)
+
 -- Limpieza de memoria gráfica al detener el recurso
 AddEventHandler('onResourceStop', function(res)
     if res == GetCurrentResourceName() then

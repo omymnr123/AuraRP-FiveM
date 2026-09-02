@@ -79,6 +79,19 @@
 
                 <!-- Botones de Acción Rápida y Logo Aura RP -->
                 <div class="quick-actions-block">
+                    <!-- Botón de Alternar Servicio (Duty) -->
+                    <button class="btn-quick-action btn-duty-toggle" id="btnActionDutyToggle" style="display: none;" title="Alternar Servicio (En servicio / Fuera de servicio)" onclick="togglePlayerDuty()">
+                        <span class="pulse-dot" id="dutyPulseDot" style="background:#ff4d6d; box-shadow:0 0 8px #ff4d6d;"></span>
+                        <span id="dutyText">SERVICIO</span>
+                    </button>
+
+                    <!-- Botón Terminal Policial MDT (Siempre visible para cualquier policía) -->
+                    <button class="btn-quick-action btn-police-mdt" id="btnActionPoliceMdt" style="display: none;" title="Terminal Policial LSPD (MDT)">
+                        <span class="pulse-dot-cyan"></span>
+                        <i class="fa-solid fa-shield-halved"></i>
+                        <span>MDT POLICÍA</span>
+                    </button>
+
                     <button class="btn-quick-action" id="btnActionSettings" title="Ajustes del Sistema">
                         <i class="fa-solid fa-gear"></i>
                         <span>AJUSTES</span>
@@ -389,6 +402,287 @@
                     <div class="empty-placeholder">
                         <i class="fa-solid fa-receipt"></i>
                         <p>No tienes facturas pendientes de cobro o pago.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL: TERMINAL POLICIAL LSPD (MDT) -->
+        <div class="hub-modal-overlay hidden" id="modalPoliceMdt">
+            <div class="hub-modal-card mdt-card">
+                <!-- Header del MDT -->
+                <div class="modal-header mdt-header">
+                    <div class="modal-title-row">
+                        <div class="mdt-badge-icon">
+                            <i class="fa-solid fa-shield-halved"></i>
+                        </div>
+                        <div>
+                            <div class="mdt-title-line">
+                                <h3>SISTEMA TÁCTICO POLICIAL MDT</h3>
+                                <span class="mdt-status-live"><span class="pulse-dot-cyan"></span> LSPD RED OPERATIVA EN VIVO</span>
+                            </div>
+                            <p>Base de datos de seguridad ciudadana, censo, vehículos, sanciones y prisiones</p>
+                        </div>
+                    </div>
+                    <div class="mdt-header-right">
+                        <!-- Pill de Alternar Servicio del Policía -->
+                        <div class="mdt-soc-pill duty-pill" id="mdtHeaderDutyPill" onclick="togglePlayerDuty()" title="Haz clic para entrar o salir de servicio" style="cursor: pointer;">
+                            <span class="sub">TU SERVICIO (CLIC)</span>
+                            <strong id="mdtDutyStatusText" style="color: #ff4d6d; display: flex; align-items: center; gap: 6px;">
+                                <span class="pulse-dot" id="mdtDutyDot" style="background:#ff4d6d; box-shadow:0 0 8px #ff4d6d; width:7px; height:7px;"></span>
+                                FUERA DE SERVICIO
+                            </strong>
+                        </div>
+
+                        <div class="mdt-soc-pill">
+                            <span class="sub">FONDO POLICIAL</span>
+                            <strong id="mdtSocBalance">$0.00</strong>
+                        </div>
+                        <button class="btn-modal-close" onclick="closeModal('modalPoliceMdt')"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                </div>
+
+                <!-- Barra de Navegación de Pestañas MDT -->
+                <div class="mdt-nav-tabs">
+                    <button class="mdt-tab-btn active" id="btnMdtTabCitizens" onclick="switchMdtTab('mdttab-citizens')">
+                        <i class="fa-solid fa-address-card"></i> <span>CIUDADANOS</span>
+                    </button>
+                    <button class="mdt-tab-btn" id="btnMdtTabVehicles" onclick="switchMdtTab('mdttab-vehicles')">
+                        <i class="fa-solid fa-car-side"></i> <span>VEHÍCULOS</span>
+                    </button>
+                    <button class="mdt-tab-btn" id="btnMdtTabFines" onclick="switchMdtTab('mdttab-fines')">
+                        <i class="fa-solid fa-receipt"></i> <span>SANCIONES Y MULTAS</span>
+                    </button>
+                    <button class="mdt-tab-btn" id="btnMdtTabJail" onclick="switchMdtTab('mdttab-jail')">
+                        <i class="fa-solid fa-lock"></i> <span>PRISIÓN BOLINGBROKE</span>
+                    </button>
+                    <button class="mdt-tab-btn" id="btnMdtTabWarrants" onclick="switchMdtTab('mdttab-warrants')">
+                        <i class="fa-solid fa-triangle-exclamation"></i> <span>BÚSQUEDA Y CAPTURA</span>
+                    </button>
+                    <button class="mdt-tab-btn" id="btnMdtTabRoster" onclick="switchMdtTab('mdttab-roster')">
+                        <i class="fa-solid fa-users-viewfinder"></i> <span>UNIDADES EN SERVICIO</span>
+                    </button>
+                    <button class="mdt-tab-btn" id="btnMdtTabDispatch" onclick="switchMdtTab('mdttab-dispatch')">
+                        <i class="fa-solid fa-tower-broadcast"></i> <span>DESPACHO 911</span>
+                    </button>
+                    <button class="mdt-tab-btn" id="btnMdtTabStaff" onclick="switchMdtTab('mdttab-staff')">
+                        <i class="fa-solid fa-user-gear"></i> <span>RRHH & PLANTILLA</span>
+                    </button>
+                </div>
+
+                <!-- Cuerpo del MDT -->
+                <div class="modal-body mdt-body">
+                    <!-- Tab 1: Ciudadanos -->
+                    <div id="mdttab-citizens" class="mdt-tab-pane active">
+                        <div class="mdt-search-bar">
+                            <div class="search-input-wrapper">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                                <input type="text" id="inputMdtCitizenSearch" placeholder="Buscar por Nombre, Apellido o CitizenID...">
+                            </div>
+                            <button class="btn-mdt-action cyan" id="btnMdtSearchCitizen"><i class="fa-solid fa-magnifying-glass"></i> Consultar Ficha</button>
+                        </div>
+                        <div id="mdtCitizenResults" class="mdt-citizen-results">
+                            <div class="mdt-empty-state">
+                                <i class="fa-solid fa-fingerprint"></i>
+                                <p>Introduce un nombre, apellido o CitizenID para consultar el historial policial completo.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab 2: Vehículos -->
+                    <div id="mdttab-vehicles" class="mdt-tab-pane">
+                        <div class="mdt-search-bar">
+                            <div class="search-input-wrapper">
+                                <i class="fa-solid fa-car"></i>
+                                <input type="text" id="inputMdtVehicleSearch" placeholder="Buscar Matrícula (Ej: 83XYZ123)..." style="text-transform: uppercase;">
+                            </div>
+                            <button class="btn-mdt-action cyan" id="btnMdtSearchVehicle"><i class="fa-solid fa-magnifying-glass"></i> Consultar Tráfico</button>
+                        </div>
+                        <div id="mdtVehicleResults" class="mdt-vehicle-results">
+                            <div class="mdt-empty-state">
+                                <i class="fa-solid fa-car-tunnel"></i>
+                                <p>Ingresa una matrícula vehicular para comprobar titularidad y estado de búsqueda BOLO.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab 3: Sanciones y Multas -->
+                    <div id="mdttab-fines" class="mdt-tab-pane">
+                        <div class="mdt-fines-layout">
+                            <div class="mdt-fines-form-card">
+                                <h4><i class="fa-solid fa-file-pen"></i> EMISIÓN DIRECTA DE SANCIÓN</h4>
+                                <p class="sub-desc">El importe se descuenta automáticamente del banco del ciudadano y se transfiere al 100% al fondo policial.</p>
+                                <div class="mdt-form-grid">
+                                    <div class="form-group">
+                                        <label>ID de Servidor o CitizenID</label>
+                                        <input type="text" id="inputMdtFineTarget" placeholder="Ej: 1 o HLWWIZKU">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Importe de la Multa ($)</label>
+                                        <input type="number" id="inputMdtFineAmount" placeholder="Ej: 500" min="1">
+                                    </div>
+                                    <div class="form-group full-width">
+                                        <label>Motivo / Código de Infracción</label>
+                                        <input type="text" id="inputMdtFineReason" placeholder="Ej: TR-02 Exceso de velocidad grave">
+                                    </div>
+                                    <button class="btn-mdt-action cyan full-width" id="btnMdtSubmitFine">
+                                        <i class="fa-solid fa-paper-plane"></i> Procesar y Notificar Sanción
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="mdt-presets-card">
+                                <h4><i class="fa-solid fa-list-check"></i> CÓDIGOS PENALES PREDEFINIDOS</h4>
+                                <div class="mdt-presets-scroll" id="mdtFinePresetsContainer">
+                                    <!-- Generado dinámicamente vía app.js -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab 4: Prisión Bolingbroke -->
+                    <div id="mdttab-jail" class="mdt-tab-pane">
+                        <div class="mdt-jail-layout">
+                            <div class="mdt-jail-form-card">
+                                <h4><i class="fa-solid fa-gavel"></i> SENTENCIA Y TRASLADO PENITENCIARIO</h4>
+                                <p class="sub-desc">Teletransporta al recluso a Bolingbroke, aplica condena en el servidor y restringe inventario.</p>
+                                <div class="mdt-form-grid">
+                                    <div class="form-group">
+                                        <label>ID de Servidor del Sospechoso</label>
+                                        <input type="number" id="inputMdtJailTarget" placeholder="ID de Jugador Conectado (Ej: 2)" min="1">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Tiempo de Condena (Minutos)</label>
+                                        <input type="number" id="inputMdtJailMinutes" placeholder="1 a 120 Minutos" min="1" max="120">
+                                    </div>
+                                    <div class="form-group full-width">
+                                        <label>Cargos y Delitos Imputados</label>
+                                        <input type="text" id="inputMdtJailReason" placeholder="Ej: Robo a mano armada + Homicidio en grado de tentativa">
+                                    </div>
+                                    <button class="btn-mdt-action red full-width" id="btnMdtSubmitJail">
+                                        <i class="fa-solid fa-handcuffs"></i> Sentenciar e Ingresar en Prisión
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="mdt-inmates-card">
+                                <h4><i class="fa-solid fa-users-slash"></i> RECLUSOS ACTIVOS EN PRISIÓN</h4>
+                                <div class="table-container mdt-table-scroll">
+                                    <table class="modal-table">
+                                        <thead>
+                                            <tr>
+                                                <th>CITIZENID</th>
+                                                <th>TIEMPO RESTANTE</th>
+                                                <th>MOTIVO</th>
+                                                <th>OFICIAL ACTUANTE</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="mdtInmatesTableBody"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab 5: Órdenes de Búsqueda y Captura -->
+                    <div id="mdttab-warrants" class="mdt-tab-pane">
+                        <div class="mdt-warrants-layout">
+                            <div class="mdt-warrant-form-card">
+                                <h4><i class="fa-solid fa-bullhorn"></i> EMITIR ORDEN DE BÚSQUEDA</h4>
+                                <div class="mdt-form-grid">
+                                    <div class="form-group">
+                                        <label>CitizenID del Sospechoso</label>
+                                        <input type="text" id="inputMdtWarrantCid" placeholder="Ej: HLWWIZKU">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Nombre y Apellidos</label>
+                                        <input type="text" id="inputMdtWarrantName" placeholder="Ej: John Doe">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Nivel de Prioridad</label>
+                                        <select id="selectMdtWarrantSeverity" class="mdt-select">
+                                            <option value="low">Baja (Infracciones)</option>
+                                            <option value="medium" selected>Media (Búsqueda General)</option>
+                                            <option value="high">Alta (Peligroso / Armado)</option>
+                                            <option value="urgent">Urgente (Código Rojo / Máxima)</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Motivo de la Orden</label>
+                                        <input type="text" id="inputMdtWarrantReason" placeholder="Ej: Asalto a joyería y fuga">
+                                    </div>
+                                    <button class="btn-mdt-action red full-width" id="btnMdtCreateWarrant">
+                                        <i class="fa-solid fa-triangle-exclamation"></i> Registrar Orden en la Red
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="mdt-warrants-list-card">
+                                <h4><i class="fa-solid fa-list-ul"></i> ÓRDENES ACTIVAS EN LA CIUDAD</h4>
+                                <div class="mdt-warrants-scroll" id="mdtWarrantsContainer">
+                                    <!-- Render dinámico -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab 6: Roster de Unidades en Servicio -->
+                    <div id="mdttab-roster" class="mdt-tab-pane">
+                        <div class="mdt-roster-header">
+                            <h4><i class="fa-solid fa-shield"></i> UNIDADES LSPD / BCSO CONECTADAS</h4>
+                            <span id="mdtActiveOfficersCount" class="mdt-tag cyan">0 Oficiales</span>
+                        </div>
+                        <div class="mdt-roster-grid" id="mdtRosterGrid">
+                            <!-- Render dinámico de oficiales -->
+                        </div>
+                    </div>
+
+                    <!-- Tab 7: Despacho 911 en Vivo -->
+                    <div id="mdttab-dispatch" class="mdt-tab-pane">
+                        <div class="mdt-dispatch-header">
+                            <h4><i class="fa-solid fa-tower-broadcast"></i> REGISTRO DE LLAMADAS 911 Y ALERTAS TÁCTICAS</h4>
+                            <button class="btn-mdt-action cyan small" onclick="loadMdtDispatchCalls()"><i class="fa-solid fa-rotate"></i> Actualizar</button>
+                        </div>
+                        <div class="mdt-dispatch-scroll" id="mdtDispatchFeed">
+                            <!-- Render dinámico de alertas 911 con botón Fijar GPS -->
+                        </div>
+                    </div>
+
+                    <!-- Tab 8: RRHH & Gestión de Personal Policial -->
+                    <div id="mdttab-staff" class="mdt-tab-pane">
+                        <div class="mdt-staff-header">
+                            <div class="mdt-staff-title-block">
+                                <h4><i class="fa-solid fa-user-gear"></i> GESTIÓN DE PLANTILLA Y OFICIALES POLICIALES</h4>
+                                <p class="sub-desc">Contratación de nuevos cadetes, promociones/degradaciones de rango y bajas del cuerpo.</p>
+                            </div>
+                            <span class="mdt-tag cyan"><i class="fa-solid fa-shield"></i> LSPD ALTO MANDO</span>
+                        </div>
+
+                        <!-- Barra de Contratación -->
+                        <div class="mdt-hire-bar">
+                            <div class="search-input-wrapper" style="max-width: 340px;">
+                                <i class="fa-solid fa-id-card"></i>
+                                <input type="number" id="inputMdtHirePoliceId" placeholder="ID de Servidor del Ciudadano (Cercano)" min="1">
+                            </div>
+                            <button class="btn-mdt-action cyan" id="btnMdtHirePolice">
+                                <i class="fa-solid fa-user-plus"></i> Contratar como Cadete (Grado 0)
+                            </button>
+                        </div>
+
+                        <!-- Tabla de Oficiales -->
+                        <div class="table-container mdt-table-scroll" style="flex: 1;">
+                            <table class="modal-table">
+                                <thead>
+                                    <tr>
+                                        <th>ESTADO</th>
+                                        <th>AGENTE</th>
+                                        <th>PUESTO / RANGO</th>
+                                        <th>SALARIO</th>
+                                        <th style="text-align: right;">ACCIONES DE MANDO</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="mdtStaffTableBody">
+                                    <!-- Render dinámico vía app.js -->
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
