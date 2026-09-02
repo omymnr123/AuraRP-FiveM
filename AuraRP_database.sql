@@ -31,11 +31,17 @@ CREATE TABLE IF NOT EXISTS `aura_doors` (
   PRIMARY KEY (`door_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
--- Volcando datos para la tabla aurarp.aura_doors: ~7 rows (aproximadamente)
+-- Volcando datos para la tabla aurarp.aura_doors: ~13 rows (aproximadamente)
 INSERT INTO `aura_doors` (`door_id`, `is_locked`, `job`, `coords_x`, `coords_y`, `coords_z`, `distance`) VALUES
 	('henhouse_main', 1, 'henhouse', -297.5899963378906, 6271.259765625, 31.510000228881836, 2),
-	('police_capitan', 1, 'police', 447.19122314453125, -980.4000244140625, 30.6783447265625, 2.5),
-	('police_main', 1, 'police', 434.75604248046875, -981.9296875, 30.6951904296875, 2.5),
+	('police_armory1', 0, 'police', 444.3560485839844, -984.0791015625, 34.3011474609375, 2.5),
+	('police_automatica1', 1, 'police', 445.71429443359375, -974.10986328125, 30.7120361328125, 2.5),
+	('police_automatica2', 0, 'police', 445.6351623535156, -986.2813110351562, 30.7120361328125, 2.5),
+	('police_automatica3', 0, 'police', 445.6087951660156, -994.2329711914062, 30.7120361328125, 2.5),
+	('police_main', 0, 'police', 434.75604248046875, -981.9296875, 30.6951904296875, 2.5),
+	('police_main2', 0, 'police', 438.3164978027344, -981.982421875, 30.7120361328125, 2.5),
+	('police_main3', 0, 'police', 441.5208740234375, -998.8483276367188, 30.7120361328125, 2.5),
+	('police_main4', 0, 'police', 457.0681457519531, -972.4747314453125, 30.7120361328125, 2.5),
 	('salieri_1', 1, 'salieri', 316.5758361816406, -1092.6065673828125, 29.4146728515625, 2.5),
 	('salieri_main', 1, 'salieri', 316.82000732421875, -1092.6199951171875, 29.420000076293945, 2),
 	('vazou_main', 1, 'vazou', -1564.43994140625, -974.6099853515625, 13.020000457763672, 2),
@@ -294,9 +300,9 @@ CREATE TABLE IF NOT EXISTS `aura_transactions` (
   KEY `idx_target_char` (`target_character_id`),
   KEY `idx_type` (`type`),
   KEY `idx_tx_uuid` (`transaction_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=90 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=91 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Volcando datos para la tabla aurarp.aura_transactions: ~11 rows (aproximadamente)
+-- Volcando datos para la tabla aurarp.aura_transactions: ~12 rows (aproximadamente)
 INSERT INTO `aura_transactions` (`id`, `transaction_id`, `character_id`, `target_character_id`, `account`, `type`, `amount`, `balance_before`, `balance_after`, `fee`, `reason`, `metadata`, `created_at`) VALUES
 	(1, 'TX-1788119036-11-f3ed8221', 11, NULL, 'bank', 'WITHDRAW', 500, 5000, 4500, 0, 'Emisión de Tarjeta de Crédito', NULL, '2026-08-30 19:43:56'),
 	(2, 'TX-1788119131-11-62a01561', 11, NULL, 'bank', 'WITHDRAW', 500, 4500, 4000, 0, 'Retirada ATM', '{"executor":11}', '2026-08-30 19:45:31'),
@@ -308,7 +314,8 @@ INSERT INTO `aura_transactions` (`id`, `transaction_id`, `character_id`, `target
 	(9, 'TX-1788119612-11-6b8b8ba0', 11, NULL, 'bank', 'DEPOSIT', 500, 4000, 4500, 0, 'Depósito bancario ATM', '{"executor":11}', '2026-08-30 19:53:32'),
 	(10, 'TX-1788119612-11-54435918', 11, NULL, 'cash', 'WITHDRAW', 500, 1000, 500, 0, 'Depósito bancario ATM', NULL, '2026-08-30 19:53:32'),
 	(11, 'TX-1788120626-11-218addc6', 11, NULL, 'bank', 'WITHDRAW', 100, 4500, 4400, 0, 'Retirada ATM', '{"executor":11}', '2026-08-30 20:10:26'),
-	(13, 'TX-1788120626-11-54806c5f', 11, NULL, 'cash', 'DEPOSIT', 100, 600, 700, 0, 'Retirada ATM', NULL, '2026-08-30 20:10:26');
+	(13, 'TX-1788120626-11-54806c5f', 11, NULL, 'cash', 'DEPOSIT', 100, 600, 700, 0, 'Retirada ATM', NULL, '2026-08-30 20:10:26'),
+	(90, 'TX-1788358046-11-8f13519d', 11, NULL, 'bank', 'DEPOSIT', 3040, 4400, 7440, 0, 'Nómina: LSPD (Jefe de Policía)', '{"tax_sunk":160,"gross":3200,"tax_rate":0.05,"grade":6,"job":"police"}', '2026-09-02 14:07:26');
 
 -- Volcando estructura para tabla aurarp.aura_vendor_transactions
 CREATE TABLE IF NOT EXISTS `aura_vendor_transactions` (
@@ -347,6 +354,7 @@ CREATE TABLE IF NOT EXISTS `characters` (
   `job` varchar(50) NOT NULL DEFAULT 'unemployed',
   `job_grade` int(11) NOT NULL DEFAULT 0,
   `job_duty` tinyint(1) NOT NULL DEFAULT 0,
+  `badge` varchar(20) DEFAULT NULL,
   `jail_time` int(11) NOT NULL DEFAULT 0,
   `iban` varchar(20) DEFAULT NULL,
   `pin` varchar(4) DEFAULT NULL,
@@ -357,12 +365,13 @@ CREATE TABLE IF NOT EXISTS `characters` (
   UNIQUE KEY `idx_phone_number` (`phone_number`),
   KEY `idx_character_job` (`job`),
   KEY `idx_character_job_duty` (`job_duty`),
+  KEY `idx_character_badge` (`badge`),
   CONSTRAINT `fk_characters_players` FOREIGN KEY (`citizenid`) REFERENCES `players` (`citizenid`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Volcando datos para la tabla aurarp.characters: ~1 rows (aproximadamente)
-INSERT INTO `characters` (`id`, `citizenid`, `slot`, `firstname`, `lastname`, `nationality`, `dob`, `gender`, `metadata`, `created_at`, `last_played`, `accounts`, `inventory`, `job`, `job_grade`, `job_duty`, `jail_time`, `iban`, `pin`, `phone_number`, `phone_settings`) VALUES
-	(11, 'HLWWIZKU', 1, 'test', 'uno', 'Angola', '1990-12-11', 0, '{"bank":5000,"appearance":{"model":"mp_m_freemode_01","headBlend":{"skinFirst":0,"shapeThird":0,"shapeMix":0,"shapeSecond":0,"thirdMix":0,"shapeFirst":0,"skinThird":0,"skinMix":0,"skinSecond":0},"tattoos":[],"components":[{"component_id":0,"drawable":0,"texture":0},{"component_id":1,"drawable":0,"texture":0},{"component_id":2,"drawable":0,"texture":0},{"component_id":3,"drawable":0,"texture":0},{"component_id":4,"drawable":0,"texture":0},{"component_id":5,"drawable":0,"texture":0},{"component_id":6,"drawable":0,"texture":0},{"component_id":7,"drawable":0,"texture":0},{"component_id":8,"drawable":0,"texture":0},{"component_id":9,"drawable":0,"texture":0},{"component_id":10,"drawable":0,"texture":0},{"component_id":11,"drawable":0,"texture":0}],"faceFeatures":{"nosePeakLowering":0,"eyeBrownForward":0,"chinBoneLowering":0,"neckThickness":0,"noseWidth":0,"noseBoneHigh":0,"cheeksWidth":0,"chinBoneLenght":0,"chinHole":0,"eyesOpening":0,"lipsThickness":0,"nosePeakHigh":0,"cheeksBoneHigh":0,"eyeBrownHigh":0,"jawBoneBackSize":0,"nosePeakSize":0,"noseBoneTwist":0,"chinBoneSize":0,"jawBoneWidth":0,"cheeksBoneWidth":0},"hair":{"highlight":0,"style":0,"texture":0,"color":0},"props":[{"prop_id":0,"texture":-1,"drawable":-1},{"prop_id":1,"texture":-1,"drawable":-1},{"prop_id":2,"texture":-1,"drawable":-1},{"prop_id":6,"texture":-1,"drawable":-1},{"prop_id":7,"texture":-1,"drawable":-1}],"headOverlays":{"makeUp":{"opacity":0,"style":0,"secondColor":0,"color":0},"blush":{"opacity":0,"style":0,"secondColor":0,"color":0},"blemishes":{"opacity":0,"style":0,"secondColor":0,"color":0},"complexion":{"opacity":0,"style":0,"secondColor":0,"color":0},"lipstick":{"opacity":0,"style":0,"secondColor":0,"color":0},"bodyBlemishes":{"opacity":0,"style":0,"secondColor":0,"color":0},"ageing":{"opacity":0,"style":0,"secondColor":0,"color":0},"beard":{"opacity":0,"style":0,"secondColor":0,"color":0},"eyebrows":{"opacity":0,"style":0,"secondColor":0,"color":0},"moleAndFreckles":{"opacity":0,"style":0,"secondColor":0,"color":0},"sunDamage":{"opacity":0,"style":0,"secondColor":0,"color":0},"chestHair":{"opacity":0,"style":0,"secondColor":0,"color":0}},"eyeColor":0},"last_location":{"z":43.6864013671875,"heading":280.6299133300781,"x":433.6615295410156,"y":-985.8329467773438},"cash":1000,"armor":0,"health":200}', '2026-08-29 13:56:37', '2026-09-02 13:08:08', '{"cash":500,"bank":4400,"black_money":0}', '[{"count":1,"metadata":{"owner":11,"description":"IBAN: AURA56149361\\nTitular ID: 11","iban":"AURA56149361"},"slot":1,"name":"credit_card"},{"count":500,"slot":2,"name":"money"},{"count":1,"slot":3,"name":"phone"}]', 'police', 6, 1, 0, 'AURA56149361', '6444', '555-8966', '{"ringtone":"ringtone.mp3","security":{"pin_code":"","face_id":true},"message_tone":"sms.mp3","volume_msg":80,"notifications":{"messages":true,"bank":true,"calls":true},"volume_ring":80,"frame_color":"#555566","device_name":"Otto","wallpaper_url":"https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=2564&auto=format&fit=crop"}');
+INSERT INTO `characters` (`id`, `citizenid`, `slot`, `firstname`, `lastname`, `nationality`, `dob`, `gender`, `metadata`, `created_at`, `last_played`, `accounts`, `inventory`, `job`, `job_grade`, `job_duty`, `badge`, `jail_time`, `iban`, `pin`, `phone_number`, `phone_settings`) VALUES
+	(11, 'HLWWIZKU', 1, 'test', 'uno', 'Angola', '1990-12-11', 0, '{"last_location":{"z":34.2843017578125,"y":-983.96044921875,"x":442.5626525878906,"heading":104.88188934326172},"health":200,"appearance":{"headOverlays":{"sunDamage":{"style":0,"opacity":0,"secondColor":0,"color":0},"blush":{"style":0,"opacity":0,"secondColor":0,"color":0},"moleAndFreckles":{"style":0,"opacity":0,"secondColor":0,"color":0},"beard":{"style":0,"opacity":0,"secondColor":0,"color":0},"chestHair":{"style":0,"opacity":0,"secondColor":0,"color":0},"ageing":{"style":0,"opacity":0,"secondColor":0,"color":0},"bodyBlemishes":{"style":0,"opacity":0,"secondColor":0,"color":0},"complexion":{"style":0,"opacity":0,"secondColor":0,"color":0},"blemishes":{"style":0,"opacity":0,"secondColor":0,"color":0},"lipstick":{"style":0,"opacity":0,"secondColor":0,"color":0},"eyebrows":{"style":0,"opacity":0,"secondColor":0,"color":0},"makeUp":{"style":0,"opacity":0,"secondColor":0,"color":0}},"props":[{"texture":-1,"prop_id":0,"drawable":-1},{"texture":-1,"prop_id":1,"drawable":-1},{"texture":-1,"prop_id":2,"drawable":-1},{"texture":-1,"prop_id":6,"drawable":-1},{"texture":-1,"prop_id":7,"drawable":-1}],"headBlend":{"skinThird":0,"shapeSecond":0,"shapeMix":0,"skinSecond":0,"skinFirst":0,"thirdMix":0,"skinMix":0,"shapeThird":0,"shapeFirst":0},"faceFeatures":{"nosePeakHigh":0,"nosePeakSize":0,"chinHole":0,"cheeksBoneWidth":0,"nosePeakLowering":0,"neckThickness":0,"chinBoneLowering":0,"noseWidth":0,"lipsThickness":0,"cheeksBoneHigh":0,"chinBoneSize":0,"chinBoneLenght":0,"eyesOpening":0,"eyeBrownHigh":0,"cheeksWidth":0,"jawBoneWidth":0,"noseBoneHigh":0,"noseBoneTwist":0,"jawBoneBackSize":0,"eyeBrownForward":0},"components":[{"texture":0,"component_id":0,"drawable":0},{"texture":0,"component_id":1,"drawable":0},{"texture":0,"component_id":2,"drawable":0},{"texture":0,"component_id":3,"drawable":0},{"texture":0,"component_id":4,"drawable":0},{"texture":0,"component_id":5,"drawable":0},{"texture":0,"component_id":6,"drawable":0},{"texture":0,"component_id":7,"drawable":0},{"texture":0,"component_id":8,"drawable":0},{"texture":0,"component_id":9,"drawable":0},{"texture":0,"component_id":10,"drawable":0},{"texture":0,"component_id":11,"drawable":0}],"hair":{"style":0,"highlight":0,"texture":0,"color":0},"tattoos":[],"eyeColor":0,"model":"mp_m_freemode_01"},"bank":5000,"cash":1000,"armor":0}', '2026-08-29 13:56:37', '2026-09-02 14:37:25', '{"bank":7440,"cash":500,"black_money":0}', '[{"metadata":{"iban":"AURA56149361","owner":11,"description":"IBAN: AURA56149361\\nTitular ID: 11"},"count":1,"name":"credit_card","slot":1},{"count":500,"name":"money","slot":2},{"count":1,"name":"phone","slot":3},{"metadata":{"ammo":12,"registered":"LazyNewt4084","durability":100,"components":[],"serial":"288707JEM353242"},"count":1,"name":"WEAPON_COMBATPISTOL","slot":4},{"count":88,"name":"ammo-9","slot":5},{"metadata":{"ammo":0,"registered":"LazyNewt4084","durability":100,"components":[],"serial":"569731GUL454992"},"count":1,"name":"WEAPON_CARBINERIFLE","slot":6},{"count":100,"name":"ammo-rifle","slot":7},{"metadata":{"ammo":0,"registered":"LazyNewt4084","durability":100,"components":[],"serial":"580246GYA736075"},"count":1,"name":"WEAPON_PUMPSHOTGUN","slot":8},{"count":100,"name":"ammo-shotgun","slot":9},{"metadata":{"serial":"637804XNA997158","durability":100,"components":[],"registered":"LazyNewt4084"},"count":1,"name":"WEAPON_STUNGUN","slot":10},{"metadata":{"components":[],"durability":100},"count":1,"name":"WEAPON_NIGHTSTICK","slot":11},{"metadata":{"components":[],"durability":100},"count":1,"name":"WEAPON_FLASHLIGHT","slot":12},{"count":1,"name":"handcuffs","slot":13},{"count":1,"name":"radio","slot":14},{"count":1,"name":"armour","slot":15},{"count":1,"name":"armour","slot":16},{"count":5,"name":"bandage","slot":17},{"count":2,"name":"medikit","slot":18},{"count":1,"name":"spikestrip","slot":19},{"count":1,"name":"police_badge","slot":20},{"count":1,"name":"bodycam","slot":21}]', 'police', 6, 1, '101', 0, 'AURA56149361', '6444', '555-8966', '{"ringtone":"ringtone.mp3","security":{"pin_code":"","face_id":true},"message_tone":"sms.mp3","volume_msg":80,"notifications":{"messages":true,"bank":true,"calls":true},"volume_ring":80,"frame_color":"#555566","device_name":"Otto","wallpaper_url":"https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=2564&auto=format&fit=crop"}');
 
 -- Volcando estructura para tabla aurarp.management_outfits
 CREATE TABLE IF NOT EXISTS `management_outfits` (
@@ -389,9 +398,11 @@ CREATE TABLE IF NOT EXISTS `ox_inventory` (
   UNIQUE KEY `owner` (`owner`,`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
--- Volcando datos para la tabla aurarp.ox_inventory: ~1 rows (aproximadamente)
+-- Volcando datos para la tabla aurarp.ox_inventory: ~2 rows (aproximadamente)
 INSERT INTO `ox_inventory` (`owner`, `name`, `data`, `lastupdated`) VALUES
-	('', 'vendor_stock_tequilala', '[{"count":100,"slot":1,"name":"water"},{"count":100,"slot":2,"name":"chips"},{"count":100,"slot":3,"name":"cocktail"},{"count":100,"slot":4,"name":"tequila_shot"},{"count":100,"slot":5,"name":"whiskey"},{"count":100,"slot":6,"name":"beer"}]', '2026-09-01 12:37:29');
+	('', 'vendor_stock_tequilala', '[{"count":100,"slot":1,"name":"water"},{"count":100,"slot":2,"name":"chips"},{"count":100,"slot":3,"name":"cocktail"},{"count":100,"slot":4,"name":"tequila_shot"},{"count":100,"slot":5,"name":"whiskey"},{"count":100,"slot":6,"name":"beer"}]', '2026-09-01 12:37:29'),
+	('', 'police_disposal_mission_row', NULL, '2026-09-02 14:05:01'),
+	('', 'police_disposal_mrpd', NULL, '2026-09-02 14:05:01');
 
 -- Volcando estructura para tabla aurarp.player_outfit_codes
 CREATE TABLE IF NOT EXISTS `player_outfit_codes` (
@@ -435,7 +446,7 @@ CREATE TABLE IF NOT EXISTS `players` (
 
 -- Volcando datos para la tabla aurarp.players: ~1 rows (aproximadamente)
 INSERT INTO `players` (`id`, `license`, `citizenid`, `metadata`, `created_at`, `last_updated`, `last_login`) VALUES
-	(1, 'license:fb83002da5edb49dd7bdb39c170a8c8af7cf5298', 'HLWWIZKU', '{"permissions":"user","status":{"hunger":100,"thirst":100},"position":{"x":0.0,"z":0.0,"y":0.0},"money":{"cash":500,"bank":1500}}', '2026-08-28 18:31:20', '2026-09-02 13:00:10', '2026-09-02 13:00:10');
+	(1, 'license:fb83002da5edb49dd7bdb39c170a8c8af7cf5298', 'HLWWIZKU', '{"permissions":"user","status":{"hunger":100,"thirst":100},"position":{"x":0.0,"z":0.0,"y":0.0},"money":{"cash":500,"bank":1500}}', '2026-08-28 18:31:20', '2026-09-02 14:09:49', '2026-09-02 14:09:49');
 
 -- Volcando estructura para tabla aurarp.playerskins
 CREATE TABLE IF NOT EXISTS `playerskins` (

@@ -3,6 +3,167 @@
 -- Armory Stashes, illenium-appearance Wardrobes, Evidence Locker & Garages
 -- ============================================================================
 
+local CivilianAppearanceBackup = nil
+local IsWearingPoliceUniform = false
+
+local function EquipPoliceUniform()
+    local ped = cache.ped
+    local pState = LocalPlayer.state
+    local grade = pState.job_grade or 0
+
+    -- Determinar género (Male / Female)
+    local model = GetEntityModel(ped)
+    local gender = 'Male'
+    if model == `mp_f_freemode_01` or not IsPedMale(ped) then
+        gender = 'Female'
+    end
+
+    -- Obtener la configuración del uniforme según el grado policial
+    local uniformConfig = Config.Uniforms[grade]
+    if not uniformConfig then
+        for g = grade, 0, -1 do
+            if Config.Uniforms[g] then
+                uniformConfig = Config.Uniforms[g]
+                break
+            end
+        end
+    end
+
+    if not uniformConfig or not uniformConfig[gender] then
+        lib.notify({
+            title = 'Vestuario LSPD',
+            description = 'No se encontró un uniforme asignado para tu rango.',
+            type = 'error'
+        })
+        return
+    end
+
+    -- Guardar copia de seguridad de la ropa civil del personaje ANTES de vestirse
+    if not IsWearingPoliceUniform then
+        local currentAppearance = nil
+        pcall(function()
+            if exports['illenium-appearance'] then
+                currentAppearance = exports['illenium-appearance']:getPedAppearance(ped)
+            end
+        end)
+
+        if currentAppearance then
+            CivilianAppearanceBackup = currentAppearance
+            TriggerServerEvent('aura_police:server:saveCivilianSkin', currentAppearance)
+        end
+    end
+
+    -- Animación de vestirse
+    lib.requestAnimDict('clothingshirt')
+    local dressed = lib.progressBar({
+        duration = 2000,
+        label = 'Equipando ' .. (uniformConfig.label or 'uniforme policial') .. '...',
+        useWhileDead = false,
+        canCancel = false,
+        disable = {
+            move = true,
+            car = true,
+            combat = true
+        },
+        anim = {
+            dict = 'clothingshirt',
+            clip = 'try_shirt_positive_d'
+        }
+    })
+
+    if not dressed then return end
+
+    -- Aplicar componentes de ropa
+    local outfit = uniformConfig[gender]
+    if outfit.components then
+        for _, comp in ipairs(outfit.components) do
+            SetPedComponentVariation(ped, comp.component_id, comp.drawable, comp.texture, 0)
+        end
+    end
+
+    -- Aplicar accesorios y complementos (props)
+    if outfit.props then
+        for _, prop in ipairs(outfit.props) do
+            if prop.drawable == -1 then
+                ClearPedProp(ped, prop.prop_id)
+            else
+                SetPedPropIndex(ped, prop.prop_id, prop.drawable, prop.texture, true)
+            end
+        end
+    end
+
+    IsWearingPoliceUniform = true
+
+    lib.notify({
+        title = 'Vestuario LSPD',
+        description = string.format("Te has equipado: %s", uniformConfig.label or 'Uniforme Reglamentario'),
+        type = 'success'
+    })
+end
+
+local function RemovePoliceUniform()
+    local ped = cache.ped
+
+    -- Animación de desvestirse
+    lib.requestAnimDict('clothingshirt')
+    local undressed = lib.progressBar({
+        duration = 2000,
+        label = 'Quitándose el uniforme policial...',
+        useWhileDead = false,
+        canCancel = false,
+        disable = {
+            move = true,
+            car = true,
+            combat = true
+        },
+        anim = {
+            dict = 'clothingshirt',
+            clip = 'try_shirt_positive_d'
+        }
+    })
+
+    if not undressed then return end
+
+    -- 1. Si tenemos copia local directa, la aplicamos
+    if CivilianAppearanceBackup then
+        pcall(function()
+            exports['illenium-appearance']:setPedAppearance(ped, CivilianAppearanceBackup)
+        end)
+        CivilianAppearanceBackup = nil
+        IsWearingPoliceUniform = false
+        lib.notify({
+            title = 'Vestuario LSPD',
+            description = 'Te has quitado el uniforme y has vuelto a tu ropa civil.',
+            type = 'inform'
+        })
+        return
+    end
+
+    -- 2. Si no había copia local (ej: reconexión), recuperar del servidor / DB
+    lib.callback('aura_police:server:getCivilianSkin', false, function(savedAppearance)
+        if savedAppearance then
+            pcall(function()
+                exports['illenium-appearance']:setPedAppearance(ped, savedAppearance)
+            end)
+            IsWearingPoliceUniform = false
+            lib.notify({
+                title = 'Vestuario LSPD',
+                description = 'Te has quitado el uniforme y has vuelto a tu ropa civil.',
+                type = 'inform'
+            })
+        else
+            -- Fallback a reloadSkin de illenium
+            TriggerEvent('illenium-appearance:client:reloadSkin')
+            IsWearingPoliceUniform = false
+            lib.notify({
+                title = 'Vestuario LSPD',
+                description = 'Te has quitado el uniforme policial.',
+                type = 'inform'
+            })
+        end
+    end)
+end
+
 local function InitStationPoints()
     for stationKey, stationData in pairs(Config.Stations) do
         -- 1. ARMERÍA POLICIAL
@@ -75,8 +236,8 @@ local function InitStationPoints()
                 options = {
                     {
                         name = 'aura_police_evidence_' .. stationKey,
-                        icon = 'fa-solid fa-boxes-stacked',
-                        label = 'Abrir Depósito de Evidencias (Confiscaciones)',
+                        icon = 'fa-solid fa-fingerprint',
+                        label = 'Depósito de Evidencias (LSPD)',
                         distance = 2.8,
                         canInteract = function()
                             local pState = LocalPlayer.state
@@ -109,7 +270,7 @@ local function InitStationPoints()
                 debug = Config.Debug,
                 options = {
                     {
-                        name = 'aura_police_wardrobe_' .. stationKey,
+                        name = 'aura_police_wardrobe_equip_' .. stationKey,
                         icon = 'fa-solid fa-shirt',
                         label = 'Abrir Vestuario (Uniformes LSPD)',
                         distance = 2.8,
@@ -118,7 +279,20 @@ local function InitStationPoints()
                             return pState.job == 'police'
                         end,
                         onSelect = function()
-                            TriggerEvent('illenium-appearance:client:openJobOutfitsMenu')
+                            EquipPoliceUniform()
+                        end
+                    },
+                    {
+                        name = 'aura_police_wardrobe_remove_' .. stationKey,
+                        icon = 'fa-solid fa-person-arrow-down-to-line',
+                        label = 'Quitar (Uniforme LSPD)',
+                        distance = 2.8,
+                        canInteract = function()
+                            local pState = LocalPlayer.state
+                            return pState.job == 'police'
+                        end,
+                        onSelect = function()
+                            RemovePoliceUniform()
                         end
                     }
                 }

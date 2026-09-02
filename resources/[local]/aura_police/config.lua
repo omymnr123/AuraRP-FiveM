@@ -46,7 +46,7 @@ Config.Stations = {
             maxWeight = 1000000 -- 1000kg
         },
         wardrobe = {
-            coords = vec3(461.35, -999.07, 30.69)
+            coords = vec3(457.68, -979.34, 34.30)
         },
         garage = {
             spawn = vec4(438.42, -1018.30, 28.75, 90.0),
@@ -277,3 +277,275 @@ Config.FinePresets = {
     { category = 'Delitos Graves', code = 'DG-03', label = 'Agresión física a funcionario público',          amount = 5000 },
     { category = 'Delitos Graves', code = 'DG-04', label = 'Fuga de control policial en vehículo',           amount = 3000 }
 }
+
+-- ============================================================================
+-- 6. VESTUARIO Y UNIFORMES REGLAMENTARIOS POR RANGO (MASCULINO Y FEMENINO)
+-- ============================================================================
+Config.Uniforms = {
+    [0] = { -- Cadete
+        label = 'Uniforme de Cadete en Prácticas (LSPD)',
+        ['Male'] = {
+            components = {
+                { component_id = 1,  drawable = 0,   texture = 0 }, -- Máscara
+                { component_id = 3,  drawable = 19,  texture = 0 }, -- Brazos / Manga corta
+                { component_id = 4,  drawable = 24,  texture = 0 }, -- Pantalón azul marino LSPD
+                { component_id = 6,  drawable = 51,  texture = 0 }, -- Botas de servicio
+                { component_id = 7,  drawable = 125, texture = 0 }, -- Cinturón táctico con funda
+                { component_id = 8,  drawable = 58,  texture = 0 }, -- Camiseta interior
+                { component_id = 9,  drawable = 0,   texture = 0 }, -- Sin chaleco exterior
+                { component_id = 10, drawable = 0,   texture = 0 }, -- Sin galones
+                { component_id = 11, drawable = 55,  texture = 0 }  -- Camisa manga corta LSPD
+            },
+            props = {
+                { prop_id = 0, drawable = 46, texture = 0 },        -- Gorra de patrulla LSPD
+                { prop_id = 1, drawable = -1, texture = 0 }
+            }
+        },
+        ['Female'] = {
+            components = {
+                { component_id = 1,  drawable = 0,   texture = 0 },
+                { component_id = 3,  drawable = 31,  texture = 0 },
+                { component_id = 4,  drawable = 133, texture = 0 },
+                { component_id = 6,  drawable = 52,  texture = 0 },
+                { component_id = 7,  drawable = 95,  texture = 0 },
+                { component_id = 8,  drawable = 35,  texture = 0 },
+                { component_id = 9,  drawable = 0,   texture = 0 },
+                { component_id = 10, drawable = 0,   texture = 0 },
+                { component_id = 11, drawable = 48,  texture = 0 }
+            },
+            props = {
+                { prop_id = 0, drawable = 45, texture = 0 },
+                { prop_id = 1, drawable = -1, texture = 0 }
+            }
+        }
+    },
+
+    [1] = { -- Oficial I
+        label = 'Uniforme de Oficial de Patrulla I (LSPD)',
+        ['Male'] = {
+            components = {
+                { component_id = 1,  drawable = 0,   texture = 0 },
+                { component_id = 3,  drawable = 19,  texture = 0 },
+                { component_id = 4,  drawable = 24,  texture = 0 },
+                { component_id = 6,  drawable = 51,  texture = 0 },
+                { component_id = 7,  drawable = 125, texture = 0 },
+                { component_id = 8,  drawable = 58,  texture = 0 },
+                { component_id = 9,  drawable = 12,  texture = 0 }, -- Chaleco balístico LSPD
+                { component_id = 10, drawable = 1,   texture = 0 }, -- Placa Oficial I
+                { component_id = 11, drawable = 55,  texture = 0 }
+            },
+            props = {
+                { prop_id = 0, drawable = -1, texture = 0 },
+                { prop_id = 1, drawable = -1, texture = 0 }
+            }
+        },
+        ['Female'] = {
+            components = {
+                { component_id = 1,  drawable = 0,   texture = 0 },
+                { component_id = 3,  drawable = 31,  texture = 0 },
+                { component_id = 4,  drawable = 133, texture = 0 },
+                { component_id = 6,  drawable = 52,  texture = 0 },
+                { component_id = 7,  drawable = 95,  texture = 0 },
+                { component_id = 8,  drawable = 35,  texture = 0 },
+                { component_id = 9,  drawable = 34,  texture = 0 }, -- Chaleco balístico femenino LSPD
+                { component_id = 10, drawable = 1,   texture = 0 },
+                { component_id = 11, drawable = 48,  texture = 0 }
+            },
+            props = {
+                { prop_id = 0, drawable = -1, texture = 0 },
+                { prop_id = 1, drawable = -1, texture = 0 }
+            }
+        }
+    },
+
+    [2] = { -- Oficial II
+        label = 'Uniforme de Oficial Superior II (LSPD)',
+        ['Male'] = {
+            components = {
+                { component_id = 1,  drawable = 0,   texture = 0 },
+                { component_id = 3,  drawable = 20,  texture = 0 }, -- Manga larga
+                { component_id = 4,  drawable = 24,  texture = 0 },
+                { component_id = 6,  drawable = 51,  texture = 0 },
+                { component_id = 7,  drawable = 125, texture = 0 },
+                { component_id = 8,  drawable = 58,  texture = 0 },
+                { component_id = 9,  drawable = 12,  texture = 0 },
+                { component_id = 10, drawable = 2,   texture = 0 }, -- Galón doble Oficial II
+                { component_id = 11, drawable = 317, texture = 0 }  -- Camisa manga larga LSPD
+            },
+            props = {
+                { prop_id = 0, drawable = -1, texture = 0 },
+                { prop_id = 1, drawable = -1, texture = 0 }
+            }
+        },
+        ['Female'] = {
+            components = {
+                { component_id = 1,  drawable = 0,   texture = 0 },
+                { component_id = 3,  drawable = 31,  texture = 0 },
+                { component_id = 4,  drawable = 133, texture = 0 },
+                { component_id = 6,  drawable = 52,  texture = 0 },
+                { component_id = 7,  drawable = 95,  texture = 0 },
+                { component_id = 8,  drawable = 35,  texture = 0 },
+                { component_id = 9,  drawable = 34,  texture = 0 },
+                { component_id = 10, drawable = 2,   texture = 0 },
+                { component_id = 11, drawable = 327, texture = 0 }
+            },
+            props = {
+                { prop_id = 0, drawable = -1, texture = 0 },
+                { prop_id = 1, drawable = -1, texture = 0 }
+            }
+        }
+    },
+
+    [3] = { -- Sargento
+        label = 'Uniforme de Mando - Sargento (LSPD)',
+        ['Male'] = {
+            components = {
+                { component_id = 1,  drawable = 0,   texture = 0 },
+                { component_id = 3,  drawable = 20,  texture = 0 },
+                { component_id = 4,  drawable = 24,  texture = 0 },
+                { component_id = 6,  drawable = 51,  texture = 0 },
+                { component_id = 7,  drawable = 126, texture = 0 }, -- Cinturón de mando con placa dorada
+                { component_id = 8,  drawable = 58,  texture = 0 },
+                { component_id = 9,  drawable = 12,  texture = 1 }, -- Chaleco táctico Sargento
+                { component_id = 10, drawable = 3,   texture = 0 }, -- Triple galón de Sargento
+                { component_id = 11, drawable = 317, texture = 0 }
+            },
+            props = {
+                { prop_id = 0, drawable = 58, texture = 0 },        -- Gorra de plato oficial de mando
+                { prop_id = 1, drawable = -1, texture = 0 }
+            }
+        },
+        ['Female'] = {
+            components = {
+                { component_id = 1,  drawable = 0,   texture = 0 },
+                { component_id = 3,  drawable = 31,  texture = 0 },
+                { component_id = 4,  drawable = 133, texture = 0 },
+                { component_id = 6,  drawable = 52,  texture = 0 },
+                { component_id = 7,  drawable = 96,  texture = 0 },
+                { component_id = 8,  drawable = 35,  texture = 0 },
+                { component_id = 9,  drawable = 34,  texture = 1 },
+                { component_id = 10, drawable = 3,   texture = 0 },
+                { component_id = 11, drawable = 327, texture = 0 }
+            },
+            props = {
+                { prop_id = 0, drawable = 57, texture = 0 },
+                { prop_id = 1, drawable = -1, texture = 0 }
+            }
+        }
+    },
+
+    [4] = { -- Teniente
+        label = 'Uniforme de Mando - Teniente (LSPD)',
+        ['Male'] = {
+            components = {
+                { component_id = 1,  drawable = 0,   texture = 0 },
+                { component_id = 3,  drawable = 20,  texture = 0 },
+                { component_id = 4,  drawable = 24,  texture = 0 },
+                { component_id = 6,  drawable = 51,  texture = 0 },
+                { component_id = 7,  drawable = 126, texture = 0 },
+                { component_id = 8,  drawable = 58,  texture = 0 },
+                { component_id = 9,  drawable = 12,  texture = 1 },
+                { component_id = 10, drawable = 4,   texture = 0 }, -- Insignia de Teniente
+                { component_id = 11, drawable = 317, texture = 1 }  -- Uniforme Class A Teniente
+            },
+            props = {
+                { prop_id = 0, drawable = 58, texture = 0 },
+                { prop_id = 1, drawable = -1, texture = 0 }
+            }
+        },
+        ['Female'] = {
+            components = {
+                { component_id = 1,  drawable = 0,   texture = 0 },
+                { component_id = 3,  drawable = 31,  texture = 0 },
+                { component_id = 4,  drawable = 133, texture = 0 },
+                { component_id = 6,  drawable = 52,  texture = 0 },
+                { component_id = 7,  drawable = 96,  texture = 0 },
+                { component_id = 8,  drawable = 35,  texture = 0 },
+                { component_id = 9,  drawable = 34,  texture = 1 },
+                { component_id = 10, drawable = 4,   texture = 0 },
+                { component_id = 11, drawable = 327, texture = 1 }
+            },
+            props = {
+                { prop_id = 0, drawable = 57, texture = 0 },
+                { prop_id = 1, drawable = -1, texture = 0 }
+            }
+        }
+    },
+
+    [5] = { -- Capitán
+        label = 'Uniforme de Alto Mando - Capitán (LSPD)',
+        ['Male'] = {
+            components = {
+                { component_id = 1,  drawable = 0,   texture = 0 },
+                { component_id = 3,  drawable = 20,  texture = 0 },
+                { component_id = 4,  drawable = 24,  texture = 0 },
+                { component_id = 6,  drawable = 51,  texture = 0 },
+                { component_id = 7,  drawable = 126, texture = 0 },
+                { component_id = 8,  drawable = 58,  texture = 0 },
+                { component_id = 9,  drawable = 12,  texture = 2 }, -- Chaleco ejecutivo Capitán
+                { component_id = 10, drawable = 5,   texture = 0 }, -- Doble barra de Capitán
+                { component_id = 11, drawable = 317, texture = 2 }  -- Uniforme Class A Capitán con laureles
+            },
+            props = {
+                { prop_id = 0, drawable = 58, texture = 2 },        -- Gorra de plato con laureles dorados
+                { prop_id = 1, drawable = -1, texture = 0 }
+            }
+        },
+        ['Female'] = {
+            components = {
+                { component_id = 1,  drawable = 0,   texture = 0 },
+                { component_id = 3,  drawable = 31,  texture = 0 },
+                { component_id = 4,  drawable = 133, texture = 0 },
+                { component_id = 6,  drawable = 52,  texture = 0 },
+                { component_id = 7,  drawable = 96,  texture = 0 },
+                { component_id = 8,  drawable = 35,  texture = 0 },
+                { component_id = 9,  drawable = 34,  texture = 2 },
+                { component_id = 10, drawable = 5,   texture = 0 },
+                { component_id = 11, drawable = 327, texture = 2 }
+            },
+            props = {
+                { prop_id = 0, drawable = 57, texture = 2 },
+                { prop_id = 1, drawable = -1, texture = 0 }
+            }
+        }
+    },
+
+    [6] = { -- Jefe de Policía (Comisario Principal / Chief of Police)
+        label = 'Uniforme de Gala y Máxima Autoridad - Jefe de Policía (LSPD)',
+        ['Male'] = {
+            components = {
+                { component_id = 1,  drawable = 0,   texture = 0 },
+                { component_id = 3,  drawable = 20,  texture = 0 },
+                { component_id = 4,  drawable = 24,  texture = 0 }, -- Pantalón de gala negro/azul
+                { component_id = 6,  drawable = 51,  texture = 0 }, -- Zapatos de gala charol
+                { component_id = 7,  drawable = 126, texture = 0 }, -- Placa de oro de Jefe de Policía
+                { component_id = 8,  drawable = 58,  texture = 0 },
+                { component_id = 9,  drawable = 12,  texture = 2 }, -- Chaleco táctico Jefe
+                { component_id = 10, drawable = 6,   texture = 0 }, -- 4 estrellas doradas de Comisario Principal
+                { component_id = 11, drawable = 317, texture = 2 }  -- Uniforme Class A de máxima graduación
+            },
+            props = {
+                { prop_id = 0, drawable = 58, texture = 2 },        -- Gorra ejecutiva con escudo dorado de Jefe
+                { prop_id = 1, drawable = -1, texture = 0 }
+            }
+        },
+        ['Female'] = {
+            components = {
+                { component_id = 1,  drawable = 0,   texture = 0 },
+                { component_id = 3,  drawable = 31,  texture = 0 },
+                { component_id = 4,  drawable = 133, texture = 0 },
+                { component_id = 6,  drawable = 52,  texture = 0 },
+                { component_id = 7,  drawable = 96,  texture = 0 },
+                { component_id = 8,  drawable = 35,  texture = 0 },
+                { component_id = 9,  drawable = 34,  texture = 2 },
+                { component_id = 10, drawable = 6,   texture = 0 },
+                { component_id = 11, drawable = 327, texture = 2 }
+            },
+            props = {
+                { prop_id = 0, drawable = 57, texture = 2 },
+                { prop_id = 1, drawable = -1, texture = 0 }
+            }
+        }
+    }
+}
+

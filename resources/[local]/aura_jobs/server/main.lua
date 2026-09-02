@@ -14,6 +14,49 @@ local function GetCharacterId(src)
     return nil
 end
 
+--- Genera un nuevo número de placa policial único correlativo (101, 102, 103...)
+local function GeneratePoliceBadge()
+    local existingBadges = MySQL.query.await([[
+        SELECT badge FROM characters 
+        WHERE badge IS NOT NULL AND badge != '' AND job = 'police'
+    ]])
+    local maxNum = 100
+    if existingBadges then
+        for _, row in ipairs(existingBadges) do
+            local num = tonumber(string.match(tostring(row.badge), "%d+"))
+            if num and num > maxNum then
+                maxNum = num
+            end
+        end
+    end
+    return string.format("%03d", maxNum + 1)
+end
+exports('GeneratePoliceBadge', GeneratePoliceBadge)
+
+--- Asegura que un policía tenga asignado su número de placa en DB y StateBags
+local function EnsurePoliceBadge(charId, src)
+    if not charId then return nil end
+    local row = MySQL.single.await('SELECT badge FROM characters WHERE id = ?', { charId })
+    local badge = row and row.badge
+    if not badge or badge == '' then
+        badge = GeneratePoliceBadge()
+        MySQL.update('UPDATE characters SET badge = ? WHERE id = ?', { badge, charId })
+    end
+    
+    if src then
+        Player(src).state:set('badge', badge, true)
+        Player(src).state:set('callsign', badge, true)
+        
+        local activeChar = exports.aura_multichar:GetActiveCharacter(src)
+        if activeChar then
+            activeChar.badge = badge
+        end
+    end
+    
+    return badge
+end
+exports('EnsurePoliceBadge', EnsurePoliceBadge)
+
 --- Inicializa y carga en memoria y StateBags el empleo de un jugador
 --- @param src number Source del jugador
 --- @param charId number | nil ID de personaje opcional
@@ -24,9 +67,10 @@ local function LoadPlayerJob(src, charId)
     local cid = charId or GetCharacterId(src)
     if not cid then return end
 
-    local row = MySQL.single.await('SELECT job, job_grade FROM characters WHERE id = ?', { cid })
+    local row = MySQL.single.await('SELECT job, job_grade, badge FROM characters WHERE id = ?', { cid })
     local jobName = (row and row.job) or 'unemployed'
     local jobGrade = (row and tonumber(row.job_grade)) or 0
+    local badge = (row and row.badge) or nil
     
     -- Todos los personajes se conectan SIEMPRE fuera de servicio por diseño
     local jobDuty = false
@@ -49,12 +93,28 @@ local function LoadPlayerJob(src, charId)
         jobDuty = false
     end
 
+    -- Si es policía, asegurar asignación de placa policial
+    if jobName == 'police' then
+        if not badge or badge == '' then
+            badge = EnsurePoliceBadge(cid, src)
+        else
+            Player(src).state:set('badge', badge, true)
+            Player(src).state:set('callsign', badge, true)
+            local activeChar = exports.aura_multichar:GetActiveCharacter(src)
+            if activeChar then activeChar.badge = badge end
+        end
+    else
+        Player(src).state:set('badge', nil, true)
+        Player(src).state:set('callsign', nil, true)
+    end
+
     -- Guardar en caché del servidor
     AuraJobs.PlayerCache[src] = {
         charId = cid,
         job = jobName,
         grade = jobGrade,
-        duty = jobDuty
+        duty = jobDuty,
+        badge = badge
     }
 
     -- Replicar a StateBags globales (Sincronización instantánea de red para clientes)
@@ -71,7 +131,7 @@ local function LoadPlayerJob(src, charId)
     UpdateAllBusinessStates()
 
     if Config.Debug then
-        print(string.format("[Aura Jobs] Empleo cargado para Src #%d (CharID #%d): %s [%d] | Servicio: %s", src, cid, jobName, jobGrade, tostring(jobDuty)))
+        print(string.format("[Aura Jobs] Empleo cargado para Src #%d (CharID #%d): %s [%d] | Servicio: %s | Placa: %s", src, cid, jobName, jobGrade, tostring(jobDuty), tostring(badge)))
     end
 end
 
@@ -185,11 +245,13 @@ local function SetDuty(src, forcedDuty)
     })
 
     -- 4. Notificación visual en el Banner Superior Aura RP
+    local currentBadge = (currentJob == 'police') and (Player(src).state.badge or (pData and pData.badge)) or nil
     TriggerClientEvent('aura_hub:client:showDutyAnnouncement', src, {
         job = currentJob,
         label = jobConfig.label,
         isDuty = newDuty,
-        isPolice = (currentJob == 'police')
+        isPolice = (currentJob == 'police'),
+        badge = currentBadge
     })
 
     UpdateAllBusinessStates()
@@ -240,6 +302,11 @@ local function SetJob(srcOrCharId, newJob, newGrade)
         charId
     })
 
+    -- Si se asigna policía, asegurar que tenga número de placa generado
+    if newJob == 'police' then
+        EnsurePoliceBadge(charId, src)
+    end
+
     -- Si el jugador está conectado, sincronizar en vivo
     if src then
         LoadPlayerJob(src, charId)
@@ -256,7 +323,7 @@ exports('SetJob', SetJob)
 
 --- Obtiene el empleo y datos de un jugador
 --- @param src number Source del jugador
---- @return table { name = string, label = string, grade = number, gradeLabel = string, duty = boolean, isBusiness = boolean }
+--- @return table { name = string, label = string, grade = number, gradeLabel = string, duty = boolean, isBusiness = boolean, badge = string | nil }
 local function GetJob(src)
     src = tonumber(src)
     if not src then return nil end
@@ -268,6 +335,7 @@ local function GetJob(src)
     local gradeConfig = jobConfig.grades[grade] or jobConfig.grades[0]
 
     local isBoss = (gradeConfig and gradeConfig.isBoss == true) or false
+    local badge = (jobName == 'police') and (pState.badge or pState.callsign) or nil
 
     return {
         name = jobName,
@@ -278,7 +346,9 @@ local function GetJob(src)
         duty = duty,
         isBusiness = jobConfig.isBusiness or false,
         canDuty = jobConfig.canDuty or false,
-        isBoss = isBoss
+        isBoss = isBoss,
+        badge = badge,
+        callsign = badge
     }
 end
 exports('GetJob', GetJob)

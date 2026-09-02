@@ -113,6 +113,25 @@ end
 Item('armour', UseArmour)
 Item('armor', UseArmour)
 
+Item('police_badge', function(data, slot)
+	local metadata = slot.metadata or {}
+	local badgeNum = metadata.badge or LocalPlayer.state.badge or "101"
+	local officerName = metadata.officer_name or (LocalPlayer.state.firstname and (LocalPlayer.state.firstname .. " " .. LocalPlayer.state.lastname)) or "Oficial"
+	local grade = metadata.grade_label or LocalPlayer.state.grade_label or "LSPD"
+	
+	ox_inventory:useItem(data, function(data)
+		if data then
+			lib.notify({
+				title = '🛡️ Placa Policial LSPD',
+				description = string.format("Placa Nº: %s\nOficial: %s\nRango: %s", badgeNum, officerName, grade),
+				type = 'inform',
+				duration = 6000
+			})
+			TriggerServerEvent('aura_police:server:showBadgeToNearby', badgeNum, officerName, grade)
+		end
+	end)
+end)
+
 client.parachute = false
 Item('parachute', function(data, slot)
 	if not client.parachute then

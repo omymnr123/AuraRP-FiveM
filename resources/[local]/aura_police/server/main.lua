@@ -256,9 +256,25 @@ lib.callback.register('aura_police:server:claimArmoryLoadout', function(source)
     end
 
     -- Entregar ítems reglamentarios al inventario del agente
+    local char = exports.aura_multichar:GetActiveCharacter(src)
+    local officerName = char and string.format("%s %s", char.firstname or "", char.lastname or "") or GetPlayerName(src)
+    local badgeNum = Player(src).state.badge or (char and char.badge) or "101"
+    local gradeLabel = Player(src).state.grade_label or ("Rango " .. grade)
+
     local givenCount = 0
     for _, item in ipairs(targetLoadout) do
-        local success, resp = exports.ox_inventory:AddItem(src, item.name, item.count)
+        local metadata = nil
+        if item.name == 'police_badge' then
+            metadata = {
+                badge = badgeNum,
+                officer_name = officerName,
+                grade_label = gradeLabel,
+                citizenid = char and char.citizenid or "",
+                description = string.format("Placa Nº: %s\nOficial: %s\nRango: %s\nDepartamento: LSPD", badgeNum, officerName, gradeLabel)
+            }
+        end
+
+        local success, resp = exports.ox_inventory:AddItem(src, item.name, item.count, metadata)
         if success then
             givenCount = givenCount + 1
         else
@@ -266,7 +282,7 @@ lib.callback.register('aura_police:server:claimArmoryLoadout', function(source)
         end
     end
 
-    return true, string.format("Dotación reglamentaria entregada (%d equipos/armas retiradas).", givenCount)
+    return true, string.format("Dotación reglamentaria entregada (%d equipos/armas retiradas). Placa asignada: #%s.", givenCount, badgeNum)
 end)
 
 -- ============================================================================
@@ -326,3 +342,97 @@ lib.callback.register('aura_police:server:getDispatchHistory', function(source)
     if not IsCopOnDuty(source) then return {} end
     return RecentDispatchCalls
 end)
+
+-- ============================================================================
+-- 7. EXHIBICIÓN DE PLACA POLICIAL E IDENTIFICACIÓN
+-- ============================================================================
+
+RegisterNetEvent('aura_police:server:showBadgeToNearby', function(badgeNum, officerName, gradeLabel)
+    local src = source
+    local ped = GetPlayerPed(src)
+    local coords = GetEntityCoords(ped)
+    local char = exports.aura_multichar:GetActiveCharacter(src)
+
+    officerName = officerName or (char and string.format("%s %s", char.firstname or "", char.lastname or "")) or GetPlayerName(src)
+    badgeNum = badgeNum or Player(src).state.badge or (char and char.badge) or "101"
+    gradeLabel = gradeLabel or Player(src).state.grade_label or "Oficial"
+
+    for _, pid in ipairs(GetPlayers()) do
+        local tPed = GetPlayerPed(pid)
+        if #(coords - GetEntityCoords(tPed)) <= 4.0 then
+            TriggerClientEvent('ox_lib:notify', pid, {
+                title = '🛡️ Placa Policial LSPD',
+                description = string.format("El oficial %s te muestra su placa reglamentaria.\nPlaca Nº: #%s | %s", officerName, badgeNum, gradeLabel),
+                type = 'inform',
+                duration = 7000
+            })
+        end
+    end
+end)
+
+RegisterCommand('placa', function(source)
+    local src = source
+    if not IsCopOnDuty(src) then
+        TriggerClientEvent('ox_lib:notify', src, {
+            title = 'Placa Policial',
+            description = 'Debes estar en servicio como policía para mostrar tu placa.',
+            type = 'error'
+        })
+        return
+    end
+
+    local char = exports.aura_multichar:GetActiveCharacter(src)
+    local officerName = char and string.format("%s %s", char.firstname or "", char.lastname or "") or GetPlayerName(src)
+    local badgeNum = Player(src).state.badge or (char and char.badge) or "101"
+    local gradeLabel = Player(src).state.grade_label or "Oficial"
+
+    TriggerEvent('aura_police:server:showBadgeToNearby', badgeNum, officerName, gradeLabel)
+end)
+
+-- ============================================================================
+-- 8. GESTIÓN DE VESTUARIO POLICIAL Y COPIA DE SEGURIDAD DE ROPA CIVIL
+-- ============================================================================
+
+local CivilianSkins = {} -- [src] = skinData (apariencia civil guardada)
+
+RegisterNetEvent('aura_police:server:saveCivilianSkin', function(skinData)
+    local src = source
+    if not src or not skinData then return end
+    CivilianSkins[src] = skinData
+    if Config.Debug then
+        print(string.format("[Aura Police] Apariencia civil guardada en sesión para jugador #%d", src))
+    end
+end)
+
+lib.callback.register('aura_police:server:getCivilianSkin', function(source)
+    local src = source
+    if CivilianSkins[src] then
+        return CivilianSkins[src]
+    end
+
+    local charId = Player(src).state.charId
+    if not charId then
+        local pData = exports.aura_jobs and exports.aura_jobs:GetPlayerJobData(src)
+        charId = pData and pData.charId
+    end
+
+    if charId then
+        local row = MySQL.single.await('SELECT metadata FROM characters WHERE id = ?', { charId })
+        if row and row.metadata then
+            local meta = json.decode(row.metadata)
+            if meta and meta.appearance then
+                return meta.appearance
+            end
+        end
+    end
+
+    return nil
+end)
+
+AddEventHandler('playerDropped', function()
+    local src = source
+    CivilianSkins[src] = nil
+    CuffedPlayers[src] = nil
+    EscortedPlayers[src] = nil
+end)
+

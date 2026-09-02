@@ -243,6 +243,56 @@ return {
 		}
 	},
 
+	['police_badge'] = {
+		label = 'Placa Policial LSPD',
+		weight = 100,
+		stack = false,
+		description = 'Insignia y placa reglamentaria de identificación oficial de la Policía de Los Santos (LSPD). Contiene el número de placa y titular.',
+		client = {
+			anim = { dict = 'missfam4', clip = 'base' },
+			usetime = 1500
+		}
+	},
+
+	['handcuffs'] = {
+		label = 'Esposas Reglamentarias',
+		weight = 250,
+		stack = true,
+		description = 'Grilletes dobles de acero inoxidable con llave de seguridad para inmovilización de sospechosos.',
+	},
+
+	['bodycam'] = {
+		label = 'Cámara Corporal Axon',
+		weight = 150,
+		stack = false,
+		description = 'Dispositivo de grabación audiovisual táctico de alta definición con transmisión en tiempo real.',
+	},
+
+	['spikestrip'] = {
+		label = 'Banda de Clavos Portátil',
+		weight = 4000,
+		stack = true,
+		description = 'Dispositivo táctico desplegable con púas huecas de desinflado rápido para detención de vehículos en persecución.',
+	},
+
+	['radio'] = {
+		label = 'Radio Walkie-Talkie',
+		weight = 400,
+		stack = false,
+		description = 'Transmisor portátil de radiofrecuencia para comunicarse por frecuencias abiertas y encriptadas.',
+	},
+
+	['medikit'] = {
+		label = 'Botiquín Táctico IFAK',
+		weight = 800,
+		stack = false,
+		description = 'Kit médico individual de primeros auxilios y trauma para emergencias tácticas.',
+		client = {
+			anim = { dict = 'missheistdockssetup1clipboard@idle_a', clip = 'idle_a', flag = 49 },
+			usetime = 3500
+		}
+	},
+
 	['clothing'] = {
 		label = 'Prendas de Ropa',
 		weight = 500,

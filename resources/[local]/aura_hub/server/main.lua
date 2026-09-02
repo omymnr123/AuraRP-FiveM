@@ -448,6 +448,7 @@ lib.callback.register('aura_hub:server:getPoliceMdtOverview', function(source)
                     name = pChar and string.format("%s %s", pChar.firstname or "", pChar.lastname or "") or GetPlayerName(pSrc),
                     grade = pState.job_grade or 0,
                     gradeLabel = pState.grade_label or "Oficial",
+                    badge = pState.badge or (pChar and pChar.badge) or "101",
                     phoneNumber = pChar and pChar.phone_number or "N/A",
                     duty = true
                 })
@@ -750,7 +751,7 @@ lib.callback.register('aura_hub:server:policeGetStaff', function(source)
     local isHighCommand = callerGrade >= 4 -- Teniente (4), Capitán (5), Jefe de Policía (6)
 
     local rows = MySQL.query.await([[
-        SELECT id, citizenid, firstname, lastname, job_grade, job_duty, phone_number
+        SELECT id, citizenid, firstname, lastname, job_grade, job_duty, phone_number, badge
         FROM characters
         WHERE job = 'police'
         ORDER BY job_grade DESC, firstname ASC
@@ -775,6 +776,7 @@ lib.callback.register('aura_hub:server:policeGetStaff', function(source)
     for _, row in ipairs(rows or {}) do
         local gradeCfg = gradesConfig[row.job_grade] or { name = "Rango " .. row.job_grade, salary = 0 }
         local onlineSrc = onlineOfficersMap[row.id]
+        local badge = row.badge or (onlineSrc and Player(onlineSrc).state.badge) or "---"
 
         table.insert(staff, {
             charId = row.id,
@@ -784,6 +786,7 @@ lib.callback.register('aura_hub:server:policeGetStaff', function(source)
             gradeLabel = gradeCfg.name,
             salary = gradeCfg.salary or 0,
             phone = row.phone_number or "N/A",
+            badge = badge,
             isOnline = onlineSrc ~= nil,
             src = onlineSrc or 0
         })
@@ -821,15 +824,16 @@ lib.callback.register('aura_hub:server:policeHireOfficer', function(source, targ
 
     local targetChar = exports.aura_multichar:GetActiveCharacter(targetSrc)
     local targetName = targetChar and string.format("%s %s", targetChar.firstname or "", targetChar.lastname or "") or GetPlayerName(targetSrc)
+    local badge = Player(targetSrc).state.badge or (targetChar and targetChar.badge) or "101"
 
     TriggerClientEvent('ox_lib:notify', targetSrc, {
         title = 'Contratación LSPD',
-        description = '¡Has sido contratado en el Departamento de Policía (LSPD) como Cadete!',
+        description = string.format('¡Has sido contratado en el LSPD como Cadete! Tu Número de Placa oficial es #%s.', tostring(badge)),
         type = 'success',
         duration = 10000
     })
 
-    return true, string.format("Has contratado a %s (ID %d) como Cadete en el LSPD.", targetName, targetSrc)
+    return true, string.format("Has contratado a %s (ID %d) como Cadete en el LSPD (Placa: #%s).", targetName, targetSrc, tostring(badge))
 end)
 
 --- Ascender o degradar a un oficial

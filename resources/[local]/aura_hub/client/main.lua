@@ -5,8 +5,11 @@
 
 local isHubOpen = false
 local isOpeningMap = false
+local isLoadingHub = false
 local currentHeadshotHandle = nil
 local currentMugshotTxd = nil
+local lastExternalNuiTime = 0
+local lastHubCloseTime = 0
 
 -- ============================================================================
 -- GENERADOR DE AVATAR REAL DEL PED DEL JUGADOR (MUGSHOT NUI ULTRA-SEGURO)
@@ -69,19 +72,101 @@ RegisterNetEvent('aura_economy:server:characterLoaded', function()
 end)
 
 -- ============================================================================
+-- VALIDACIÓN DE PANTALLA LIMPIA PARA APERTURA DE AURA HUB
+-- ============================================================================
+
+local function CanOpenAuraHub()
+    -- Si el Hub ya está abierto o cargando, o abriendo mapa
+    if isHubOpen or isLoadingHub or isOpeningMap then
+        return false
+    end
+
+    -- 1. Comprobación de NUI activa externa (Inventario, Teléfono, Banco, Menús, etc.)
+    if IsNuiFocused() then
+        return false
+    end
+
+    -- 2. Buffer/Cooldown tras haber cerrado otra NUI o el propio Hub (450 ms)
+    -- Evita que la liberación de la tecla ESC tras cerrar otra ventana abra el Hub
+    local now = GetGameTimer()
+    if (now - lastExternalNuiTime) < 450 then
+        return false
+    end
+    if (now - lastHubCloseTime) < 450 then
+        return false
+    end
+
+    -- 3. Menú de pausa nativo de GTA V o mapa
+    if IsPauseMenuActive() or (GetPauseMenuState and GetPauseMenuState() ~= 0) then
+        return false
+    end
+
+    -- 4. Mensajes de advertencia nativos o frontend no disponible
+    if IsWarningMessageActive and IsWarningMessageActive() then
+        return false
+    end
+
+    -- 5. Transiciones de pantalla (pantalla negra, fundidos, cinemáticas, respawn)
+    if IsScreenFadedOut() or IsScreenFadingOut() or IsScreenFadingIn() then
+        return false
+    end
+    if IsPlayerSwitchInProgress and IsPlayerSwitchInProgress() then
+        return false
+    end
+
+    -- 6. Estado del jugador (muerto, muriendo, inconsciente)
+    local ped = PlayerPedId()
+    if not DoesEntityExist(ped) or IsPedDeadOrDying(ped, true) or IsEntityDead(ped) then
+        return false
+    end
+
+    -- 7. State Bags de Aura RP / Ox (Muerte, Esposado, Encarcelado, Inventario abierto o busy)
+    local pState = LocalPlayer.state
+    if pState then
+        if pState.isDead or pState.isCuffed or pState.isJailed or pState.invOpen or pState.invBusy then
+            return false
+        end
+    end
+
+    -- 8. Menús y elementos interactivos de ox_lib (Context Menus, Menús desplegables, Barras de progreso)
+    if lib then
+        if lib.progressActive and lib.progressActive() then
+            return false
+        end
+        if lib.getOpenContextMenu and lib.getOpenContextMenu() ~= nil then
+            return false
+        end
+        if lib.getOpenMenu and lib.getOpenMenu() ~= nil then
+            return false
+        end
+    end
+
+    return true
+end
+
+-- ============================================================================
 -- APERTURA Y CIERRE DEL HUB
 -- ============================================================================
 
 local function OpenAuraHub()
-    if isHubOpen or isOpeningMap or IsPauseMenuActive() then return end
+    if not CanOpenAuraHub() then return end
+
+    isLoadingHub = true
 
     lib.callback('aura_hub:server:getHubData', false, function(data)
+        isLoadingHub = false
+
         if not data then
             lib.notify({
                 title = 'Aura Hub',
                 description = 'No se pudo cargar la información del personaje.',
                 type = 'error'
             })
+            return
+        end
+
+        -- Si el jugador abrió otra interfaz o cambió de estado mientras se esperaba la respuesta del servidor
+        if not CanOpenAuraHub() and not isHubOpen then
             return
         end
 
@@ -98,8 +183,10 @@ local function OpenAuraHub()
 end
 
 local function CloseAuraHub()
-    if not isHubOpen then return end
+    if not isHubOpen and not isLoadingHub then return end
     isHubOpen = false
+    isLoadingHub = false
+    lastHubCloseTime = GetGameTimer()
     SetNuiFocus(false, false)
     SendNUIMessage({ action = 'closeHub' })
 end
@@ -111,6 +198,12 @@ end
 CreateThread(function()
     while true do
         Wait(0)
+
+        -- Monitorizar continuamente si hay alguna NUI externa activa en el juego
+        if IsNuiFocused() and not isHubOpen then
+            lastExternalNuiTime = GetGameTimer()
+        end
+
         local pauseActive = IsPauseMenuActive()
 
         if not pauseActive and not isOpeningMap then
@@ -119,10 +212,12 @@ CreateThread(function()
             DisableControlAction(0, 200, true) -- INPUT_FRONTEND_PAUSE_ALTERNATE
 
             if IsDisabledControlJustReleased(0, 199) or IsDisabledControlJustReleased(0, 200) then
-                if not isHubOpen then
-                    OpenAuraHub()
-                else
+                if isHubOpen then
                     CloseAuraHub()
+                else
+                    if CanOpenAuraHub() then
+                        OpenAuraHub()
+                    end
                 end
             end
         else
@@ -170,15 +265,16 @@ end)
 -- ============================================================================
 
 RegisterNUICallback('closeHub', function(_, cb)
-    isHubOpen = false
-    SetNuiFocus(false, false)
+    CloseAuraHub()
     cb('ok')
 end)
 
 -- Apertura SEGURA del mapa nativo de GTA V sin error ERR_GUI_MENU_VER
 RegisterNUICallback('openMap', function(_, cb)
     isHubOpen = false
+    isLoadingHub = false
     isOpeningMap = true
+    lastHubCloseTime = GetGameTimer()
     SetNuiFocus(false, false)
     SendNUIMessage({ action = 'closeHub' })
     cb('ok')

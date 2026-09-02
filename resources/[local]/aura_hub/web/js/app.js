@@ -254,10 +254,13 @@ function updateDutyUI(jobData) {
     const btnDutyToggle = document.getElementById('btnActionDutyToggle');
     const dutyPulseDot = document.getElementById('dutyPulseDot');
     const dutyText = document.getElementById('dutyText');
+    const dutyBadgeSub = document.getElementById('dutyBadgeSub');
     const mdtDutyStatusText = document.getElementById('mdtDutyStatusText');
+    const mdtBadgeSub = document.getElementById('mdtBadgeSub');
 
     const canDuty = jobData && (jobData.canDuty === true || jobData.canDuty === 1);
     const isDuty = jobData && (jobData.duty === true || jobData.duty === 1);
+    const badge = (jobData && (jobData.badge || jobData.callsign)) || (currentHubData && currentHubData.job && (currentHubData.job.badge || currentHubData.job.callsign));
 
     if (canDuty) {
         if (btnDutyToggle) {
@@ -283,6 +286,15 @@ function updateDutyUI(jobData) {
                     dutyText.style.color = '#ff4d6d';
                 }
             }
+
+            if (dutyBadgeSub) {
+                if (badge && jobData && jobData.name === 'police') {
+                    dutyBadgeSub.textContent = `Placa: #${badge}`;
+                    dutyBadgeSub.style.display = 'block';
+                } else {
+                    dutyBadgeSub.style.display = 'none';
+                }
+            }
         }
     } else {
         if (btnDutyToggle) btnDutyToggle.style.display = 'none';
@@ -295,6 +307,15 @@ function updateDutyUI(jobData) {
         } else {
             mdtDutyStatusText.style.color = '#ff4d6d';
             mdtDutyStatusText.innerHTML = `<span class="pulse-dot" id="mdtDutyDot" style="background:#ff4d6d; box-shadow:0 0 8px #ff4d6d; width:7px; height:7px;"></span> FUERA DE SERVICIO`;
+        }
+    }
+
+    if (mdtBadgeSub) {
+        if (badge && jobData && jobData.name === 'police') {
+            mdtBadgeSub.textContent = `Placa: #${badge}`;
+            mdtBadgeSub.style.display = 'block';
+        } else {
+            mdtBadgeSub.style.display = 'none';
         }
     }
 }
@@ -1056,7 +1077,10 @@ async function loadMdtRoster() {
             <div class="officer-avatar"><i class="fa-solid fa-shield"></i></div>
             <div class="officer-roster-details">
                 <h5>${off.name} <small style="color:var(--text-dim);">(ID: ${off.src})</small></h5>
-                <span>${off.gradeLabel} (Grado ${off.grade})</span>
+                <div style="display:flex; align-items:center; gap:6px; margin-top:2px;">
+                    <span>${off.gradeLabel} (Grado ${off.grade})</span>
+                    <span class="badge-pill" style="background:rgba(0,255,255,0.12); color:#00ffff; border:1px solid rgba(0,255,255,0.3); padding:1px 6px; border-radius:4px; font-size:9.5px; font-weight:700;"><i class="fa-solid fa-id-badge"></i> Placa #${off.badge || '---'}</span>
+                </div>
                 <p style="font-size:10px; color:var(--text-muted); margin-top:2px;"><i class="fa-solid fa-phone"></i> ${off.phoneNumber}</p>
             </div>
             <div class="officer-status-tag active" style="margin-left:auto; display:flex; align-items:center; gap:6px; font-size:10px; font-weight:800; color:#00ff9d; background:rgba(0,255,157,0.12); padding:4px 8px; border-radius:6px; border:1px solid rgba(0,255,157,0.3);">
