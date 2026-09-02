@@ -351,4 +351,90 @@ lib.addCommand("clearstuckprops", { help = _L("commands.clearstuckprops.title") 
     TriggerClientEvent("illenium-appearance:client:ClearStuckProps", source)
 end)
 
+-- ============================================================================
+-- COMANDO ADMINISTRATIVO: /vestimenta [ID_JUGADOR]
+-- ============================================================================
+local function HandleVestimentaCommand(source, args)
+    local isConsole = (source == 0)
+    local isAllowed = isConsole 
+        or IsPlayerAceAllowed(tostring(source), "command.vestimenta") 
+        or IsPlayerAceAllowed(tostring(source), "command") 
+        or IsPlayerAceAllowed(tostring(source), "group.admin")
+    
+    if not isAllowed then
+        TriggerClientEvent("ox_lib:notify", source, {
+            title = "Administración",
+            description = "No tienes permisos de administrador para usar /vestimenta.",
+            type = "error"
+        })
+        return
+    end
+
+    local targetSrc = nil
+    if args and args[1] then
+        targetSrc = tonumber(args[1])
+    elseif not isConsole then
+        targetSrc = source
+    end
+
+    if not targetSrc then
+        if isConsole then
+            print("[illenium-appearance] Uso desde consola: /vestimenta [ID_Servidor]")
+        else
+            TriggerClientEvent("ox_lib:notify", source, {
+                title = "Comando /vestimenta",
+                description = "Uso: /vestimenta [ID_Servidor] (o sin ID para abrirte a ti mismo)",
+                type = "inform"
+            })
+        end
+        return
+    end
+
+    local targetPed = GetPlayerPed(targetSrc)
+    if not targetPed or targetPed == 0 or GetPlayerPing(targetSrc) <= 0 then
+        if isConsole then
+            print(string.format("[illenium-appearance] Error: El jugador con ID #%s no está conectado.", tostring(targetSrc)))
+        else
+            TriggerClientEvent("ox_lib:notify", source, {
+                title = "Administración",
+                description = string.format("El jugador con ID #%s no se encuentra conectado.", tostring(targetSrc)),
+                type = "error"
+            })
+        end
+        return
+    end
+
+    -- Abrir menú de vestimenta en el cliente objetivo
+    TriggerClientEvent("illenium-appearance:client:openAdminClothingMenu", targetSrc)
+
+    -- Mensajes de confirmación
+    local targetName = GetPlayerName(targetSrc) or ("ID #" .. targetSrc)
+    if isConsole then
+        print(string.format("[illenium-appearance] Menú de vestimenta abierto para %s (ID #%d).", targetName, targetSrc))
+    else
+        if source == targetSrc then
+            TriggerClientEvent("ox_lib:notify", source, {
+                title = "Vestimenta",
+                description = "Abriendo menú de vestimenta...",
+                type = "inform"
+            })
+        else
+            TriggerClientEvent("ox_lib:notify", source, {
+                title = "Administración",
+                description = string.format("Has abierto el menú de vestimenta a %s (ID #%d).", targetName, targetSrc),
+                type = "success"
+            })
+            TriggerClientEvent("ox_lib:notify", targetSrc, {
+                title = "Vestimenta",
+                description = "Un administrador te ha abierto el menú para cambiar de vestimenta.",
+                type = "inform"
+            })
+        end
+    end
+end
+
+RegisterCommand("vestimenta", HandleVestimentaCommand, false)
+RegisterCommand("ropa", HandleVestimentaCommand, false)
+
 lib.versionCheck("iLLeniumStudios/illenium-appearance")
+

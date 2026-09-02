@@ -372,6 +372,103 @@ class AppearanceApp {
     document.getElementById("btn-exit-character").addEventListener("click", () => {
       this.post("appearance_exit");
     });
+
+    // Global Keyboard Arrow Navigation for Items, Models, Textures & Sliders
+    window.addEventListener("keydown", (e) => {
+      // Don't intercept if user is typing in standard inputs
+      if (e.target && (e.target.tagName === "INPUT" && e.target.type === "text" || e.target.tagName === "TEXTAREA")) {
+        return;
+      }
+
+      // Check if modal is open
+      const saveModal = document.getElementById("save-modal");
+      if (saveModal && saveModal.classList.contains("active")) return;
+
+      const step = e.shiftKey ? 10 : 1;
+
+      if (e.key === "ArrowLeft" || e.key === "Left") {
+        e.preventDefault();
+        const stepper = this.getActiveStepper();
+        if (stepper) {
+          stepper.decrement(step);
+        }
+      } else if (e.key === "ArrowRight" || e.key === "Right") {
+        e.preventDefault();
+        const stepper = this.getActiveStepper();
+        if (stepper) {
+          stepper.increment(step);
+        }
+      } else if (e.key === "ArrowUp" || e.key === "Up") {
+        e.preventDefault();
+        this.navigateStepperFocus(-1);
+      } else if (e.key === "ArrowDown" || e.key === "Down") {
+        e.preventDefault();
+        this.navigateStepperFocus(1);
+      } else if (e.key === "PageUp") {
+        e.preventDefault();
+        const stepper = this.getActiveStepper();
+        if (stepper) stepper.increment(25);
+      } else if (e.key === "PageDown") {
+        e.preventDefault();
+        const stepper = this.getActiveStepper();
+        if (stepper) stepper.decrement(25);
+      } else if (e.key === "Home") {
+        e.preventDefault();
+        const stepper = this.getActiveStepper();
+        if (stepper) stepper.jumpMin();
+      } else if (e.key === "End") {
+        e.preventDefault();
+        const stepper = this.getActiveStepper();
+        if (stepper) stepper.jumpMax();
+      } else if ((e.key === "a" || e.key === "A") && !(e.target && e.target.tagName === "INPUT")) {
+        this.post("rotate_left");
+      } else if ((e.key === "d" || e.key === "D") && !(e.target && e.target.tagName === "INPUT")) {
+        this.post("rotate_right");
+      }
+    });
+  }
+
+  setActiveStepper(stepper) {
+    if (this.activeStepper && this.activeStepper.el) {
+      this.activeStepper.el.classList.remove("stepper-focused");
+    }
+    this.activeStepper = stepper;
+    if (this.activeStepper && this.activeStepper.el) {
+      this.activeStepper.el.classList.add("stepper-focused");
+    }
+  }
+
+  getActiveStepper() {
+    if (this.activeStepper && document.body.contains(this.activeStepper.el)) {
+      return this.activeStepper;
+    }
+    // Fallback to first visible stepper in tab content
+    if (this.allSteppers && this.allSteppers.length > 0) {
+      const firstValid = this.allSteppers.find(s => document.body.contains(s.el));
+      if (firstValid) {
+        this.setActiveStepper(firstValid);
+        return firstValid;
+      }
+    }
+    return null;
+  }
+
+  navigateStepperFocus(dir) {
+    if (!this.allSteppers || this.allSteppers.length === 0) return;
+    const visibleSteppers = this.allSteppers.filter(s => document.body.contains(s.el));
+    if (visibleSteppers.length === 0) return;
+
+    let currentIndex = visibleSteppers.indexOf(this.activeStepper);
+    let nextIndex = 0;
+    if (currentIndex === -1) {
+      nextIndex = dir > 0 ? 0 : visibleSteppers.length - 1;
+    } else {
+      nextIndex = (currentIndex + dir + visibleSteppers.length) % visibleSteppers.length;
+    }
+
+    const nextStepper = visibleSteppers[nextIndex];
+    this.setActiveStepper(nextStepper);
+    nextStepper.el.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }
 
   initDragOrbit() {
@@ -456,6 +553,8 @@ class AppearanceApp {
   render() {
     this.subNavEl.innerHTML = "";
     this.contentEl.innerHTML = "";
+    this.allSteppers = [];
+    this.activeStepper = null;
 
     switch (this.currentTab) {
       case "genetics":
@@ -1267,46 +1366,113 @@ class AppearanceApp {
     container.appendChild(block);
   }
 
-  // Scoped Helpers: Steppers
+  // Scoped Helpers: Steppers (Integrated Keyboard & Numeric Entry Engine)
   attachStepper(container, initialVal, min, max, onChange) {
     if (!container) return null;
 
     let currentVal = initialVal;
 
     container.innerHTML = `
-      <div class="stepper-control">
-        <button class="stepper-btn btn-prev"><i class="fa-solid fa-chevron-left"></i></button>
+      <div class="stepper-control" tabindex="0">
+        <button class="stepper-btn btn-prev" title="Anterior (← Flecha Izquierda)"><i class="fa-solid fa-chevron-left"></i></button>
         <input type="range" class="stepper-slider" min="${min}" max="${max}" value="${currentVal}">
-        <button class="stepper-btn btn-next"><i class="fa-solid fa-chevron-right"></i></button>
+        <button class="stepper-btn btn-next" title="Siguiente (→ Flecha Derecha)"><i class="fa-solid fa-chevron-right"></i></button>
+        <div class="stepper-input-wrapper" title="Escribe un número para ir directo">
+          <input type="number" class="stepper-num-input" min="${min}" max="${max}" value="${currentVal}">
+        </div>
       </div>
     `;
 
+    const stepperEl = container.querySelector(".stepper-control");
     const slider = container.querySelector(".stepper-slider");
     const prevBtn = container.querySelector(".btn-prev");
     const nextBtn = container.querySelector(".btn-next");
+    const numInput = container.querySelector(".stepper-num-input");
 
-    const updateValue = (newVal) => {
+    const updateValue = (newVal, skipInput) => {
       currentVal = Math.max(min, Math.min(max, newVal));
       slider.value = currentVal;
+      if (!skipInput && numInput) numInput.value = currentVal;
       onChange(currentVal);
     };
 
-    prevBtn.addEventListener("click", () => updateValue(currentVal - 1));
-    nextBtn.addEventListener("click", () => updateValue(currentVal + 1));
+    prevBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      updateValue(currentVal - (e.shiftKey ? 10 : 1));
+    });
+    nextBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      updateValue(currentVal + (e.shiftKey ? 10 : 1));
+    });
     slider.addEventListener("input", (e) => updateValue(parseInt(e.target.value)));
 
-    return {
+    if (numInput) {
+      numInput.addEventListener("change", (e) => {
+        let val = parseInt(e.target.value);
+        if (isNaN(val)) val = min;
+        updateValue(val);
+      });
+      numInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          numInput.blur();
+        }
+        e.stopPropagation();
+      });
+    }
+
+    // Direct Mouse Wheel Support on Stepper
+    stepperEl.addEventListener("wheel", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const step = e.shiftKey ? 10 : 1;
+      if (e.deltaY < 0) {
+        updateValue(currentVal + step);
+      } else {
+        updateValue(currentVal - step);
+      }
+    }, { passive: false });
+
+    // Focus & Hover Tracking
+    stepperEl.addEventListener("mouseenter", () => {
+      this.setActiveStepper(stepperObj);
+    });
+    stepperEl.addEventListener("focus", () => {
+      this.setActiveStepper(stepperObj);
+    });
+
+    const stepperObj = {
+      el: stepperEl,
+      container: container,
+      getValue: () => currentVal,
       updateLimits: (newMin, newMax) => {
         min = newMin;
         max = newMax;
         slider.min = newMin;
         slider.max = newMax;
+        if (numInput) {
+          numInput.min = newMin;
+          numInput.max = newMax;
+        }
       },
       setValue: (newVal) => {
         currentVal = Math.max(min, Math.min(max, newVal));
         slider.value = currentVal;
-      }
+        if (numInput) numInput.value = currentVal;
+      },
+      increment: (step = 1) => {
+        updateValue(currentVal + step);
+      },
+      decrement: (step = 1) => {
+        updateValue(currentVal - step);
+      },
+      jumpMin: () => updateValue(min),
+      jumpMax: () => updateValue(max)
     };
+
+    if (!this.allSteppers) this.allSteppers = [];
+    this.allSteppers.push(stepperObj);
+
+    return stepperObj;
   }
 }
 

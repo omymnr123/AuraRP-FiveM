@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LSPD Fleet Command - Garaje Policial</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="garageApp" class="garage-wrapper hidden">
+        <!-- Backdrop Blur -->
+        <div class="garage-backdrop" id="garageBackdrop"></div>
+
+        <div class="garage-container">
+            <!-- Neon Top Glow Strip -->
+            <div class="neon-glow-strip"></div>
+
+            <!-- Header Superior -->
+            <header class="garage-header">
+                <div class="header-left">
+                    <div class="header-logo-badge">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+                    <div class="header-titles">
+                        <div class="header-badge-tag">
+                            <span class="pulse-dot"></span>
+                            <span>DIVISIÓN DE TRANSPORTE Y PARQUE MÓVIL</span>
+                        </div>
+                        <h1 class="header-main-title">LSPD FLEET COMMAND</h1>
+                        <p class="header-sub" id="stationLabel">Comisaría Central - Mission Row</p>
+                    </div>
+                </div>
+
+                <div class="header-right">
+                    <!-- Tarjeta de Oficial -->
+                    <div class="officer-card">
+                        <div class="officer-avatar">
+                            <i class="fa-solid fa-user-shield"></i>
+                        </div>
+                        <div class="officer-info">
+                            <span class="officer-name" id="officerName">Oficial de Policía</span>
+                            <div class="officer-grade-badge">
+                                <i class="fa-solid fa-star"></i>
+                                <span id="officerGradeLabel">Grado 0 - Cadete</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Botón Cerrar -->
+                    <button class="btn-close" id="btnCloseGarage" title="Cerrar (ESC)">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Barra de Filtros y Categorías -->
+            <nav class="category-nav">
+                <div class="category-pills" id="categoryPills">
+                    <button class="cat-pill active" data-cat="all">
+                        <i class="fa-solid fa-layer-group"></i>
+                        <span>Todos los Vehículos</span>
+                    </button>
+                    <button class="cat-pill" data-cat="Cruiser">
+                        <i class="fa-solid fa-car-side"></i>
+                        <span>Patrullas Urbanas</span>
+                    </button>
+                    <button class="cat-pill" data-cat="Interceptor">
+                        <i class="fa-solid fa-gauge-high"></i>
+                        <span>Interceptores</span>
+                    </button>
+                    <button class="cat-pill" data-cat="Encubierto">
+                        <i class="fa-solid fa-user-secret"></i>
+                        <span>Encubiertos</span>
+                    </button>
+                    <button class="cat-pill" data-cat="Transporte">
+                        <i class="fa-solid fa-van-shuttle"></i>
+                        <span>Transporte Celdas</span>
+                    </button>
+                    <button class="cat-pill" data-cat="SWAT">
+                        <i class="fa-solid fa-shield"></i>
+                        <span>Táctico SWAT</span>
+                    </button>
+                    <button class="cat-pill" data-cat="Aereo">
+                        <i class="fa-solid fa-helicopter"></i>
+                        <span>Unidad Aérea</span>
+                    </button>
+                </div>
+
+                <div class="category-count" id="vehicleCountBadge">
+                    Mostrando 7 vehículos
+                </div>
+            </nav>
+
+            <!-- Rejilla de Tarjetas de Vehículos -->
+            <main class="vehicles-grid" id="vehiclesGrid">
+                <!-- Inyectado dinámicamente por app.js -->
+            </main>
+
+            <!-- Footer / Acciones Rápidas -->
+            <footer class="garage-footer">
+                <div class="footer-left-info">
+                    <i class="fa-solid fa-circle-info"></i>
+                    <span>Usa la tecla <kbd>I</kbd> para bloquear o desbloquear las puertas de tu patrulla asignada.</span>
+                </div>
+
+                <div class="footer-actions">
+                    <button class="btn-store-veh" id="btnStoreVehicle">
+                        <i class="fa-solid fa-square-parking"></i>
+                        <span>Guardar Patrulla Actual</span>
+                    </button>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

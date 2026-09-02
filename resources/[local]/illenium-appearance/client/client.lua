@@ -181,6 +181,20 @@ end
 
 RegisterNetEvent("illenium-appearance:client:openClothingShop", OpenClothingShop)
 
+RegisterNetEvent("illenium-appearance:client:openAdminClothingMenu", function(isFullPed)
+    local config = GetDefaultConfig()
+    config.components = true
+    config.props = true
+    if isFullPed then
+        config.ped = true
+        config.headBlend = true
+        config.faceFeatures = true
+        config.headOverlays = true
+        config.tattoos = not Config.RCoreTattoosCompatibility and true
+    end
+    OpenShop(config, true, "clothing")
+end)
+
 RegisterNetEvent("illenium-appearance:client:importOutfitCode", function()
     local response = lib.inputDialog(_L("outfits.import.title"), {
         {

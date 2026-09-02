@@ -25,6 +25,14 @@ client_scripts {
     'client/jail.lua'
 }
 
+ui_page 'web/index.html'
+
+files {
+    'web/index.html',
+    'web/style.css',
+    'web/app.js'
+}
+
 dependencies {
     'oxmysql',
     'ox_lib',

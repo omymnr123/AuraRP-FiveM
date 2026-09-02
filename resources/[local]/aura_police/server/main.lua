@@ -187,9 +187,10 @@ end)
 -- 4. VEHÍCULOS POLICIALES: METER Y SACAR SOSPECHOSOS
 -- ============================================================================
 
-RegisterNetEvent('aura_police:server:putInVehicle', function(targetSrc)
+RegisterNetEvent('aura_police:server:putInVehicle', function(targetSrc, vehNetId, chosenSeat)
     local copSrc = source
     targetSrc = tonumber(targetSrc)
+    chosenSeat = tonumber(chosenSeat)
 
     if not IsCopOnDuty(copSrc) or not targetSrc or not GetPlayerName(tostring(targetSrc)) then
         return
@@ -199,8 +200,8 @@ RegisterNetEvent('aura_police:server:putInVehicle', function(targetSrc)
     EscortedPlayers[targetSrc] = nil
     TriggerClientEvent('aura_police:client:syncEscort', targetSrc, nil)
 
-    -- Meter en vehículo
-    TriggerClientEvent('aura_police:client:putInVehicle', targetSrc)
+    -- Meter en vehículo en el asiento asignado
+    TriggerClientEvent('aura_police:client:putInVehicle', targetSrc, vehNetId, chosenSeat)
     TriggerClientEvent('ox_lib:notify', copSrc, { title = 'Vehículo', description = 'Has introducido al sospechoso en el vehículo.', type = 'success' })
 end)
 
@@ -212,8 +213,14 @@ RegisterNetEvent('aura_police:server:takeOutOfVehicle', function(targetSrc)
         return
     end
 
+    -- Sacar del vehículo
     TriggerClientEvent('aura_police:client:takeOutOfVehicle', targetSrc)
-    TriggerClientEvent('ox_lib:notify', copSrc, { title = 'Vehículo', description = 'Has sacado al sospechoso del vehículo.', type = 'success' })
+
+    -- Iniciar escolta automáticamente
+    EscortedPlayers[targetSrc] = copSrc
+    TriggerClientEvent('aura_police:client:syncEscort', targetSrc, copSrc)
+    TriggerClientEvent('aura_police:client:startCopEscortDirect', copSrc, targetSrc)
+    TriggerClientEvent('ox_lib:notify', copSrc, { title = 'Custodia Policial', description = 'Has sacado al sospechoso del vehículo escoltado.', type = 'success' })
 end)
 
 -- Limpieza si el sospechoso o el oficial se desconectan

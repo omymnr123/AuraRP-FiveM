@@ -50,7 +50,11 @@ Config.Stations = {
         },
         garage = {
             spawn = vec4(438.42, -1018.30, 28.75, 90.0),
-            interact = vec3(441.25, -1024.15, 28.65)
+            interact = vec3(438.82, -1012.08, 28.58),
+            returns = {
+                vec3(464.18, -1019.79, 28.10),
+                vec3(464.00, -1015.00, 28.08)
+            }
         },
         helipad = {
             spawn = vec4(449.25, -981.34, 43.69, 90.0),
@@ -247,17 +251,17 @@ Config.ArmoryWeapons = {
 -- 4. FLOTA VEHICULAR POLICIAL
 -- ============================================================================
 Config.Vehicles = {
-    { model = 'police',  label = 'Patrulla Cruiser Vapid (LSPD)', minGrade = 0 },
-    { model = 'police2', label = 'Patrulla Buffalo Interceptor',  minGrade = 1 },
-    { model = 'police3', label = 'Interceptor Vapid Cruiser',     minGrade = 1 },
-    { model = 'police4', label = 'Vehículo Camuflado (Unmarked)', minGrade = 2 },
-    { model = 'policet', label = 'Furgón de Transporte / Celdas', minGrade = 1 },
-    { model = 'fbi2',    label = 'SUV Blindado Granger LSPD',     minGrade = 2 },
-    { model = 'riot',    label = 'Furgón Blindado SWAT / Riot',   minGrade = 3 }
+    { model = 'police',  label = 'Patrulla Cruiser Vapid (LSPD)', minGrade = 0, category = 'Cruiser',      desc = 'Vehículo estándar de patrulla urbana con equipamiento táctico LSPD.' },
+    { model = 'police2', label = 'Patrulla Buffalo Interceptor',  minGrade = 1, category = 'Interceptor',  desc = 'Unidad de interceptación y persecución de alta velocidad.' },
+    { model = 'police3', label = 'Interceptor Vapid Cruiser',     minGrade = 1, category = 'Interceptor',  desc = 'Cruiser repotenciado con kit aerodinámico y suspensión reforzada.' },
+    { model = 'police4', label = 'Vehículo Camuflado (Unmarked)', minGrade = 2, category = 'Encubierto',   desc = 'Vehículo civil sin distintivos exteriores para operaciones encubiertas.' },
+    { model = 'policet', label = 'Furgón de Transporte / Celdas', minGrade = 1, category = 'Transporte',   desc = 'Furgón blindado con celdas de contención múltiple para detenidos.' },
+    { model = 'fbi2',    label = 'SUV Blindado Granger LSPD',     minGrade = 2, category = 'SUV Blindado', desc = 'SUV táctico 4x4 con blindaje balístico ligero y espacio de carga.' },
+    { model = 'riot',    label = 'Furgón Blindado SWAT / Riot',   minGrade = 3, category = 'SWAT',         desc = 'Vehículo de asalto táctico SWAT y contención de disturbios graves.' }
 }
 
 Config.Helicopters = {
-    { model = 'polmav', label = 'Helicóptero Policial Air-1 (Con Helicam)', minGrade = 2 }
+    { model = 'polmav', label = 'Helicóptero Policial Air-1 (Con Helicam)', minGrade = 2, category = 'Aéreo', desc = 'Unidad aérea con cámara térmica, foco de alta potencia y rastreador.' }
 }
 
 -- ============================================================================
@@ -297,7 +301,7 @@ Config.Uniforms = {
                 { component_id = 11, drawable = 55,  texture = 0 }  -- Camisa manga corta LSPD
             },
             props = {
-                { prop_id = 0, drawable = 46, texture = 0 },        -- Gorra de patrulla LSPD
+                { prop_id = 0, drawable = 46, texture = 0 }, -- Gorra de patrulla LSPD
                 { prop_id = 1, drawable = -1, texture = 0 }
             }
         },
@@ -411,7 +415,7 @@ Config.Uniforms = {
                 { component_id = 11, drawable = 317, texture = 0 }
             },
             props = {
-                { prop_id = 0, drawable = 58, texture = 0 },        -- Gorra de plato oficial de mando
+                { prop_id = 0, drawable = 58, texture = 0 }, -- Gorra de plato oficial de mando
                 { prop_id = 1, drawable = -1, texture = 0 }
             }
         },
@@ -487,7 +491,7 @@ Config.Uniforms = {
                 { component_id = 11, drawable = 317, texture = 2 }  -- Uniforme Class A Capitán con laureles
             },
             props = {
-                { prop_id = 0, drawable = 58, texture = 2 },        -- Gorra de plato con laureles dorados
+                { prop_id = 0, drawable = 58, texture = 2 }, -- Gorra de plato con laureles dorados
                 { prop_id = 1, drawable = -1, texture = 0 }
             }
         },
@@ -525,7 +529,7 @@ Config.Uniforms = {
                 { component_id = 11, drawable = 317, texture = 2 }  -- Uniforme Class A de máxima graduación
             },
             props = {
-                { prop_id = 0, drawable = 58, texture = 2 },        -- Gorra ejecutiva con escudo dorado de Jefe
+                { prop_id = 0, drawable = 58, texture = 2 }, -- Gorra ejecutiva con escudo dorado de Jefe
                 { prop_id = 1, drawable = -1, texture = 0 }
             }
         },
@@ -548,4 +552,3 @@ Config.Uniforms = {
         }
     }
 }
-
