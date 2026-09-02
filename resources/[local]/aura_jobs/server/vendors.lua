@@ -160,12 +160,21 @@ lib.callback.register('aura_jobs:server:buyVendorCart', function(source, data)
     end
 
     -- Cobrar al comprador
-    local paid = exports.aura_economy:RemoveAccountMoney(
-        src,
-        paymentMethod,
-        totalPrice,
-        string.format("Compra 24/7 en %s (%d artículos)", vendorConfig.label, #itemsToProcess)
-    )
+    local paid = false
+    if paymentMethod == 'cash' then
+        local currentCash = exports.ox_inventory:GetItem(src, 'money', nil, true) or 0
+        if currentCash >= totalPrice then
+            paid = exports.ox_inventory:RemoveItem(src, 'money', totalPrice)
+        end
+    else
+        local removed, _, _ = exports.aura_economy:RemoveMoney(
+            src,
+            'bank',
+            totalPrice,
+            string.format("Compra 24/7 en %s (%d artículos)", vendorConfig.label, #itemsToProcess)
+        )
+        paid = (removed == true)
+    end
 
     if not paid then
         return false, string.format("Fondos insuficientes en tu %s para pagar $%d.", paymentMethod == 'bank' and "cuenta bancaria" or "cartera en efectivo", totalPrice)

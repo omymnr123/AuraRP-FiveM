@@ -36,12 +36,30 @@ AddEventHandler('aura_economy:server:characterLoaded', function(arg1, arg2, arg3
 
     server.setPlayerInventory(player, nil)
     
-    -- Sincronizar el efectivo físico inicial si aplica
+    -- Sincronizar el efectivo físico inicial si aplica (solo si no tenía inventario previo)
     local cash = accounts and accounts.cash or 0
-    if cash > 0 then
+    local currentMoney = Inventory.GetItem(src, 'money', nil, true) or 0
+    if currentMoney == 0 and cash > 0 then
         Inventory.SetItem(src, 'money', cash)
     end
 end)
+
+---@diagnostic disable-next-line: duplicate-set-field
+function server.syncInventory(inv)
+    local accounts = Inventory.GetAccountItemCounts(inv)
+    if not accounts then return end
+
+    local src = tonumber(inv.id)
+    if not src or not GetPlayerName(tostring(src)) then return end
+
+    for account, amount in pairs(accounts) do
+        local accountName = account == 'money' and 'cash' or account
+        local currentMoney = exports.aura_economy:GetMoney(src, accountName)
+        if currentMoney ~= amount then
+            exports.aura_economy:SetMoney(src, accountName, amount, string.format("Sync %s con inventario físico", accountName))
+        end
+    end
+end
 
 -- Sincronización en vivo cuando aura_jobs actualiza el trabajo de un jugador
 AddEventHandler('aura_jobs:server:jobUpdated', function(src, job, grade)

@@ -425,7 +425,7 @@ end
 
 local function IsPoliceOnDuty(src)
     local pState = Player(src).state
-    return pState.job == 'police'
+    return pState.job == 'police' and (pState.job_duty == true or pState.job_duty == 1)
 end
 
 --- Resumen general del MDT: agentes en servicio, balances societarios y estadísticas
@@ -439,16 +439,19 @@ lib.callback.register('aura_hub:server:getPoliceMdtOverview', function(source)
         local pSrc = tonumber(pid)
         if pSrc and IsPoliceOfficer(pSrc) then
             local pState = Player(pSrc).state
-            local pChar = exports.aura_multichar:GetActiveCharacter(pSrc)
-            table.insert(officers, {
-                src = pSrc,
-                citizenid = pChar and pChar.citizenid or tostring(pSrc),
-                name = pChar and string.format("%s %s", pChar.firstname or "", pChar.lastname or "") or GetPlayerName(pSrc),
-                grade = pState.job_grade or 0,
-                gradeLabel = pState.grade_label or "Oficial",
-                phoneNumber = pChar and pChar.phone_number or "N/A",
-                duty = pState.job_duty == true
-            })
+            -- Solo listar unidades que están efectivamente "En Servicio"
+            if pState.job_duty == true or pState.job_duty == 1 then
+                local pChar = exports.aura_multichar:GetActiveCharacter(pSrc)
+                table.insert(officers, {
+                    src = pSrc,
+                    citizenid = pChar and pChar.citizenid or tostring(pSrc),
+                    name = pChar and string.format("%s %s", pChar.firstname or "", pChar.lastname or "") or GetPlayerName(pSrc),
+                    grade = pState.job_grade or 0,
+                    gradeLabel = pState.grade_label or "Oficial",
+                    phoneNumber = pChar and pChar.phone_number or "N/A",
+                    duty = true
+                })
+            end
         end
     end
 

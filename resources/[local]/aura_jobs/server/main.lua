@@ -181,13 +181,12 @@ local function SetDuty(src, forcedDuty)
         cid
     })
 
-    -- 4. Notificación visual al jugador
-    local statusText = newDuty and 'ENTRADO EN SERVICIO' or 'SALIDO DE SERVICIO'
-    local statusType = newDuty and 'success' or 'inform'
-    TriggerClientEvent('ox_lib:notify', src, {
-        title = string.format("Servicio: %s", jobConfig.label),
-        description = string.format("Has %s correctamente.", statusText),
-        type = statusType
+    -- 4. Notificación visual en el Banner Superior Aura RP
+    TriggerClientEvent('aura_hub:client:showDutyAnnouncement', src, {
+        job = currentJob,
+        label = jobConfig.label,
+        isDuty = newDuty,
+        isPolice = (currentJob == 'police')
     })
 
     UpdateAllBusinessStates()

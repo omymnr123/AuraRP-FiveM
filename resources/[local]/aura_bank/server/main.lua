@@ -243,11 +243,8 @@ lib.callback.register('aura_bank:doTransaction', function(source, targetCharId, 
         -- Quitamos efectivo físico
         local removedItem = exports.ox_inventory:RemoveItem(src, 'money', amountNum)
         if removedItem then
-            -- Añadimos banco a la cuenta target
+            -- Añadimos banco a la cuenta target (server.syncInventory sincroniza el cash en memoria y BD automáticamente)
             exports.aura_economy:AddMoney(targetCharId, 'bank', amountNum, "Depósito bancario ATM", { executor = executorCharId })
-            -- Opcional: sincronizar cuenta cash (por si acaso)
-            exports.aura_economy:RemoveMoney(src, 'cash', amountNum, "Depósito bancario ATM")
-            
             return true, "Depósito completado"
         end
         return false, "Error en depósito"
@@ -259,9 +256,8 @@ lib.callback.register('aura_bank:doTransaction', function(source, targetCharId, 
 
         local removed = exports.aura_economy:RemoveMoney(targetCharId, 'bank', amountNum, "Retirada ATM", { executor = executorCharId })
         if removed then
+            -- Entregar dinero físico (server.syncInventory sincroniza el cash en memoria y BD automáticamente)
             exports.ox_inventory:AddItem(src, 'money', amountNum)
-            -- Opcional: sincronizar cuenta cash
-            exports.aura_economy:AddMoney(src, 'cash', amountNum, "Retirada ATM")
             return true, "Retirada completada"
         end
         return false, "Error en retirada"

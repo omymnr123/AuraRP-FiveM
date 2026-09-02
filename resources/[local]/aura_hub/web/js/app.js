@@ -78,6 +78,33 @@ function formatMoney(amount) {
     return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
 }
 
+function formatDateOfBirth(rawDob) {
+    if (!rawDob) return "N/A";
+    
+    // Si es un número o string numérico (timestamp en ms o segundos)
+    const num = Number(rawDob);
+    if (!isNaN(num) && num > 10000000) {
+        const ms = num < 10000000000 ? num * 1000 : num;
+        const d = new Date(ms);
+        if (!isNaN(d.getTime())) {
+            const day = String(d.getDate()).padStart(2, '0');
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const year = d.getFullYear();
+            return `${day}/${month}/${year}`;
+        }
+    }
+
+    // Si es string formato YYYY-MM-DD
+    if (typeof rawDob === 'string' && rawDob.includes('-')) {
+        const parts = rawDob.split('-');
+        if (parts.length === 3) {
+            return `${parts[2].padStart(2, '0')}/${parts[1].padStart(2, '0')}/${parts[0]}`;
+        }
+    }
+
+    return String(rawDob);
+}
+
 function updateOpenBusinessesList(businesses) {
     if (!openBusinessesList) return;
     openBusinessesList.innerHTML = '';
@@ -281,7 +308,6 @@ window.togglePlayerDuty = async () => {
             currentHubData.job.duty = newDuty;
             updateDutyUI(currentHubData.job);
         }
-        showToast(newDuty ? "Has ENTRADO en servicio." : "Has SALIDO de servicio.");
     } else {
         showToast("Error al alternar servicio.", true);
     }
@@ -368,6 +394,8 @@ window.addEventListener('message', (event) => {
         hubWrapper.classList.add('hidden');
     } else if (payload.action === 'showAnnouncement') {
         triggerGlobalAnnouncement(payload.data);
+    } else if (payload.action === 'showDutyAnnouncement') {
+        triggerDutyAnnouncement(payload.data);
     }
 });
 
@@ -379,6 +407,10 @@ function triggerGlobalAnnouncement(data) {
         clearTimeout(announcementTimeout);
     }
 
+    const metaTag = document.querySelector('.banner-tag');
+    if (metaTag) metaTag.textContent = "AVISO DE LA CIUDAD";
+
+    bannerCard.classList.remove('duty-active');
     bannerTitle.textContent = data.business || "Comercio Local";
     const isOpen = data.isOpen == true;
 
@@ -406,6 +438,44 @@ function triggerGlobalAnnouncement(data) {
         globalBanner.classList.remove('show');
         setTimeout(() => globalBanner.classList.add('hidden'), 450);
     }, data.duration || 7000);
+}
+
+function triggerDutyAnnouncement(data) {
+    if (announcementTimeout) {
+        clearTimeout(announcementTimeout);
+    }
+
+    const isDuty = data.isDuty === true;
+    bannerTitle.textContent = data.label || "Servicio Oficial";
+    
+    const metaTag = document.querySelector('.banner-tag');
+    if (metaTag) metaTag.textContent = "REGISTRO DE SERVICIO";
+
+    if (isDuty) {
+        bannerCard.classList.remove('closed');
+        bannerCard.classList.add('duty-active');
+        bannerIcon.className = data.isPolice ? 'fa-solid fa-shield-halved' : 'fa-solid fa-user-check';
+        bannerSubtitle.textContent = "Has ENTRADO en servicio activo. Terminal y armamento autorizados.";
+        bannerBadgeText.textContent = "EN SERVICIO";
+    } else {
+        bannerCard.classList.add('closed');
+        bannerCard.classList.remove('duty-active');
+        bannerIcon.className = data.isPolice ? 'fa-solid fa-shield' : 'fa-solid fa-user-clock';
+        bannerSubtitle.textContent = "Has SALIDO de servicio. Estado fuera de servicio registrado.";
+        bannerBadgeText.textContent = "FUERA DE SERVICIO";
+    }
+
+    playTone('announcement');
+    globalBanner.classList.remove('hidden');
+    globalBanner.classList.add('show');
+
+    announcementTimeout = setTimeout(() => {
+        globalBanner.classList.remove('show');
+        setTimeout(() => {
+            globalBanner.classList.add('hidden');
+            if (metaTag) metaTag.textContent = "AVISO DE LA CIUDAD";
+        }, 450);
+    }, data.duration || 6500);
 }
 
 // ============================================================================
@@ -711,7 +781,7 @@ async function searchMdtCitizen() {
                 ${c.hasWarrant ? `<div class="warrant-badge-warning"><i class="fa-solid fa-triangle-exclamation"></i> ORDEN DE CAPTURA ACTIVA</div>` : ''}
             </div>
             <div class="mdt-citizen-info-grid">
-                <div class="mdt-info-box"><span>FECHA NACIMIENTO</span><strong>${c.dob}</strong></div>
+                <div class="mdt-info-box"><span>FECHA NACIMIENTO</span><strong>${formatDateOfBirth(c.dob)}</strong></div>
                 <div class="mdt-info-box"><span>GÉNERO</span><strong>${c.gender}</strong></div>
                 <div class="mdt-info-box"><span>TELÉFONO</span><strong>${c.phone}</strong></div>
                 <div class="mdt-info-box"><span>CUENTA IBAN</span><strong>${c.iban}</strong></div>
@@ -962,14 +1032,24 @@ window.deleteWarrant = async (warrantId) => {
 async function loadMdtRoster() {
     const container = document.getElementById('mdtRosterGrid');
     if (!container) return;
+
+    if (!mdtOverviewData) {
+        await loadPoliceMdtOverview();
+    }
+
     container.innerHTML = '';
 
-    if (!mdtOverviewData || !mdtOverviewData.officers || mdtOverviewData.officers.length === 0) {
-        container.innerHTML = `<div class="mdt-empty-state" style="grid-column: span 3;"><i class="fa-solid fa-user-slash"></i><p>No hay oficiales en servicio actualmente.</p></div>`;
+    // Filtrar explícitamente solo oficiales con duty == true
+    const activeOfficers = (mdtOverviewData && mdtOverviewData.officers) 
+        ? mdtOverviewData.officers.filter(off => off.duty === true || off.duty === 1)
+        : [];
+
+    if (activeOfficers.length === 0) {
+        container.innerHTML = `<div class="mdt-empty-state" style="grid-column: span 3;"><i class="fa-solid fa-user-slash"></i><p>No hay unidades en servicio actualmente.</p></div>`;
         return;
     }
 
-    mdtOverviewData.officers.forEach(off => {
+    activeOfficers.forEach(off => {
         const div = document.createElement('div');
         div.className = 'officer-roster-card';
         div.innerHTML = `
@@ -978,6 +1058,10 @@ async function loadMdtRoster() {
                 <h5>${off.name} <small style="color:var(--text-dim);">(ID: ${off.src})</small></h5>
                 <span>${off.gradeLabel} (Grado ${off.grade})</span>
                 <p style="font-size:10px; color:var(--text-muted); margin-top:2px;"><i class="fa-solid fa-phone"></i> ${off.phoneNumber}</p>
+            </div>
+            <div class="officer-status-tag active" style="margin-left:auto; display:flex; align-items:center; gap:6px; font-size:10px; font-weight:800; color:#00ff9d; background:rgba(0,255,157,0.12); padding:4px 8px; border-radius:6px; border:1px solid rgba(0,255,157,0.3);">
+                <span class="pulse-dot" style="background:#00ff9d; box-shadow:0 0 6px #00ff9d; width:6px; height:6px; border-radius:50%;"></span>
+                <span>EN SERVICIO</span>
             </div>
         `;
         container.appendChild(div);

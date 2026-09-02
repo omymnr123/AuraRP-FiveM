@@ -150,6 +150,21 @@ RegisterNetEvent('aura_hub:client:showAnnouncement', function(announcementData)
     })
 end)
 
+RegisterNetEvent('aura_hub:client:showDutyAnnouncement', function(dutyData)
+    if not dutyData then return end
+
+    SendNUIMessage({
+        action = 'showDutyAnnouncement',
+        data = {
+            job = dutyData.job,
+            label = dutyData.label or "Servicio Oficial",
+            isDuty = dutyData.isDuty == true,
+            isPolice = dutyData.isPolice == true,
+            duration = 6500
+        }
+    })
+end)
+
 -- ============================================================================
 -- NUI CALLBACKS
 -- ============================================================================

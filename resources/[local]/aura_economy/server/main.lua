@@ -113,6 +113,12 @@ end
 -- ============================================================================
 
 local function ExecuteBalanceUpdate(charId, src, account, delta, txType, reason, metadata, targetCharId, fee)
+    if delta == 0 then
+        local _, _, currentAccounts = ResolveCharacter(charId)
+        local currentBalance = currentAccounts and currentAccounts[account] or 0
+        return true, currentBalance, nil
+    end
+
     AcquireLock(charId)
 
     local _, _, currentAccounts = ResolveCharacter(charId)

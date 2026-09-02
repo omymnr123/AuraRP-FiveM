@@ -137,6 +137,27 @@ html, body {
     color: var(--pink-hot);
 }
 
+.banner-card.duty-active {
+    border-color: rgba(0, 255, 157, 0.5);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7), 0 0 30px rgba(0, 255, 157, 0.35);
+}
+
+.banner-card.duty-active .banner-icon-wrapper {
+    background: rgba(0, 255, 157, 0.15);
+    border-color: rgba(0, 255, 157, 0.4);
+    color: #00ff9d;
+}
+
+.banner-card.duty-active .banner-tag {
+    color: #00ff9d;
+}
+
+.banner-card.duty-active .banner-status-badge {
+    background: rgba(0, 255, 157, 0.12);
+    border-color: #00ff9d;
+    color: #00ff9d;
+}
+
 .banner-content {
     display: flex;
     flex-direction: column;
@@ -240,7 +261,7 @@ html, body {
     position: relative;
     width: 1280px;
     height: 780px;
-    background: var(--bg-dark);
+    background: rgba(8, 14, 28, 0.95);
     border: 1px solid var(--border-turquoise);
     border-radius: var(--radius-xl);
     padding: 24px;
@@ -248,9 +269,9 @@ html, body {
     flex-direction: column;
     gap: 20px;
     box-shadow: 
-        0 30px 80px rgba(0, 0, 0, 0.9),
-        0 0 45px rgba(64, 224, 208, 0.25),
-        inset 0 1px 2px rgba(255, 255, 255, 0.2);
+        0 20px 50px rgba(0, 0, 0, 0.6),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1),
+        0 0 25px rgba(64, 224, 208, 0.2);
     z-index: 10;
     animation: hubAppear 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
@@ -755,7 +776,8 @@ html, body {
 .hub-modal-overlay {
     position: absolute;
     inset: 0;
-    background: rgba(5, 8, 18, 0.92);
+    background: rgba(4, 8, 18, 0.65);
+    border-radius: var(--radius-xl);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -774,10 +796,10 @@ html, body {
 
 .hub-modal-card {
     width: 600px;
-    background: var(--bg-dark);
+    background: rgba(8, 16, 32, 0.96);
     border: 1px solid var(--border-turquoise);
     border-radius: var(--radius-lg);
-    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9), var(--turquoise-glow);
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7), var(--turquoise-glow);
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -1195,14 +1217,15 @@ html, body {
     max-height: 88vh !important;
     display: flex !important;
     flex-direction: column !important;
-    background: rgba(8, 14, 28, 0.94) !important;
+    background: rgba(8, 16, 32, 0.96) !important;
     border: 1px solid rgba(0, 242, 254, 0.35) !important;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 40px rgba(0, 242, 254, 0.15) !important;
+    border-radius: var(--radius-xl) !important;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7), 0 0 35px rgba(0, 242, 254, 0.18) !important;
 }
 
 .mdt-header {
     border-bottom: 1px solid rgba(0, 242, 254, 0.2) !important;
-    padding-bottom: 14px !important;
+    padding-bottom: 12px !important;
 }
 
 .mdt-badge-icon {
@@ -1242,14 +1265,14 @@ html, body {
 .mdt-header-right {
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 12px;
 }
 
 .mdt-soc-pill {
-    background: rgba(0, 0, 0, 0.4);
+    background: rgba(0, 0, 0, 0.45);
     border: 1px solid rgba(0, 242, 254, 0.3);
     border-radius: var(--radius-md);
-    padding: 6px 14px;
+    padding: 6px 12px;
     display: flex;
     flex-direction: column;
     align-items: flex-end;
@@ -1262,7 +1285,7 @@ html, body {
 }
 
 .mdt-soc-pill strong {
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 900;
     color: #00f2fe;
     text-shadow: 0 0 10px rgba(0, 242, 254, 0.4);
@@ -1271,36 +1294,43 @@ html, body {
 /* TABS DE NAVEGACIÓN MDT */
 .mdt-nav-tabs {
     display: flex;
-    gap: 8px;
-    padding: 10px 24px;
-    background: rgba(0, 0, 0, 0.25);
+    gap: 6px;
+    padding: 8px 16px;
+    background: rgba(0, 0, 0, 0.28);
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     overflow-x: auto;
-    scrollbar-width: none;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 242, 254, 0.3) transparent;
 }
 
 .mdt-nav-tabs::-webkit-scrollbar {
-    display: none;
+    height: 3px;
+}
+
+.mdt-nav-tabs::-webkit-scrollbar-thumb {
+    background: rgba(0, 242, 254, 0.4);
+    border-radius: 4px;
 }
 
 .mdt-tab-btn {
     background: rgba(255, 255, 255, 0.04);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: var(--radius-md);
-    padding: 9px 16px;
+    padding: 7px 11px;
     color: var(--text-muted);
     font-size: 11px;
     font-weight: 800;
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     transition: var(--transition-fast);
     white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .mdt-tab-btn i {
-    font-size: 13px;
+    font-size: 12px;
 }
 
 .mdt-tab-btn:hover {
@@ -1652,15 +1682,88 @@ html, body {
     grid-column: span 2;
 }
 
+/* FORM CONTROLS DENTRO DE MDT Y MODALES */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-group label {
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--text-muted);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.form-group input,
+.mdt-form-grid input,
+.mdt-hire-bar input,
+.modal-form-control {
+    width: 100%;
+    background: rgba(4, 8, 18, 0.65) !important;
+    border: 1px solid rgba(0, 242, 254, 0.28) !important;
+    border-radius: var(--radius-md) !important;
+    padding: 11px 14px !important;
+    color: #ffffff !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    font-family: var(--font-main) !important;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5) !important;
+    transition: var(--transition-fast) !important;
+    box-sizing: border-box;
+}
+
+.form-group input::placeholder,
+.mdt-form-grid input::placeholder,
+.mdt-hire-bar input::placeholder {
+    color: rgba(255, 255, 255, 0.3) !important;
+    font-weight: 500 !important;
+}
+
+.form-group input:focus,
+.mdt-form-grid input:focus,
+.mdt-hire-bar input:focus {
+    border-color: #00f2fe !important;
+    box-shadow: 0 0 16px rgba(0, 242, 254, 0.45), inset 0 2px 4px rgba(0, 0, 0, 0.6) !important;
+    background: rgba(4, 8, 22, 0.85) !important;
+    outline: none !important;
+}
+
 .mdt-select {
     width: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    border: 1px solid rgba(0, 242, 254, 0.3);
-    border-radius: var(--radius-md);
-    padding: 10px 12px;
-    color: #ffffff;
+    background: rgba(4, 8, 18, 0.75) !important;
+    border: 1px solid rgba(0, 242, 254, 0.3) !important;
+    border-radius: var(--radius-md) !important;
+    padding: 11px 14px !important;
+    color: #ffffff !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    font-family: var(--font-main) !important;
+    cursor: pointer;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5) !important;
+    transition: var(--transition-fast) !important;
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2300f2fe' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 14px center !important;
+    padding-right: 36px !important;
+    box-sizing: border-box;
+}
+
+.mdt-select:focus {
+    border-color: #00f2fe !important;
+    box-shadow: 0 0 16px rgba(0, 242, 254, 0.45) !important;
+}
+
+.mdt-select option {
+    background: #0b1329 !important;
+    color: #ffffff !important;
+    padding: 10px;
     font-size: 12px;
-    font-weight: 700;
 }
 
 .mdt-presets-scroll,
