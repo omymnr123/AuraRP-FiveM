@@ -140,26 +140,84 @@ RegisterCommand('hud', function()
     })
 end)
 
--- Función para aplicar posición del minimapa de forma sincronizada
-local currentMinimapPos = { x = 1.5, y = 1.5 }
-
--- NUI Callback para guardar la posición del HUD
+-- NUI Callback para guardar las posiciones del HUD y Cinturón de Items
 RegisterNUICallback('savePos', function(data, cb)
     SetNuiFocus(false, false)
     
-    -- Notificamos al servidor para que guarde la posición en la BD
-    TriggerServerEvent('aura_hud:server:SavePosition', data.x, data.y)
+    -- Notificamos al servidor para guardar en la BD/Metadata
+    TriggerServerEvent('aura_hud:server:SavePosition', data)
     
-    print("HUD Position Saved Successfully!")
+    -- Guardar también en KVP local para carga instantánea
+    if data and type(data) == 'table' then
+        if data.hud then
+            SetResourceKvp('aura_hud_pos', json.encode(data.hud))
+        end
+        if data.hotbar then
+            SetResourceKvp('aura_hotbar_pos', json.encode(data.hotbar))
+            TriggerEvent('ox_inventory:client:setHotbarPosition', data.hotbar.x, data.hotbar.y)
+        end
+    end
+    
+    if lib and lib.notify then
+        lib.notify({
+            title = 'HUD & Cinturón',
+            description = 'Posiciones guardadas correctamente.',
+            type = 'success',
+            duration = 3500
+        })
+    end
+    
     cb('ok')
 end)
 
--- Evento para recibir la posición desde el servidor al loguear
+-- NUI Callback para cancelar o cerrar el modo edición
+RegisterNUICallback('closeEdit', function(data, cb)
+    SetNuiFocus(false, false)
+    cb('ok')
+end)
+
+-- Evento para recibir las posiciones desde el servidor al loguear
 RegisterNetEvent('aura_hud:client:SetPosition')
-AddEventHandler('aura_hud:client:SetPosition', function(x, y)
+AddEventHandler('aura_hud:client:SetPosition', function(hudPos, hotbarPos)
+    local finalHud = hudPos
+    local finalHotbar = hotbarPos
+    
+    -- Compatibilidad con formato antiguo numérico
+    if type(hudPos) == 'number' then
+        finalHud = { x = hudPos, y = hotbarPos }
+        finalHotbar = { x = 50.0, y = 3.5 }
+    end
+    
+    -- Enviar a la UI de aura_hud
     SendNUIMessage({
         action = 'setPosition',
-        x = x,
-        y = y
+        hud = finalHud,
+        hotbar = finalHotbar
     })
+    
+    -- Sincronizar el cinturón de ox_inventory
+    if finalHotbar and finalHotbar.x and finalHotbar.y then
+        TriggerEvent('ox_inventory:client:setHotbarPosition', finalHotbar.x, finalHotbar.y)
+    end
+end)
+
+-- Restaurar posiciones locales al iniciar el recurso
+CreateThread(function()
+    Wait(500)
+    local savedHud = GetResourceKvpString('aura_hud_pos')
+    local savedHotbar = GetResourceKvpString('aura_hotbar_pos')
+    
+    local hudPos = savedHud and json.decode(savedHud) or nil
+    local hotbarPos = savedHotbar and json.decode(savedHotbar) or nil
+    
+    if hudPos or hotbarPos then
+        SendNUIMessage({
+            action = 'setPosition',
+            hud = hudPos or { x = 17.5, y = 3.5 },
+            hotbar = hotbarPos or { x = 50.0, y = 3.5 }
+        })
+        if hotbarPos then
+            TriggerEvent('ox_inventory:client:setHotbarPosition', hotbarPos.x, hotbarPos.y)
+        end
+    end
 end)

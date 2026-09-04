@@ -36,8 +36,28 @@ AddEventHandler("mlo_blips:receiveBlips", function(blipsData)
     CreateBlips(blipsData)
 end)
 
--- Pedir los blips al servidor al iniciar
+-- Pedir los blips al servidor al iniciar y registrar sugerencias de chat
 CreateThread(function()
     Wait(1000)
     TriggerServerEvent("mlo_blips:requestBlips")
+
+    -- Sugerencias para el chat
+    TriggerEvent('chat:addSuggestion', '/marcar', 'Añadir un marcador permanente en el mapa en tu posición actual', {
+        { name = 'nombre', help = 'Nombre que aparecerá en el mapa para este MLO/Lugar' }
+    })
+
+    TriggerEvent('chat:addSuggestion', '/borrarblip', 'Borrar un marcador del mapa (por cercanía, nombre o ID)', {
+        { name = 'nombre o ID', help = '(Opcional) Nombre o número #ID del blip. Si lo dejas vacío, borra el más cercano.' }
+    })
+
+    TriggerEvent('chat:addSuggestion', '/delblip', 'Borrar un marcador del mapa (alias de /borrarblip)', {
+        { name = 'nombre o ID', help = '(Opcional) Nombre o número #ID del blip.' }
+    })
+
+    TriggerEvent('chat:addSuggestion', '/desmarcar', 'Borrar un marcador del mapa (alias de /borrarblip)', {
+        { name = 'nombre o ID', help = '(Opcional) Nombre o número #ID del blip.' }
+    })
+
+    TriggerEvent('chat:addSuggestion', '/listarblips', 'Listar todos los marcadores guardados en el mapa con su ID y distancia')
+    TriggerEvent('chat:addSuggestion', '/blips', 'Listar todos los marcadores guardados en el mapa (alias de /listarblips)')
 end)

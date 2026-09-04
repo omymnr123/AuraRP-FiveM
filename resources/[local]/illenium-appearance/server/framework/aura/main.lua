@@ -87,6 +87,8 @@ end
 function Framework.SaveAppearance(appearance, citizenID)
     if not citizenID or not appearance then return end
 
+    local charId = tonumber(citizenID)
+
     -- Guardar en la tabla playerskins de illenium
     pcall(function()
         Database.PlayerSkins.UpdateActiveField(citizenID, 0)
@@ -94,17 +96,20 @@ function Framework.SaveAppearance(appearance, citizenID)
         Database.PlayerSkins.Add(citizenID, appearance.model, json.encode(appearance), 1)
     end)
     
-    -- TAMBIÉN guardar en la tabla characters de Aura (dentro de metadata.appearance)
-    local charId = tonumber(citizenID)
-    if charId then
-        local charRow = MySQL.single.await('SELECT metadata FROM characters WHERE id = ?', { charId })
-        if charRow then
-            local metadata = json.decode(charRow.metadata) or {}
-            metadata.appearance = appearance
-            MySQL.update.await('UPDATE characters SET metadata = ? WHERE id = ?', {
-                json.encode(metadata),
-                charId
-            })
+    -- Sincronizar en memoria activa y en la tabla characters de Aura
+    if exports.aura_multichar and exports.aura_multichar.SetCharacterAppearance then
+        exports.aura_multichar:SetCharacterAppearance(charId or citizenID, appearance)
+    else
+        if charId then
+            local charRow = MySQL.single.await('SELECT metadata FROM characters WHERE id = ?', { charId })
+            if charRow then
+                local metadata = json.decode(charRow.metadata) or {}
+                metadata.appearance = appearance
+                MySQL.update.await('UPDATE characters SET metadata = ? WHERE id = ?', {
+                    json.encode(metadata),
+                    charId
+                })
+            end
         end
     end
 end

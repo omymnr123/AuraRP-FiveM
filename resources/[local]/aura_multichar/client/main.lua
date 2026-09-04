@@ -209,7 +209,7 @@ RegisterNUICallback('createCharacter', function(data, cb)
             FreezeEntityPosition(ped, true)
 
             -- Iniciar directamente la personalización de apariencia 3D en el mismo escenario
-            TriggerEvent('aura_appearance:startCustomization', newChar.gender)
+            TriggerEvent('aura_appearance:startCustomization', newChar.gender, newChar)
             cb('ok')
         else
             cb('error')
@@ -285,7 +285,7 @@ RegisterNUICallback('selectCharacter', function(data, cb)
             
             local isNew = (not charData.metadata.appearance or next(charData.metadata.appearance) == nil)
             if isNew then
-                TriggerEvent('aura_appearance:startCustomization', charData.gender)
+                TriggerEvent('aura_appearance:startCustomization', charData.gender, charData)
             else
                 TriggerEvent('aura_appearance:applyAppearance', charData.metadata.appearance)
             end
@@ -293,6 +293,7 @@ RegisterNUICallback('selectCharacter', function(data, cb)
             DisplayHud(true)
             DisplayRadar(true)
             TriggerEvent('aura_multichar:client:characterLoaded', charData)
+            TriggerServerEvent('aura_multichar:server:characterLoaded', charData.id)
             
             DoScreenFadeIn(1000)
             TriggerEvent('aura_core:client:playerSpawned')

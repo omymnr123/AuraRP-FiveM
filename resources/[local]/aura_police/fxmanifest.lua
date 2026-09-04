@@ -15,14 +15,21 @@ shared_scripts {
 server_scripts {
     '@oxmysql/lib/MySQL.lua',
     'server/main.lua',
-    'server/jail.lua'
+    'server/jail.lua',
+    'server/dispatch.lua',
+    'server/mdt.lua',
+    'server/radio.lua',
+    'server/debug.lua'
 }
 
 client_scripts {
     'client/main.lua',
     'client/interactions.lua',
     'client/stations.lua',
-    'client/jail.lua'
+    'client/jail.lua',
+    'client/dispatch.lua',
+    'client/radio_blips.lua',
+    'client/debug.lua'
 }
 
 ui_page 'web/index.html'

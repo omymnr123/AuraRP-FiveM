@@ -44,7 +44,7 @@
     <div id="hubWrapper" class="hub-wrapper hidden">
         <div class="hub-backdrop" id="hubBackdrop"></div>
 
-        <div class="hub-screen-container">
+        <div class="hub-screen-container" id="hubScreenContainer">
             <!-- Neon Top Border Glow -->
             <div class="hub-neon-strip"></div>
 
@@ -93,6 +93,13 @@
                         <span class="pulse-dot-cyan"></span>
                         <i class="fa-solid fa-shield-halved"></i>
                         <span>MDT POLICÍA</span>
+                    </button>
+
+                    <!-- Botón Terminal Clandestino Dark Web (Solo bandas y cárteles) -->
+                    <button class="btn-quick-action btn-dark-web" id="btnActionDarkWeb" style="display: none;" title="Terminal Clandestino (Dark Web)">
+                        <span class="pulse-dot-pink"></span>
+                        <i class="fa-solid fa-skull"></i>
+                        <span class="glitch-label">DARK WEB</span>
                     </button>
 
                     <button class="btn-quick-action" id="btnActionSettings" title="Ajustes del Sistema">
@@ -382,6 +389,7 @@
                 <div class="modal-body">
                     <div class="settings-actions">
                         <button class="btn-setting-item resume" onclick="closeHub()"><i class="fa-solid fa-play"></i> Reanudar Juego</button>
+                        <button class="btn-setting-item options" id="btnModalGtaSettings"><i class="fa-solid fa-sliders"></i> Opciones de GTA V</button>
                         <button class="btn-setting-item disconnect" id="btnModalDisconnect"><i class="fa-solid fa-power-off"></i> Desconectar del Servidor</button>
                     </div>
                 </div>
@@ -471,6 +479,9 @@
                     </button>
                     <button class="mdt-tab-btn" id="btnMdtTabStaff" onclick="switchMdtTab('mdttab-staff')">
                         <i class="fa-solid fa-user-gear"></i> <span>PLANTILLA RRHH</span>
+                    </button>
+                    <button class="mdt-tab-btn" id="btnMdtTabRadio" onclick="switchMdtTab('mdttab-radio')">
+                        <i class="fa-solid fa-walkie-talkie"></i> <span>RADIO-PATRULLAS</span>
                     </button>
                 </div>
 
@@ -684,14 +695,172 @@
                                 </thead>
                                 <tbody id="mdtStaffTableBody">
                                     <!-- Render dinámico vía app.js -->
-                                </tbody>
                             </table>
+                        </div>
+                    </div>
+
+                    <!-- Tab 9: Radio-Patrullas Tácticas (Mando + Patrullas 1-20) -->
+                    <div id="mdttab-radio" class="mdt-tab-pane">
+                        <!-- Banner Compacto de Conexión Activa y Guía Táctica -->
+                        <div class="radio-status-banner">
+                            <div class="radio-active-info">
+                                <div class="radio-beacon-wrapper" id="radioBeaconWrapper">
+                                    <span class="radio-pulse-beacon" id="radioActiveDot"></span>
+                                    <i class="fa-solid fa-tower-broadcast"></i>
+                                </div>
+                                <div class="radio-active-texts">
+                                    <span class="sub">FRECUENCIA SINTONIZADA</span>
+                                    <h4 id="radioActiveChannelTitle">DESCONECTADO DE LA RED</h4>
+                                </div>
+                            </div>
+                            <div class="radio-banner-actions">
+                                <div class="radio-keybinds-pill">
+                                    <span><i class="fa-solid fa-microphone"></i> <strong>PTT:</strong> Tecla Radio</span>
+                                    <span><i class="fa-solid fa-bullhorn"></i> <strong>MALLA GENERAL:</strong> Tecla <kbd>Y</kbd> (Mando)</span>
+                                </div>
+                                <button class="btn-mdt-action red small" id="btnDisconnectRadio" onclick="leavePoliceRadio()" style="display: none;">
+                                    <i class="fa-solid fa-power-off"></i> Desconectar
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Tarjeta Compacta: CANAL DE MANDO -->
+                        <div class="mando-vip-card" id="cardChannelMando">
+                            <div class="mando-header-row">
+                                <div class="mando-title-badge">
+                                    <div class="mando-icon-box">
+                                        <i class="fa-solid fa-shield-halved"></i>
+                                    </div>
+                                    <div class="mando-texts-block">
+                                        <div class="mando-tag">
+                                            <span class="pulse-dot-gold"></span>
+                                            <strong>CANAL DE MANDO (100.0 MHz)</strong>
+                                            <span class="mando-sub-label">Supervisión Directa</span>
+                                        </div>
+                                        <div class="mando-members-inline" id="members_mando">
+                                            <span class="empty-chips">Sin mandos conectados actualmente.</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mando-actions-row">
+                                    <button class="btn-channel-color" onclick="openRadioColorPicker('mando', event)" title="Personalizar color del canal y blip">
+                                        <span class="color-dot-indicator" id="colorIndicator_mando" style="background-color: #ffb700;"></span>
+                                        <span>Color</span>
+                                    </button>
+                                    <button class="btn-channel-connect" id="btnConnect_mando" onclick="joinPoliceRadio('mando')">
+                                        <i class="fa-solid fa-plug"></i> Conectar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Encabezado de Patrullas -->
+                        <div class="patrols-section-header">
+                            <h4><i class="fa-solid fa-car-on"></i> Malla de Patrullas & Misiones Tácticas (#01 al #20)</h4>
+                        </div>
+
+                        <!-- Grid de Patrullas (#01 al #20) -->
+                        <div class="radio-patrols-grid" id="radioPatrolsContainer">
+                            <!-- Inyectado dinámicamente vía app.js -->
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
+        <!-- =================================================================
+             MODAL: TERMINAL DARK WEB (BANDAS, MAFIAS Y CÁRTELES)
+        ================================================================== -->
+        <div class="hub-modal-overlay hidden" id="modalDarkWeb">
+            <div class="hub-modal-card large dark-web-card">
+                <div class="neon-glow-strip-pink"></div>
+                <div class="modal-header">
+                    <div class="modal-title-row">
+                        <div class="dark-web-icon-badge">
+                            <i class="fa-solid fa-user-secret"></i>
+                        </div>
+                        <div>
+                            <div class="header-badge-tag dark-badge">
+                                <span class="pulse-dot-pink"></span>
+                                <span id="darkWebNetworkTag">TOR ONION // RED CLANDESTINA</span>
+                            </div>
+                            <h3 id="modalDarkGangTitle" class="glitch-text">DARK WEB // TERMINAL DE CONTROL</h3>
+                            <p id="modalDarkGangSub">Cifrado RSA-4096 | Red Segura Descentralizada</p>
+                        </div>
+                    </div>
+                    <button class="btn-modal-close" onclick="closeModal('modalDarkWeb')"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+
+                <div class="modal-tabs-nav dark-tabs">
+                    <button class="modal-tab-btn active" data-modaltab="dark-roster"><i class="fa-solid fa-users-viewfinder"></i> Roster Clandestino</button>
+                    <button class="modal-tab-btn" data-modaltab="dark-offshore"><i class="fa-solid fa-vault"></i> Cuentas Offshore</button>
+                </div>
+
+                <div class="modal-body">
+                    <!-- TAB 1: ROSTER CLANDESTINO -->
+                    <div id="modaltab-dark-roster" class="modal-tab-content active">
+                        <div class="hire-bar" id="darkWebHireBar">
+                            <div class="search-input-wrapper" style="max-width: 320px;">
+                                <i class="fa-solid fa-id-card"></i>
+                                <input type="number" id="darkHireId" placeholder="ID de Servidor del Recluta (Cercano)" min="1">
+                            </div>
+                            <button class="btn-neon-action pink" id="btnDarkHire">
+                                <i class="fa-solid fa-user-plus"></i> Reclutar Miembro
+                            </button>
+                        </div>
+                        <div class="table-container">
+                            <table class="modal-table">
+                                <thead>
+                                    <tr>
+                                        <th>ESTADO</th>
+                                        <th>NOMBRE</th>
+                                        <th>IDENTIFICADOR</th>
+                                        <th>RANGO / PUESTO</th>
+                                        <th style="text-align: right;">ACCIONES DE MANDO</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="darkRosterTableBody">
+                                    <!-- Render dinámico vía app.js -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- TAB 2: FINANZAS OFFSHORE -->
+                    <div id="modaltab-dark-offshore" class="modal-tab-content">
+                        <div class="dark-finance-grid">
+                            <div class="dark-balance-card">
+                                <span class="sub">FONDO MONETARIO OFFSHORE</span>
+                                <h2 id="darkOffshoreBalance">$0</h2>
+                                <span class="badge-offshore"><i class="fa-solid fa-shield-virus"></i> Cuentas Clandestinas No Auditables</span>
+                            </div>
+                            <div class="dark-transfer-card">
+                                <h4><i class="fa-solid fa-money-bill-transfer"></i> Movimiento de Capitales Offshore</h4>
+                                <div class="dark-input-group">
+                                    <input type="number" id="darkTransferAmount" placeholder="Cantidad ($)" min="1">
+                                    <select id="darkAccountSelect">
+                                        <option value="black_money">Dinero Negro (Billetes)</option>
+                                        <option value="money">Dinero Limpio (Efectivo)</option>
+                                    </select>
+                                </div>
+                                <div class="dark-actions-row">
+                                    <button class="btn-neon-action pink" id="btnDarkDeposit"><i class="fa-solid fa-arrow-down"></i> Depositar en Fondo</button>
+                                    <button class="btn-neon-action cyan" id="btnDarkWithdraw" style="display: none;"><i class="fa-solid fa-arrow-up"></i> Retirar Fondos (Jefe)</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <!-- Dropdown Flotante Selector de Color Táctico Radio -->
+    <div id="radioColorPickerDropdown" class="radio-color-picker-dropdown hidden">
+        <div class="picker-header">
+            <span><i class="fa-solid fa-palette"></i> COLOR DE PATRULLA & BLIP</span>
+            <button class="btn-picker-close" onclick="closeRadioColorPicker()"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="picker-swatches-grid" id="pickerSwatchesGrid"></div>
     </div>
 
     <!-- Toast Notifications -->

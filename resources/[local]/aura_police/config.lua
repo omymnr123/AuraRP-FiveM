@@ -3,6 +3,16 @@ Config = {}
 Config.Debug = false
 
 -- ============================================================================
+-- 0. CONFIGURACIÓN DE DESPACHO INTELIGENTE (SMART DISPATCH)
+-- ============================================================================
+Config.Dispatch = {
+    -- Cooldown anti-spam (en segundos) por tirador para no saturar la centralita
+    gunshotCooldown = 15,
+    -- Duración de los blips en el mapa antes de auto-eliminarse (en segundos)
+    blipDuration = 120
+}
+
+-- ============================================================================
 -- 1. CONFIGURACIÓN DE PRISIÓN Y CÁRCEL (BOLINGBROKE PENITENTIARY)
 -- ============================================================================
 Config.Jail = {
@@ -50,7 +60,8 @@ Config.Stations = {
         },
         garage = {
             spawn = vec4(438.42, -1018.30, 28.75, 90.0),
-            interact = vec3(438.82, -1012.08, 28.58),
+            interact = vec3(488.06, -1002.62, 26.82),
+            heading = 269.11, -- Girado 180° para que la pantalla del terminal mire al oficial y no hacia la pared
             returns = {
                 vec3(464.18, -1019.79, 28.10),
                 vec3(464.00, -1015.00, 28.08)
@@ -122,7 +133,7 @@ Config.Stations = {
 }
 
 -- ============================================================================
--- 3. DOTACIÓN DE ARMERÍA POR RANGO POLICIAL (0: Cadete ... 6: Jefe de Policía)
+-- 3. DOTACIÓN DE ARMERÍA POR RANGO POLICIAL (0: Cadete ... 5: Comisario)
 -- ============================================================================
 Config.ArmoryWeapons = {
     [0] = { -- Cadete
@@ -138,7 +149,7 @@ Config.ArmoryWeapons = {
         { name = 'police_badge',        label = 'Placa Policial LSPD',    count = 1 },
         { name = 'bodycam',             label = 'Cámara Corporal Axon',   count = 1 }
     },
-    [1] = { -- Oficial I
+    [1] = { -- Oficial
         { name = 'weapon_combatpistol', label = 'Pistola Glock 19 (9mm)', count = 1 },
         { name = 'ammo-9',              label = 'Munición 9mm (x50)',     count = 100 },
         { name = 'weapon_stungun',      label = 'Pistola Taser X26',      count = 1 },
@@ -148,15 +159,14 @@ Config.ArmoryWeapons = {
         { name = 'radio',               label = 'Radio Walkie-Talkie',    count = 1 },
         { name = 'armour',              label = 'Chaleco Balístico',      count = 2 },
         { name = 'bandage',             label = 'Vendaje Médico',         count = 5 },
-        { name = 'medikit',             label = 'Botiquín Táctico IFAK',  count = 1 },
         { name = 'police_badge',        label = 'Placa Policial LSPD',    count = 1 },
         { name = 'bodycam',             label = 'Cámara Corporal Axon',   count = 1 }
     },
-    [2] = { -- Oficial II
+    [2] = { -- Sargento
         { name = 'weapon_combatpistol', label = 'Pistola Glock 19 (9mm)',   count = 1 },
         { name = 'ammo-9',              label = 'Munición 9mm (x50)',       count = 100 },
         { name = 'weapon_pumpshotgun',  label = 'Escopeta Mossberg 590',    count = 1 },
-        { name = 'ammo-shotgun',        label = 'Cartuchos Escopeta (x20)', count = 100 },
+        { name = 'ammo-shotgun',        label = 'Cartuchos Escopeta (x20)', count = 50 },
         { name = 'weapon_stungun',      label = 'Pistola Taser X26',        count = 1 },
         { name = 'weapon_nightstick',   label = 'Porra Reglamentaria',      count = 1 },
         { name = 'weapon_flashlight',   label = 'Linterna Táctica',         count = 1 },
@@ -164,18 +174,17 @@ Config.ArmoryWeapons = {
         { name = 'radio',               label = 'Radio Walkie-Talkie',      count = 1 },
         { name = 'armour',              label = 'Chaleco Balístico',        count = 2 },
         { name = 'bandage',             label = 'Vendaje Médico',           count = 5 },
-        { name = 'medikit',             label = 'Botiquín Táctico IFAK',    count = 2 },
         { name = 'spikestrip',          label = 'Banda de Clavos Portátil', count = 1 },
         { name = 'police_badge',        label = 'Placa Policial LSPD',      count = 1 },
         { name = 'bodycam',             label = 'Cámara Corporal Axon',     count = 1 }
     },
-    [3] = { -- Sargento
+    [3] = { -- Teniente
         { name = 'weapon_combatpistol', label = 'Pistola Glock 19 (9mm)',    count = 1 },
         { name = 'ammo-9',              label = 'Munición 9mm (x50)',        count = 100 },
         { name = 'weapon_carbinerifle', label = 'Carabina Táctica M4',       count = 1 },
         { name = 'ammo-rifle',          label = 'Munición Rifle 5.56 (x60)', count = 100 },
         { name = 'weapon_pumpshotgun',  label = 'Escopeta Mossberg 590',     count = 1 },
-        { name = 'ammo-shotgun',        label = 'Cartuchos Escopeta (x20)',  count = 100 },
+        { name = 'ammo-shotgun',        label = 'Cartuchos Escopeta (x20)',  count = 50 },
         { name = 'weapon_stungun',      label = 'Pistola Taser X26',         count = 1 },
         { name = 'weapon_nightstick',   label = 'Porra Reglamentaria',       count = 1 },
         { name = 'weapon_flashlight',   label = 'Linterna Táctica',          count = 1 },
@@ -183,50 +192,24 @@ Config.ArmoryWeapons = {
         { name = 'radio',               label = 'Radio Walkie-Talkie',       count = 1 },
         { name = 'armour',              label = 'Chaleco Balístico',         count = 2 },
         { name = 'bandage',             label = 'Vendaje Médico',            count = 5 },
-        { name = 'medikit',             label = 'Botiquín Táctico IFAK',     count = 2 },
+        { name = 'medikit',             label = 'Botiquín Táctico IFAK',     count = 1 },
         { name = 'spikestrip',          label = 'Banda de Clavos Portátil',  count = 1 },
         { name = 'police_badge',        label = 'Placa Policial LSPD',       count = 1 },
         { name = 'bodycam',             label = 'Cámara Corporal Axon',      count = 1 }
     },
-    [4] = { -- Teniente
-        { name = 'weapon_combatpistol', label = 'Pistola Glock 19 (9mm)',    count = 1 },
-        { name = 'ammo-9',              label = 'Munición 9mm (x50)',        count = 100 },
-        { name = 'weapon_carbinerifle', label = 'Carabina Táctica M4',       count = 1 },
-        { name = 'ammo-rifle',          label = 'Munición Rifle 5.56 (x60)', count = 100 },
-        { name = 'weapon_pumpshotgun',  label = 'Escopeta Mossberg 590',     count = 1 },
-        { name = 'ammo-shotgun',        label = 'Cartuchos Escopeta (x20)',  count = 100 },
-        { name = 'weapon_stungun',      label = 'Pistola Taser X26',         count = 1 },
-        { name = 'weapon_nightstick',   label = 'Porra Reglamentaria',       count = 1 },
-        { name = 'weapon_flashlight',   label = 'Linterna Táctica',          count = 1 },
-        { name = 'handcuffs',           label = 'Esposas Reglamentarias',    count = 1 },
-        { name = 'radio',               label = 'Radio Walkie-Talkie',       count = 1 },
-        { name = 'armour',              label = 'Chaleco Balístico',         count = 2 },
-        { name = 'bandage',             label = 'Vendaje Médico',            count = 5 },
-        { name = 'medikit',             label = 'Botiquín Táctico IFAK',     count = 2 },
-        { name = 'spikestrip',          label = 'Banda de Clavos Portátil',  count = 1 },
-        { name = 'police_badge',        label = 'Placa Policial LSPD',       count = 1 },
-        { name = 'bodycam',             label = 'Cámara Corporal Axon',      count = 1 }
+    [4] = { -- Detective
+        { name = 'weapon_combatpistol', label = 'Pistola Glock 19 (9mm)', count = 1 },
+        { name = 'ammo-9',              label = 'Munición 9mm (x50)',     count = 100 },
+        { name = 'weapon_stungun',      label = 'Pistola Taser X26',      count = 1 },
+        { name = 'weapon_flashlight',   label = 'Linterna Táctica',       count = 1 },
+        { name = 'handcuffs',           label = 'Esposas Reglamentarias', count = 1 },
+        { name = 'radio',               label = 'Radio Walkie-Talkie',    count = 1 },
+        { name = 'armour',              label = 'Chaleco Balístico',      count = 2 },
+        { name = 'bandage',             label = 'Vendaje Médico',         count = 5 },
+        { name = 'police_badge',        label = 'Placa Policial LSPD',    count = 1 },
+        { name = 'bodycam',             label = 'Cámara Corporal Axon',   count = 1 }
     },
-    [5] = { -- Capitán
-        { name = 'weapon_combatpistol', label = 'Pistola Glock 19 (9mm)',    count = 1 },
-        { name = 'ammo-9',              label = 'Munición 9mm (x50)',        count = 100 },
-        { name = 'weapon_carbinerifle', label = 'Carabina Táctica M4',       count = 1 },
-        { name = 'ammo-rifle',          label = 'Munición Rifle 5.56 (x60)', count = 100 },
-        { name = 'weapon_pumpshotgun',  label = 'Escopeta Mossberg 590',     count = 1 },
-        { name = 'ammo-shotgun',        label = 'Cartuchos Escopeta (x20)',  count = 100 },
-        { name = 'weapon_stungun',      label = 'Pistola Taser X26',         count = 1 },
-        { name = 'weapon_nightstick',   label = 'Porra Reglamentaria',       count = 1 },
-        { name = 'weapon_flashlight',   label = 'Linterna Táctica',          count = 1 },
-        { name = 'handcuffs',           label = 'Esposas Reglamentarias',    count = 1 },
-        { name = 'radio',               label = 'Radio Walkie-Talkie',       count = 1 },
-        { name = 'armour',              label = 'Chaleco Balístico',         count = 2 },
-        { name = 'bandage',             label = 'Vendaje Médico',            count = 5 },
-        { name = 'medikit',             label = 'Botiquín Táctico IFAK',     count = 2 },
-        { name = 'spikestrip',          label = 'Banda de Clavos Portátil',  count = 1 },
-        { name = 'police_badge',        label = 'Placa Policial LSPD',       count = 1 },
-        { name = 'bodycam',             label = 'Cámara Corporal Axon',      count = 1 }
-    },
-    [6] = { -- Jefe de Policía (Comisario Principal / Chief)
+    [5] = { -- Comisario (Máxima Autoridad / Chief)
         { name = 'weapon_combatpistol', label = 'Pistola Glock 19 (9mm)',    count = 1 },
         { name = 'ammo-9',              label = 'Munición 9mm (x50)',        count = 100 },
         { name = 'weapon_carbinerifle', label = 'Carabina Táctica M4',       count = 1 },
@@ -254,10 +237,10 @@ Config.Vehicles = {
     { model = 'police',  label = 'Patrulla Cruiser Vapid (LSPD)', minGrade = 0, category = 'Cruiser',      desc = 'Vehículo estándar de patrulla urbana con equipamiento táctico LSPD.' },
     { model = 'police2', label = 'Patrulla Buffalo Interceptor',  minGrade = 1, category = 'Interceptor',  desc = 'Unidad de interceptación y persecución de alta velocidad.' },
     { model = 'police3', label = 'Interceptor Vapid Cruiser',     minGrade = 1, category = 'Interceptor',  desc = 'Cruiser repotenciado con kit aerodinámico y suspensión reforzada.' },
-    { model = 'police4', label = 'Vehículo Camuflado (Unmarked)', minGrade = 2, category = 'Encubierto',   desc = 'Vehículo civil sin distintivos exteriores para operaciones encubiertas.' },
     { model = 'policet', label = 'Furgón de Transporte / Celdas', minGrade = 1, category = 'Transporte',   desc = 'Furgón blindado con celdas de contención múltiple para detenidos.' },
     { model = 'fbi2',    label = 'SUV Blindado Granger LSPD',     minGrade = 2, category = 'SUV Blindado', desc = 'SUV táctico 4x4 con blindaje balístico ligero y espacio de carga.' },
-    { model = 'riot',    label = 'Furgón Blindado SWAT / Riot',   minGrade = 3, category = 'SWAT',         desc = 'Vehículo de asalto táctico SWAT y contención de disturbios graves.' }
+    { model = 'riot',    label = 'Furgón Blindado SWAT / Riot',   minGrade = 3, category = 'SWAT',         desc = 'Vehículo de asalto táctico SWAT y contención de disturbios graves.' },
+    { model = 'police4', label = 'Vehículo Camuflado (Unmarked)', minGrade = 4, category = 'Encubierto',   desc = 'Vehículo camuflado sin distintivos exteriores para operaciones de Detective.' }
 }
 
 Config.Helicopters = {
@@ -324,8 +307,8 @@ Config.Uniforms = {
         }
     },
 
-    [1] = { -- Oficial I
-        label = 'Uniforme de Oficial de Patrulla I (LSPD)',
+    [1] = { -- Oficial
+        label = 'Uniforme de Oficial de Patrulla (LSPD)',
         ['Male'] = {
             components = {
                 { component_id = 1,  drawable = 0,   texture = 0 },
@@ -335,7 +318,7 @@ Config.Uniforms = {
                 { component_id = 7,  drawable = 125, texture = 0 },
                 { component_id = 8,  drawable = 58,  texture = 0 },
                 { component_id = 9,  drawable = 12,  texture = 0 }, -- Chaleco balístico LSPD
-                { component_id = 10, drawable = 1,   texture = 0 }, -- Placa Oficial I
+                { component_id = 10, drawable = 1,   texture = 0 }, -- Placa Oficial
                 { component_id = 11, drawable = 55,  texture = 0 }
             },
             props = {
@@ -362,45 +345,7 @@ Config.Uniforms = {
         }
     },
 
-    [2] = { -- Oficial II
-        label = 'Uniforme de Oficial Superior II (LSPD)',
-        ['Male'] = {
-            components = {
-                { component_id = 1,  drawable = 0,   texture = 0 },
-                { component_id = 3,  drawable = 20,  texture = 0 }, -- Manga larga
-                { component_id = 4,  drawable = 24,  texture = 0 },
-                { component_id = 6,  drawable = 51,  texture = 0 },
-                { component_id = 7,  drawable = 125, texture = 0 },
-                { component_id = 8,  drawable = 58,  texture = 0 },
-                { component_id = 9,  drawable = 12,  texture = 0 },
-                { component_id = 10, drawable = 2,   texture = 0 }, -- Galón doble Oficial II
-                { component_id = 11, drawable = 317, texture = 0 }  -- Camisa manga larga LSPD
-            },
-            props = {
-                { prop_id = 0, drawable = -1, texture = 0 },
-                { prop_id = 1, drawable = -1, texture = 0 }
-            }
-        },
-        ['Female'] = {
-            components = {
-                { component_id = 1,  drawable = 0,   texture = 0 },
-                { component_id = 3,  drawable = 31,  texture = 0 },
-                { component_id = 4,  drawable = 133, texture = 0 },
-                { component_id = 6,  drawable = 52,  texture = 0 },
-                { component_id = 7,  drawable = 95,  texture = 0 },
-                { component_id = 8,  drawable = 35,  texture = 0 },
-                { component_id = 9,  drawable = 34,  texture = 0 },
-                { component_id = 10, drawable = 2,   texture = 0 },
-                { component_id = 11, drawable = 327, texture = 0 }
-            },
-            props = {
-                { prop_id = 0, drawable = -1, texture = 0 },
-                { prop_id = 1, drawable = -1, texture = 0 }
-            }
-        }
-    },
-
-    [3] = { -- Sargento
+    [2] = { -- Sargento
         label = 'Uniforme de Mando - Sargento (LSPD)',
         ['Male'] = {
             components = {
@@ -438,7 +383,7 @@ Config.Uniforms = {
         }
     },
 
-    [4] = { -- Teniente
+    [3] = { -- Teniente
         label = 'Uniforme de Mando - Teniente (LSPD)',
         ['Male'] = {
             components = {
@@ -476,60 +421,60 @@ Config.Uniforms = {
         }
     },
 
-    [5] = { -- Capitán
-        label = 'Uniforme de Alto Mando - Capitán (LSPD)',
+    [4] = { -- Detective
+        label = 'Indumentaria de Investigación - Detective (LSPD)',
         ['Male'] = {
             components = {
-                { component_id = 1,  drawable = 0,   texture = 0 },
-                { component_id = 3,  drawable = 20,  texture = 0 },
-                { component_id = 4,  drawable = 24,  texture = 0 },
-                { component_id = 6,  drawable = 51,  texture = 0 },
-                { component_id = 7,  drawable = 126, texture = 0 },
-                { component_id = 8,  drawable = 58,  texture = 0 },
-                { component_id = 9,  drawable = 12,  texture = 2 }, -- Chaleco ejecutivo Capitán
-                { component_id = 10, drawable = 5,   texture = 0 }, -- Doble barra de Capitán
-                { component_id = 11, drawable = 317, texture = 2 }  -- Uniforme Class A Capitán con laureles
+                { component_id = 1,  drawable = 0,   texture = 0 }, -- Máscara
+                { component_id = 3,  drawable = 11,  texture = 0 }, -- Brazos con camisa
+                { component_id = 4,  drawable = 28,  texture = 0 }, -- Pantalón formal
+                { component_id = 6,  drawable = 10,  texture = 0 }, -- Zapatos elegantes
+                { component_id = 7,  drawable = 125, texture = 0 }, -- Funda táctica con placa en cinturón
+                { component_id = 8,  drawable = 31,  texture = 0 }, -- Camisa con corbata
+                { component_id = 9,  drawable = 0,   texture = 0 }, -- Sin chaleco exterior
+                { component_id = 10, drawable = 0,   texture = 0 },
+                { component_id = 11, drawable = 10,  texture = 0 }  -- Chaqueta blazer Detective
             },
             props = {
-                { prop_id = 0, drawable = 58, texture = 2 }, -- Gorra de plato con laureles dorados
-                { prop_id = 1, drawable = -1, texture = 0 }
+                { prop_id = 0, drawable = -1, texture = 0 },
+                { prop_id = 1, drawable = 5,  texture = 0 } -- Gafas de sol tácticas
             }
         },
         ['Female'] = {
             components = {
-                { component_id = 1,  drawable = 0,   texture = 0 },
-                { component_id = 3,  drawable = 31,  texture = 0 },
-                { component_id = 4,  drawable = 133, texture = 0 },
-                { component_id = 6,  drawable = 52,  texture = 0 },
-                { component_id = 7,  drawable = 96,  texture = 0 },
-                { component_id = 8,  drawable = 35,  texture = 0 },
-                { component_id = 9,  drawable = 34,  texture = 2 },
-                { component_id = 10, drawable = 5,   texture = 0 },
-                { component_id = 11, drawable = 327, texture = 2 }
+                { component_id = 1,  drawable = 0,  texture = 0 },
+                { component_id = 3,  drawable = 14, texture = 0 },
+                { component_id = 4,  drawable = 37, texture = 0 },
+                { component_id = 6,  drawable = 13, texture = 0 },
+                { component_id = 7,  drawable = 95, texture = 0 },
+                { component_id = 8,  drawable = 35, texture = 0 },
+                { component_id = 9,  drawable = 0,  texture = 0 },
+                { component_id = 10, drawable = 0,  texture = 0 },
+                { component_id = 11, drawable = 6,  texture = 0 }
             },
             props = {
-                { prop_id = 0, drawable = 57, texture = 2 },
-                { prop_id = 1, drawable = -1, texture = 0 }
+                { prop_id = 0, drawable = -1, texture = 0 },
+                { prop_id = 1, drawable = 5,  texture = 0 }
             }
         }
     },
 
-    [6] = { -- Jefe de Policía (Comisario Principal / Chief of Police)
-        label = 'Uniforme de Gala y Máxima Autoridad - Jefe de Policía (LSPD)',
+    [5] = { -- Comisario (Máxima Autoridad / Chief of Police)
+        label = 'Uniforme de Gala y Máxima Autoridad - Comisario (LSPD)',
         ['Male'] = {
             components = {
                 { component_id = 1,  drawable = 0,   texture = 0 },
                 { component_id = 3,  drawable = 20,  texture = 0 },
                 { component_id = 4,  drawable = 24,  texture = 0 }, -- Pantalón de gala negro/azul
                 { component_id = 6,  drawable = 51,  texture = 0 }, -- Zapatos de gala charol
-                { component_id = 7,  drawable = 126, texture = 0 }, -- Placa de oro de Jefe de Policía
+                { component_id = 7,  drawable = 126, texture = 0 }, -- Placa de oro de Comisario
                 { component_id = 8,  drawable = 58,  texture = 0 },
-                { component_id = 9,  drawable = 12,  texture = 2 }, -- Chaleco táctico Jefe
-                { component_id = 10, drawable = 6,   texture = 0 }, -- 4 estrellas doradas de Comisario Principal
+                { component_id = 9,  drawable = 12,  texture = 2 }, -- Chaleco táctico ejecutivo
+                { component_id = 10, drawable = 6,   texture = 0 }, -- 4 estrellas doradas de Comisario
                 { component_id = 11, drawable = 317, texture = 2 }  -- Uniforme Class A de máxima graduación
             },
             props = {
-                { prop_id = 0, drawable = 58, texture = 2 }, -- Gorra ejecutiva con escudo dorado de Jefe
+                { prop_id = 0, drawable = 58, texture = 2 }, -- Gorra ejecutiva con escudo dorado
                 { prop_id = 1, drawable = -1, texture = 0 }
             }
         },

@@ -1,83 +1,83 @@
 [
     {
+        "scale": 0.8,
         "z": 31.0,
         "y": -1300.0,
         "x": -205.0,
         "name": "Benny's Motorworks",
-        "scale": 0.8,
-        "color": 4,
-        "sprite": 446
+        "sprite": 446,
+        "color": 4
     },
     {
+        "scale": 0.8,
         "z": 29.2,
         "y": -866.3,
         "x": 362.6,
         "name": "Legion Square Bus Lanes",
-        "scale": 0.8,
-        "color": 3,
-        "sprite": 513
+        "sprite": 513,
+        "color": 3
     },
     {
+        "scale": 0.8,
         "z": 26.0,
         "y": -1200.0,
         "x": 750.0,
         "name": "La Mesa Gym (LMSC)",
-        "scale": 0.8,
-        "color": 7,
-        "sprite": 311
+        "sprite": 311,
+        "color": 7
     },
     {
+        "scale": 0.8,
         "z": 20.0,
         "y": 1075.0,
         "x": -3170.0,
         "name": "Hookies Restaurant",
-        "scale": 0.8,
-        "color": 5,
-        "sprite": 274
+        "sprite": 274,
+        "color": 5
     },
     {
+        "scale": 0.8,
         "z": 41.29,
         "y": -1504.83,
         "x": 1152.37,
         "name": "Thunder Medical Center",
-        "scale": 0.8,
-        "color": 1,
-        "sprite": 153
+        "sprite": 153,
+        "color": 1
     },
     {
+        "scale": 0.8,
         "z": 64.5296630859375,
         "y": -307.4769287109375,
         "x": 1086.3692626953126,
         "name": "marihuana",
-        "scale": 0.8,
-        "color": 3,
-        "sprite": 1
+        "sprite": 1,
+        "color": 3
     },
     {
+        "scale": 0.8,
         "z": 32.43,
         "y": 6331.45,
         "x": -247.05,
         "name": "Paleto Bay Clinic",
-        "scale": 0.8,
-        "color": 1,
-        "sprite": 153
+        "sprite": 153,
+        "color": 1
     },
     {
+        "scale": 0.8,
         "z": 30.72,
         "y": 6013.16,
         "x": -445.25,
         "name": "Paleto Bay Sheriff Station",
-        "scale": 0.8,
-        "color": 29,
-        "sprite": 60
+        "sprite": 60,
+        "color": 29
     },
     {
+        "scale": 0.8,
         "z": 30.37,
         "y": 6467.96,
         "x": -30.93,
         "name": "Lost MC Clubhouse",
-        "scale": 0.8,
-        "color": 0,
-        "sprite": 226
+        "sprite": 226,
+        "color": 0
     }
 ]

@@ -34,7 +34,9 @@ function lib.notify(data)
     local sound = settings.notification_audio and data.sound
     local payload = table.clone(data)
     payload.sound = nil
-    payload.position = payload.position or settings.notification_position
+    if not payload.position or payload.position == 'top-right' then
+        payload.position = settings.notification_position or 'center-right'
+    end
 
     SendNUIMessage({
         action = 'notify',

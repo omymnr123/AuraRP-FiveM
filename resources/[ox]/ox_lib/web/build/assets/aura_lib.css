@@ -23,6 +23,7 @@
 
 body, html, #root {
   background: transparent !important;
+  background-color: transparent !important;
   margin: 0 !important;
   padding: 0 !important;
   overflow: hidden !important;
@@ -145,123 +146,734 @@ div[class*="sp1-container"] {
 }
 
 /* ==========================================================================
-   3. NOTIFICATIONS - USER REFERENCE REPLICA (OBSIDIAN + GLOWING ACCENT EDGES)
+   3. NOTIFICATIONS - SIGNATURE AURARP (OBSIDIAN + TURQUOISE & PINK GRADIENT)
+   Posición: Parte Superior Derecha (Top-Right)
+   Disposición: Stacking fluido hacia abajo con espaciado limpio
+   Estilo: Réplica idéntica al sistema de alertas de AuraRP (Imagen 2)
    ========================================================================== */
 
+#_rht_toaster {
+  position: fixed !important;
+  top: 24px !important;
+  right: 28px !important;
+  bottom: auto !important;
+  left: auto !important;
+  transform: none !important;
+  width: 390px !important;
+  height: auto !important;
+  max-height: 90vh !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-end !important;
+  justify-content: flex-start !important;
+  gap: 12px !important;
+  pointer-events: none !important;
+  z-index: 9999999 !important;
+  background: transparent !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow: visible !important;
+}
+
+#_rht_toaster > div {
+  position: relative !important;
+  top: auto !important;
+  bottom: auto !important;
+  left: auto !important;
+  right: auto !important;
+  transform: none !important;
+  display: flex !important;
+  justify-content: flex-end !important;
+  width: 100% !important;
+  background: transparent !important;
+  pointer-events: none !important;
+  margin: 0 !important;
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
 /* Main Notification Card inside the Toaster */
-#_rht_toaster .mantine-Paper-root,
-#_rht_toaster div[class*="eo1-container"] {
-  background: var(--aura-bg-card) !important;
-  background-color: var(--aura-bg-card) !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
-  border-left: 3.5px solid var(--aura-cyan) !important;
-  border-bottom: 2.5px solid var(--aura-cyan) !important;
-  border-radius: 12px !important;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), -2px 2px 14px var(--aura-cyan-glow) !important;
-  padding: 12px 16px !important;
-  margin: 6px 10px !important;
-  width: 320px !important;
-  max-width: 340px !important;
+.aura-toast-card,
+#_rht_toaster > div > div,
+#_rht_toaster .mantine-Box-root,
+#_rht_toaster div[class*="mantine-Box"] {
+  background: #090e1c !important;
+  background-color: #090e1c !important;
+  border-radius: 14px !important;
+  border: 1px solid rgba(64, 224, 208, 0.45) !important;
+  box-shadow: 
+    0 16px 40px rgba(0, 0, 0, 0.9), 
+    0 0 22px rgba(64, 224, 208, 0.25), 
+    inset 0 1px 1px rgba(255, 255, 255, 0.12) !important;
+  padding: 14px 16px !important;
+  margin: 0 !important;
+  width: 390px !important;
+  max-width: 390px !important;
+  min-height: 64px !important;
+  height: auto !important;
   position: relative !important;
   overflow: hidden !important;
   pointer-events: auto !important;
+  animation: auraNotifySlideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+  transform-origin: right center !important;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: flex-start !important;
+  box-sizing: border-box !important;
+  gap: 14px !important;
 }
 
-/* Status Variations for Notifications */
-#_rht_toaster .mantine-Paper-root:has([color*="red"]),
-#_rht_toaster .mantine-Paper-root:has([class*="circle-xmark"]),
-#_rht_toaster .mantine-Paper-root:has(.toast-error) {
-  border-left-color: var(--aura-crimson) !important;
-  border-bottom-color: var(--aura-crimson) !important;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), -2px 2px 14px rgba(255, 51, 102, 0.45) !important;
+/* Top AuraRP Gradient Glow Strip (Turquoise to Pink - Image 2) */
+.aura-toast-card::before,
+#_rht_toaster > div > div::before,
+#_rht_toaster .mantine-Box-root::before,
+#_rht_toaster div[class*="mantine-Box"]::before {
+  content: "" !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  height: 3px !important;
+  background: linear-gradient(90deg, #40E0D0 0%, #FF007F 100%) !important;
+  box-shadow: 0 0 12px rgba(64, 224, 208, 0.8), 0 0 18px rgba(255, 0, 127, 0.6) !important;
+  border-top-left-radius: 14px !important;
+  border-top-right-radius: 14px !important;
+  z-index: 10 !important;
 }
 
-#_rht_toaster .mantine-Paper-root:has([color*="teal"]),
-#_rht_toaster .mantine-Paper-root:has([color*="green"]),
-#_rht_toaster .mantine-Paper-root:has([class*="circle-check"]),
-#_rht_toaster .mantine-Paper-root:has(.toast-success) {
-  border-left-color: var(--aura-emerald) !important;
-  border-bottom-color: var(--aura-emerald) !important;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), -2px 2px 14px rgba(0, 255, 170, 0.45) !important;
+/* Group & Stack Container Resets */
+#_rht_toaster .mantine-Group-root,
+#_rht_toaster div[class*="mantine-Group"] {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: flex-start !important;
+  gap: 14px !important;
+  width: 100% !important;
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  box-shadow: none !important;
+  flex-wrap: nowrap !important;
 }
 
-#_rht_toaster .mantine-Paper-root:has([color*="yellow"]),
-#_rht_toaster .mantine-Paper-root:has([class*="circle-exclamation"]) {
-  border-left-color: var(--aura-amber) !important;
-  border-bottom-color: var(--aura-amber) !important;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), -2px 2px 14px rgba(245, 158, 11, 0.45) !important;
+#_rht_toaster .mantine-Stack-root,
+#_rht_toaster div[class*="mantine-Stack"] {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  flex: 1 1 auto !important;
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  box-shadow: none !important;
+  gap: 2px !important;
+  min-width: 0 !important;
 }
 
-/* Circular Icon Badge on the Left of Notification */
-#_rht_toaster .mantine-ThemeIcon-root {
-  width: 32px !important;
-  height: 32px !important;
-  min-width: 32px !important;
-  min-height: 32px !important;
-  border-radius: 50% !important;
-  background: rgba(0, 242, 254, 0.15) !important;
-  border: 1.5px solid rgba(0, 242, 254, 0.6) !important;
+/* Square Icon Badge — styled via JS-injected class on the correct top-level container */
+.aura-toast-icon-badge {
+  width: 44px !important;
+  height: 44px !important;
+  min-width: 44px !important;
+  min-height: 44px !important;
+  border-radius: 11px !important;
+  background: rgba(64, 224, 208, 0.15) !important;
+  background-color: rgba(64, 224, 208, 0.15) !important;
+  border: 1px solid rgba(64, 224, 208, 0.45) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow: 0 0 14px rgba(64, 224, 208, 0.35), inset 0 0 8px rgba(64, 224, 208, 0.1) !important;
+  flex-shrink: 0 !important;
+  position: relative !important;
+  overflow: hidden !important;
+  margin: 2px 0 0 0 !important;
+  padding: 0 !important;
+}
+
+/* Reset: all RingProgress and ThemeIcon elements inside toaster = no visual background by default */
+#_rht_toaster .mantine-RingProgress-root,
+#_rht_toaster div[class*="mantine-RingProgress"],
+#_rht_toaster .mantine-ThemeIcon-root,
+#_rht_toaster div[class*="mantine-ThemeIcon"] {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
 }
 
-#_rht_toaster .mantine-ThemeIcon-root svg {
-  color: var(--aura-cyan) !important;
+/* Standalone ThemeIcon (no RingProgress parent): gets badge dimensions when marked */
+#_rht_toaster .mantine-ThemeIcon-root.aura-toast-icon-badge {
+  background: rgba(64, 224, 208, 0.15) !important;
+  background-color: rgba(64, 224, 208, 0.15) !important;
+  border: 1px solid rgba(64, 224, 208, 0.45) !important;
+  box-shadow: 0 0 14px rgba(64, 224, 208, 0.35), inset 0 0 8px rgba(64, 224, 208, 0.1) !important;
+}
+
+/* RingProgress container when marked as badge */
+#_rht_toaster .mantine-RingProgress-root.aura-toast-icon-badge,
+#_rht_toaster div[class*="mantine-RingProgress"].aura-toast-icon-badge {
+  background: rgba(64, 224, 208, 0.15) !important;
+  background-color: rgba(64, 224, 208, 0.15) !important;
+  border: 1px solid rgba(64, 224, 208, 0.45) !important;
+  box-shadow: 0 0 14px rgba(64, 224, 208, 0.35), inset 0 0 8px rgba(64, 224, 208, 0.1) !important;
+}
+
+/* RingProgress SVG is hidden via the consolidated rule below */
+
+#_rht_toaster .mantine-RingProgress-label,
+#_rht_toaster .mantine-Center-root {
+  position: relative !important;
+  width: 100% !important;
+  height: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* When ThemeIcon is NESTED inside RingProgress, make it fully transparent container.
+   This is CRITICAL to prevent the circular Mantine "light" variant background from showing
+   inside our square badge, which causes the "duplicate icon" visual bug. */
+#_rht_toaster .mantine-RingProgress-root .mantine-ThemeIcon-root,
+#_rht_toaster .aura-toast-icon-badge .mantine-ThemeIcon-root,
+#_rht_toaster [class*="mantine-RingProgress"] [class*="mantine-ThemeIcon"] {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  border-radius: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: visible !important;
+}
+
+/* Glowing Icon itself — ONLY target FontAwesome rendered icons */
+#_rht_toaster svg.svg-inline--fa {
+  color: #40E0D0 !important;
   fill: currentColor !important;
-  font-size: 15px !important;
+  font-size: 20px !important;
+  width: 20px !important;
+  height: 20px !important;
+  filter: drop-shadow(0 0 8px #40E0D0) !important;
+  display: inline-block !important;
+  flex-shrink: 0 !important;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
-/* Success / Error / Warning Icon Badges */
-#_rht_toaster .mantine-Paper-root:has([class*="circle-check"]) .mantine-ThemeIcon-root {
-  background: rgba(0, 255, 170, 0.15) !important;
-  border-color: rgba(0, 255, 170, 0.7) !important;
-}
-#_rht_toaster .mantine-Paper-root:has([class*="circle-check"]) .mantine-ThemeIcon-root svg {
-  color: var(--aura-emerald) !important;
+/* Ensure RingProgress SVG (circular timer) is properly hidden but doesn't break layout */
+#_rht_toaster svg.mantine-RingProgress-svg,
+#_rht_toaster [class*="mantine-RingProgress"] > svg {
+  display: none !important;
 }
 
-#_rht_toaster .mantine-Paper-root:has([class*="circle-xmark"]) .mantine-ThemeIcon-root {
-  background: rgba(255, 51, 102, 0.15) !important;
-  border-color: rgba(255, 51, 102, 0.7) !important;
-}
-#_rht_toaster .mantine-Paper-root:has([class*="circle-xmark"]) .mantine-ThemeIcon-root svg {
-  color: var(--aura-crimson) !important;
+/* ==========================================================================
+   META HEADER ROW (TAG & TIME)
+   ========================================================================== */
+
+.aura-toast-meta {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+  margin-bottom: 3px !important;
 }
 
-#_rht_toaster .mantine-Paper-root:has([class*="circle-exclamation"]) .mantine-ThemeIcon-root {
-  background: rgba(245, 158, 11, 0.15) !important;
-  border-color: rgba(245, 158, 11, 0.7) !important;
-}
-#_rht_toaster .mantine-Paper-root:has([class*="circle-exclamation"]) .mantine-ThemeIcon-root svg {
-  color: var(--aura-amber) !important;
-}
-
-/* Notification Title */
-#_rht_toaster div[class*="mantine-Text-root"],
-#_rht_toaster [class*="title"] {
-  font-family: var(--aura-font-title) !important;
-  font-size: 15px !important;
+.aura-toast-tag {
+  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-size: 9.5px !important;
   font-weight: 800 !important;
-  letter-spacing: 0.3px !important;
+  letter-spacing: 1px !important;
+  color: #40E0D0 !important;
+  text-transform: uppercase !important;
+}
+
+.aura-toast-time {
+  font-family: 'JetBrains Mono', monospace, sans-serif !important;
+  font-size: 9.5px !important;
+  color: #64748b !important;
+  font-weight: 700 !important;
+}
+
+/* ==========================================================================
+   TYPOGRAPHY (TITLE & DESCRIPTION) - 1:1 REPLICA OF IMAGE 2
+   ========================================================================== */
+
+/* Notification Title (Pure Bold White Outfit font with AuraRP Drop Shadow) */
+#_rht_toaster .mantine-Stack-root > div:first-child:not(.description):not(.aura-toast-meta),
+#_rht_toaster .mantine-Stack-root > .mantine-Text-root:not(.description),
+#_rht_toaster div[class*="mantine-Text-root"]:not(.description),
+.aura-toast-title {
+  font-family: var(--aura-font-title) !important;
+  font-size: 14.5px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.4px !important;
   color: #ffffff !important;
-  text-transform: capitalize !important;
-  margin-bottom: 2px !important;
+  -webkit-text-fill-color: #ffffff !important;
+  background: none !important;
+  text-shadow: 0 0 10px rgba(64, 224, 208, 0.3) !important;
+  text-transform: uppercase !important;
+  margin: 0 0 3px 0 !important;
+  line-height: 1.25 !important;
+  display: block !important;
 }
 
 /* Notification Description Text */
 #_rht_toaster .description,
+#_rht_toaster .description p,
 #_rht_toaster p {
   font-family: var(--aura-font-body) !important;
   font-size: 12px !important;
   font-weight: 500 !important;
   color: #cbd5e1 !important;
-  line-height: 1.35 !important;
+  line-height: 1.45 !important;
+  margin: 0 !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8) !important;
+}
+
+#_rht_toaster .description strong,
+#_rht_toaster .description b {
+  color: #40E0D0 !important;
+  font-weight: 700 !important;
+  text-shadow: 0 0 6px rgba(64, 224, 208, 0.5) !important;
+}
+
+/* ==========================================================================
+   STATUS COLOR VARIATIONS (SUCCESS, ERROR, WARNING, INFO)
+   ========================================================================== */
+
+/* SUCCESS (Verde Esmeralda Neón) */
+.aura-toast-success,
+#_rht_toaster .aura-toast-success {
+  border-color: rgba(0, 255, 157, 0.45) !important;
+  box-shadow: 
+    0 16px 40px rgba(0, 0, 0, 0.9), 
+    0 0 22px rgba(0, 255, 157, 0.25),
+    inset 0 1px 1px rgba(255, 255, 255, 0.12) !important;
+}
+
+.aura-toast-success .aura-toast-tag {
+  color: #00ff9d !important;
+}
+
+.aura-toast-success .aura-toast-icon-badge {
+  background: rgba(0, 255, 157, 0.15) !important;
+  background-color: rgba(0, 255, 157, 0.15) !important;
+  border-color: rgba(0, 255, 157, 0.45) !important;
+  box-shadow: 0 0 14px rgba(0, 255, 157, 0.35) !important;
+}
+
+.aura-toast-success svg.svg-inline--fa {
+  color: #00ff9d !important;
+  fill: #00ff9d !important;
+  filter: drop-shadow(0 0 8px #00ff9d) !important;
+}
+
+/* ERROR (Rojo Neón Carmesí) */
+.aura-toast-error,
+#_rht_toaster .aura-toast-error {
+  border-color: rgba(255, 0, 85, 0.45) !important;
+  box-shadow: 
+    0 16px 40px rgba(0, 0, 0, 0.9), 
+    0 0 22px rgba(255, 0, 85, 0.25),
+    inset 0 1px 1px rgba(255, 255, 255, 0.12) !important;
+}
+
+.aura-toast-error .aura-toast-tag {
+  color: #ff2255 !important;
+}
+
+.aura-toast-error .aura-toast-icon-badge {
+  background: rgba(255, 0, 85, 0.18) !important;
+  background-color: rgba(255, 0, 85, 0.18) !important;
+  border-color: rgba(255, 0, 85, 0.55) !important;
+  box-shadow: 0 0 14px rgba(255, 0, 85, 0.35) !important;
+}
+
+.aura-toast-error svg.svg-inline--fa {
+  color: #ff2255 !important;
+  fill: #ff2255 !important;
+  filter: drop-shadow(0 0 8px #ff2255) !important;
+}
+
+/* WARNING (Ámbar / Naranja Neón) */
+.aura-toast-warning,
+#_rht_toaster .aura-toast-warning {
+  border-color: rgba(255, 165, 2, 0.45) !important;
+  box-shadow: 
+    0 16px 40px rgba(0, 0, 0, 0.9), 
+    0 0 22px rgba(255, 165, 2, 0.25),
+    inset 0 1px 1px rgba(255, 255, 255, 0.12) !important;
+}
+
+.aura-toast-warning .aura-toast-tag {
+  color: #ffa502 !important;
+}
+
+.aura-toast-warning .aura-toast-icon-badge {
+  background: rgba(255, 165, 2, 0.18) !important;
+  background-color: rgba(255, 165, 2, 0.18) !important;
+  border-color: rgba(255, 165, 2, 0.55) !important;
+  box-shadow: 0 0 14px rgba(255, 165, 2, 0.35) !important;
+}
+
+.aura-toast-warning svg.svg-inline--fa {
+  color: #ffa502 !important;
+  fill: #ffa502 !important;
+  filter: drop-shadow(0 0 8px #ffa502) !important;
+}
+
+/* INFO (Turquesa Neón AuraRP) */
+.aura-toast-info,
+#_rht_toaster .aura-toast-info {
+  border-color: rgba(64, 224, 208, 0.45) !important;
+  box-shadow: 
+    0 16px 40px rgba(0, 0, 0, 0.9), 
+    0 0 22px rgba(64, 224, 208, 0.25),
+    inset 0 1px 1px rgba(255, 255, 255, 0.12) !important;
+}
+
+.aura-toast-info .aura-toast-tag {
+  color: #40E0D0 !important;
+}
+
+.aura-toast-info .aura-toast-icon-badge {
+  background: rgba(64, 224, 208, 0.15) !important;
+  background-color: rgba(64, 224, 208, 0.15) !important;
+  border-color: rgba(64, 224, 208, 0.45) !important;
+  box-shadow: 0 0 14px rgba(64, 224, 208, 0.35) !important;
+}
+
+.aura-toast-info svg.svg-inline--fa {
+  color: #40E0D0 !important;
+  fill: #40E0D0 !important;
+  filter: drop-shadow(0 0 8px #40E0D0) !important;
+}
+
+@keyframes auraNotifySlideIn {
+  0% {
+    opacity: 0;
+    transform: translateX(50px) scale(0.92);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+/* ==========================================================================
+   4. MODALS & ALERT DIALOGS - SIGNATURE AURARP TURQUOISE & PINK GRADIENT
+   ========================================================================== */
+
+/* Overlay backdrop: NO backdrop-filter blur (fixes Chromium CEF Black Screen bug) */
+.mantine-Modal-overlay,
+div[class*="mantine-Modal-overlay"],
+.mantine-Overlay-root,
+div[class*="mantine-Overlay-root"] {
+  background: rgba(0, 0, 0, 0.45) !important;
+  background-color: rgba(0, 0, 0, 0.45) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  filter: none !important;
+  pointer-events: auto !important;
+}
+
+/* Modal Root & Inner Containers: Transparent wrapper so game world is visible */
+.mantine-Modal-root,
+.mantine-Modal-inner,
+div[class*="mantine-Modal-root"],
+div[class*="mantine-Modal-inner"],
+div[class*="mantine-Dialog-root"] {
+  background: transparent !important;
+  background-color: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  filter: none !important;
+  pointer-events: auto !important;
+}
+
+/* Main Modal Card (Alert Dialog & Input Dialog) */
+.mantine-Modal-modal,
+.mantine-Modal-content,
+div[class*="mantine-Modal-content"],
+div[class*="mantine-Modal-modal"],
+.mantine-Dialog-root {
+  background: linear-gradient(180deg, rgba(14, 19, 32, 0.98) 0%, rgba(8, 11, 20, 0.98) 100%) !important;
+  background-color: rgba(10, 14, 25, 0.98) !important;
+  border-radius: 16px !important;
+  border: 1.5px solid rgba(0, 242, 254, 0.35) !important;
+  border-bottom: 2.5px solid #ff007f !important;
+  position: relative !important;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.95), 0 0 35px rgba(0, 242, 254, 0.3), 0 0 50px rgba(255, 0, 127, 0.25) !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  pointer-events: auto !important;
+  max-width: 540px !important;
+  width: 100% !important;
+  animation: auraModalPop 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+@keyframes auraModalPop {
+  0% {
+    opacity: 0;
+    transform: scale(0.92) translateY(12px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Dual-Glow Gradient Top Accent Line (Turquoise to Pink) */
+.mantine-Modal-modal::before,
+.mantine-Modal-content::before,
+div[class*="mantine-Modal-content"]::before {
+  content: "" !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  height: 4px !important;
+  background: linear-gradient(90deg, #00f2fe 0%, #d946ef 50%, #ff007f 100%) !important;
+  box-shadow: 0 0 15px rgba(0, 242, 254, 0.8), 0 0 25px rgba(255, 0, 127, 0.8) !important;
+  z-index: 10 !important;
+}
+
+/* Modal Header Bar */
+.mantine-Modal-header,
+div[class*="mantine-Modal-header"] {
+  background: rgba(16, 22, 38, 0.7) !important;
+  padding: 20px 24px 16px 24px !important;
+  margin: 0 !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+}
+
+/* Modal Title (Signature AuraRP Gradient) */
+.mantine-Modal-title,
+h2[class*="mantine-Modal-title"],
+div[class*="mantine-Modal-title"] {
+  font-family: var(--aura-font-title) !important;
+  font-size: 19px !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.6px !important;
+  text-transform: uppercase !important;
+  background: linear-gradient(135deg, #00f2fe 0%, #f472b6 60%, #ff007f 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  filter: drop-shadow(0 0 12px rgba(0, 242, 254, 0.4)) !important;
+  margin: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
+
+/* Close Button (X) */
+.mantine-Modal-close,
+button[class*="mantine-Modal-close"] {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 8px !important;
+  color: #94a3b8 !important;
+  transition: all 0.2s ease !important;
+  width: 32px !important;
+  height: 32px !important;
+  min-width: 32px !important;
+  min-height: 32px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+.mantine-Modal-close:hover,
+button[class*="mantine-Modal-close"]:hover {
+  background: rgba(255, 51, 102, 0.25) !important;
+  border-color: var(--aura-crimson) !important;
+  color: #ffffff !important;
+  transform: scale(1.08) !important;
+}
+
+/* Modal Body Content */
+.mantine-Modal-body,
+div[class*="mantine-Modal-body"] {
+  padding: 22px 24px !important;
+  font-family: var(--aura-font-body) !important;
+  color: #e2e8f0 !important;
+  font-size: 13.5px !important;
+  line-height: 1.6 !important;
+  pointer-events: auto !important;
+}
+
+/* Headings in markdown content */
+.mantine-Modal-body h1,
+.mantine-Modal-body h2,
+.mantine-Modal-body h3,
+.mantine-Modal-body h4 {
+  font-family: var(--aura-font-title) !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.5px !important;
+  text-transform: uppercase !important;
+  color: var(--aura-cyan) !important;
+  text-shadow: 0 0 10px rgba(0, 242, 254, 0.4) !important;
+  margin: 14px 0 10px 0 !important;
+  font-size: 15px !important;
+}
+
+.mantine-Modal-body h1:first-child,
+.mantine-Modal-body h2:first-child,
+.mantine-Modal-body h3:first-child,
+.mantine-Modal-body h4:first-child {
+  margin-top: 0 !important;
+}
+
+/* Recipe & Checklist Item Badges */
+.mantine-Modal-body ul {
+  list-style: none !important;
+  padding: 0 !important;
+  margin: 10px 0 14px 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+}
+
+.mantine-Modal-body li {
+  background: rgba(18, 24, 40, 0.75) !important;
+  border: 1px solid rgba(0, 242, 254, 0.2) !important;
+  border-left: 4px solid var(--aura-cyan) !important;
+  border-radius: 8px !important;
+  padding: 10px 14px !important;
+  font-size: 13px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  transition: all 0.2s ease !important;
+}
+
+.mantine-Modal-body li:hover {
+  background: rgba(24, 32, 54, 0.95) !important;
+  border-color: var(--aura-cyan) !important;
+  box-shadow: 0 0 14px rgba(0, 242, 254, 0.25) !important;
+  transform: translateX(4px) !important;
+}
+
+/* Danger / Hazard Blockquote (Warning Card with Pink-Amber Neon) */
+.mantine-Modal-body blockquote {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.12) 0%, rgba(255, 0, 127, 0.12) 100%) !important;
+  border: 1px solid rgba(245, 158, 11, 0.35) !important;
+  border-left: 4.5px solid #ff007f !important;
+  border-radius: 10px !important;
+  padding: 12px 16px !important;
+  margin: 16px 0 10px 0 !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), 0 0 15px rgba(255, 0, 127, 0.2) !important;
+}
+
+.mantine-Modal-body blockquote p {
+  color: #fef08a !important;
+  font-size: 12.5px !important;
+  line-height: 1.5 !important;
   margin: 0 !important;
 }
 
-/* Notification Progress Duration Ring */
-#_rht_toaster circle {
-  stroke: var(--aura-cyan) !important;
-  filter: drop-shadow(0 0 4px var(--aura-cyan)) !important;
+.mantine-Modal-body blockquote strong {
+  color: #ffffff !important;
+  text-shadow: 0 0 8px rgba(255, 0, 127, 0.6) !important;
+}
+
+/* Modal Action Buttons Footer */
+.mantine-Modal-body div[class*="mantine-Group-root"],
+.mantine-Modal-body .mantine-Group-root {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 12px !important;
+  margin-top: 20px !important;
+  padding-top: 16px !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+/* General Buttons in Modals */
+.mantine-Modal-body .mantine-Button-root,
+.mantine-Modal-body button[class*="mantine-Button"] {
+  height: 44px !important;
+  padding: 0 22px !important;
+  border-radius: 10px !important;
+  font-family: var(--aura-font-title) !important;
+  font-size: 13.5px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.6px !important;
+  text-transform: uppercase !important;
+  cursor: pointer !important;
+  pointer-events: auto !important;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Secondary Button (Cancel / Abortar - Left) */
+.mantine-Modal-body .mantine-Button-root:first-child:not(:only-child),
+.mantine-Modal-body button[class*="mantine-Button-subtle"],
+.mantine-Modal-body button[class*="mantine-Button-default"] {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.15) !important;
+  color: #94a3b8 !important;
+}
+
+.mantine-Modal-body .mantine-Button-root:first-child:not(:only-child):hover,
+.mantine-Modal-body button[class*="mantine-Button-subtle"]:hover,
+.mantine-Modal-body button[class*="mantine-Button-default"]:hover {
+  background: rgba(255, 51, 102, 0.15) !important;
+  border-color: var(--aura-crimson) !important;
+  color: #ff3366 !important;
+  box-shadow: 0 0 15px rgba(255, 51, 102, 0.35) !important;
+  transform: translateY(-2px) !important;
+}
+
+/* Primary Button (Confirm / Comenzar Síntesis - Right) */
+.mantine-Modal-body .mantine-Button-root:last-child,
+.mantine-Modal-body button[class*="mantine-Button-filled"] {
+  background: linear-gradient(135deg, #00f2fe 0%, #ec4899 50%, #ff007f 100%) !important;
+  border: none !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 20px rgba(0, 242, 254, 0.55), 0 0 32px rgba(255, 0, 127, 0.45) !important;
+}
+
+.mantine-Modal-body .mantine-Button-root:last-child:hover,
+.mantine-Modal-body button[class*="mantine-Button-filled"]:hover {
+  background: linear-gradient(135deg, #38bdf8 0%, #f472b6 50%, #ff1493 100%) !important;
+  box-shadow: 0 0 30px rgba(0, 242, 254, 0.75), 0 0 48px rgba(255, 0, 127, 0.65) !important;
+  transform: translateY(-2px) scale(1.03) !important;
+}
+
+/* Inputs styling for InputDialog / Prompts */
+.mantine-Input-input,
+input[class*="mantine-Input-input"] {
+  background: rgba(14, 19, 32, 0.9) !important;
+  border: 1.5px solid rgba(0, 242, 254, 0.3) !important;
+  border-radius: 8px !important;
+  color: #ffffff !important;
+  font-family: var(--aura-font-body) !important;
+  transition: all 0.2s ease !important;
+}
+.mantine-Input-input:focus,
+input[class*="mantine-Input-input"]:focus {
+  border-color: var(--aura-cyan) !important;
+  box-shadow: 0 0 12px rgba(0, 242, 254, 0.4) !important;
 }

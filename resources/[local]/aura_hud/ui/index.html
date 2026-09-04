@@ -74,11 +74,46 @@
         </div>
     </div>
 
+    <!-- Preview Movible del Cinturón de Items (F1) para el Modo Edición -->
+    <div id="hotbar-preview" class="hidden">
+        <div class="hotbar-preview-header">
+            <i class="fa-solid fa-arrows-up-down-left-right"></i>
+            <span>CINTURÓN DE ITEMS [F1]</span>
+        </div>
+        <div class="hotbar-preview-slots">
+            <div class="hotbar-preview-slot">
+                <span class="hotbar-slot-key">1</span>
+                <i class="fa-solid fa-gun"></i>
+            </div>
+            <div class="hotbar-preview-slot">
+                <span class="hotbar-slot-key">2</span>
+                <i class="fa-solid fa-bottle-water"></i>
+            </div>
+            <div class="hotbar-preview-slot">
+                <span class="hotbar-slot-key">3</span>
+                <i class="fa-solid fa-burger"></i>
+            </div>
+            <div class="hotbar-preview-slot">
+                <span class="hotbar-slot-key">4</span>
+                <i class="fa-solid fa-kit-medical"></i>
+            </div>
+            <div class="hotbar-preview-slot">
+                <span class="hotbar-slot-key">5</span>
+                <i class="fa-solid fa-mobile-screen"></i>
+            </div>
+        </div>
+    </div>
+
     <!-- Edit Mode Overlay -->
     <div id="edit-overlay" class="hidden">
-        <div class="edit-text">Modo Edición Activado</div>
-        <div class="edit-subtext">Arrastra el HUD a la posición deseada</div>
-        <button id="save-btn"><i class="fa-solid fa-floppy-disk"></i> Guardar Posición</button>
+        <div class="edit-badge"><i class="fa-solid fa-sliders"></i> PERSONALIZACIÓN DE INTERFAZ</div>
+        <div class="edit-text">MODO EDICIÓN AURARP</div>
+        <div class="edit-subtext">Arrastra los <strong>Anillos de Estado</strong> o el <strong>Cinturón de Items (F1)</strong> a la posición deseada en pantalla.</div>
+        <div class="edit-btn-group">
+            <button id="save-btn"><i class="fa-solid fa-floppy-disk"></i> Guardar Posiciones</button>
+            <button id="reset-btn"><i class="fa-solid fa-rotate-left"></i> Restablecer por Defecto</button>
+            <button id="cancel-btn"><i class="fa-solid fa-xmark"></i> Cancelar</button>
+        </div>
     </div>
 
     <!-- Minimap Border -->

@@ -3,7 +3,7 @@
 -- Conecta aura_multichar con illenium-appearance en modo standalone
 
 -- Evento: Nuevo personaje → inicializar con ropa base y abrir creador de apariencia en el mismo escenario
-AddEventHandler('aura_appearance:startCustomization', function(gender)
+AddEventHandler('aura_appearance:startCustomization', function(gender, charData)
     local genderNum = tonumber(gender) or 0
     local genderStr = (genderNum == 1) and "Female" or "Male"
 
@@ -34,6 +34,12 @@ AddEventHandler('aura_appearance:startCustomization', function(gender)
         DoScreenFadeIn(1200)
 
         -- Notificar que el jugador terminó la creación y está listo en el mundo
+        if charData then
+            charData.metadata = charData.metadata or {}
+            charData.metadata.appearance = appearance
+            TriggerEvent('aura_multichar:client:characterLoaded', charData)
+        end
+        TriggerEvent('aura_core:client:playerSpawned')
         TriggerEvent('aura_core:playerSpawnedAndReady')
     end, function()
         -- Si cancela / vuelve atrás, regresar a la pantalla de registro de identidad

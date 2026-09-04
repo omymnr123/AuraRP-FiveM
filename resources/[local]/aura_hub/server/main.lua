@@ -25,9 +25,11 @@ lib.callback.register('aura_hub:server:getHubData', function(source)
     local jobData = exports.aura_jobs:GetJob(src)
     local accounts = exports.aura_economy:GetAccounts(src) or { cash = 0, bank = 0, savings = 0 }
 
-    local isBusiness = jobData and jobData.isBusiness == true
-    local isBoss = jobData and jobData.isBoss == true
     local jobName = jobData and jobData.name or 'unemployed'
+    local jobConfig = exports.aura_jobs and exports.aura_jobs:GetJobConfig(jobName)
+    local isBusiness = (jobData and jobData.isBusiness == true) or (jobConfig and jobConfig.isBusiness == true)
+    local isBoss = (jobData and jobData.isBoss == true) or false
+    local isGang = (jobData and jobData.isGang == true) or (jobConfig and jobConfig.isGang == true) or (jobName == 'cartel' or jobName == 'salieri' or jobName == 'vazou' or jobName == 'ballas' or jobName == 'families' or jobName == 'vagos')
 
     local businessOpen = false
     local societyData = nil
@@ -95,6 +97,7 @@ lib.callback.register('aura_hub:server:getHubData', function(source)
         accounts = accounts,
         businessOpen = businessOpen,
         isBoss = isBoss,
+        isGang = isGang,
         society = societyData,
         onlinePlayers = onlineCount,
         maxPlayers = maxPlayers,
@@ -744,11 +747,10 @@ end)
 --- Obtener la plantilla completa de oficiales de policía
 lib.callback.register('aura_hub:server:policeGetStaff', function(source)
     local src = source
-    if not IsPoliceOnDuty(src) then return false, "UNAUTHORIZED" end
-
+    if not IsPoliceOnDuty(src) then return false end
     local pState = Player(src).state
     local callerGrade = pState.job_grade or 0
-    local isHighCommand = callerGrade >= 4 -- Teniente (4), Capitán (5), Jefe de Policía (6)
+    local isHighCommand = callerGrade >= 3 -- Teniente (3), Detective (4), Comisario (5)
 
     local rows = MySQL.query.await([[
         SELECT id, citizenid, firstname, lastname, job_grade, job_duty, phone_number, badge
@@ -802,8 +804,8 @@ lib.callback.register('aura_hub:server:policeHireOfficer', function(source, targ
 
     local pState = Player(src).state
     local callerGrade = pState.job_grade or 0
-    if callerGrade < 4 then
-        return false, "Se requiere rango de Alto Mando (Teniente o superior) para contratar oficiales."
+    if callerGrade < 3 then
+        return false, "Se requiere rango de Mando (Teniente o superior) para contratar oficiales."
     end
 
     targetSrc = tonumber(targetSrc)
@@ -813,7 +815,10 @@ lib.callback.register('aura_hub:server:policeHireOfficer', function(source, targ
 
     local copPed = GetPlayerPed(src)
     local targetPed = GetPlayerPed(targetSrc)
-    if #(GetEntityCoords(copPed) - GetEntityCoords(targetPed)) > 15.0 then
+    local copCoords = GetEntityCoords(copPed)
+    local targetCoords = GetEntityCoords(targetPed)
+
+    if #(copCoords - targetCoords) > 10.0 then
         return false, "El ciudadano debe estar cerca de ti para formalizar la contratación."
     end
 
@@ -843,17 +848,17 @@ lib.callback.register('aura_hub:server:policeSetOfficerGrade', function(source, 
 
     local pState = Player(src).state
     local callerGrade = pState.job_grade or 0
-    if callerGrade < 4 then
-        return false, "Se requiere rango de Alto Mando para modificar rangos."
+    if callerGrade < 3 then
+        return false, "Se requiere rango de Mando (Teniente o superior) para modificar rangos."
     end
 
     local targetCharId = tonumber(data.targetCharId)
     local newGrade = tonumber(data.newGrade)
-    if not targetCharId or newGrade == nil or newGrade < 0 or newGrade > 6 then
-        return false, "Rango o ID de oficial inválido (0 a 6)."
+    if not targetCharId or newGrade == nil or newGrade < 0 or newGrade > 5 then
+        return false, "Rango o ID de oficial inválido (0 a 5)."
     end
 
-    if callerGrade < 6 and newGrade >= callerGrade then
+    if callerGrade < 5 and newGrade >= callerGrade then
         return false, "No puedes ascender a un oficial a un rango igual o superior al tuyo."
     end
 
@@ -894,8 +899,8 @@ lib.callback.register('aura_hub:server:policeFireOfficer', function(source, targ
 
     local pState = Player(src).state
     local callerGrade = pState.job_grade or 0
-    if callerGrade < 4 then
-        return false, "Se requiere rango de Alto Mando para expulsar agentes del cuerpo."
+    if callerGrade < 3 then
+        return false, "Se requiere rango de Mando (Teniente o superior) para expulsar agentes del cuerpo."
     end
 
     targetCharId = tonumber(targetCharId)
@@ -904,7 +909,7 @@ lib.callback.register('aura_hub:server:policeFireOfficer', function(source, targ
     local row = MySQL.single.await('SELECT firstname, lastname, job_grade FROM characters WHERE id = ?', { targetCharId })
     if not row then return false, "Oficial no encontrado en la base de datos." end
 
-    if row.job_grade >= callerGrade and callerGrade < 6 then
+    if row.job_grade >= callerGrade and callerGrade < 5 then
         return false, "No tienes autoridad para expulsar a un oficial de igual o superior graduación."
     end
 

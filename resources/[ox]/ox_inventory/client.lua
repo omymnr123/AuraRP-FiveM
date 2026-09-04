@@ -1932,3 +1932,21 @@ lib.callback.register('ox_inventory:getVehicleData', function(netid)
 		return GetEntityModel(entity), GetVehicleClass(entity)
 	end
 end)
+
+-- Posicionamiento dinámico del cinturón de items (Hotbar F1)
+RegisterNetEvent('ox_inventory:client:setHotbarPosition', function(x, y)
+	SendNUIMessage({
+		action = 'setHotbarPosition',
+		x = x,
+		y = y
+	})
+end)
+
+exports('setHotbarPosition', function(x, y)
+	SendNUIMessage({
+		action = 'setHotbarPosition',
+		x = x,
+		y = y
+	})
+end)
+

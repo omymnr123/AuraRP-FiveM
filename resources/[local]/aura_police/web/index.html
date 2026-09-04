@@ -13,6 +13,60 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- HUD DE DESPACHO TÁCTICO POLICIAL (SMART DISPATCH AURA RP) -->
+    <div id="dispatchContainer" class="dispatch-hud-container"></div>
+
+    <!-- =====================================================================
+         CENTRAL DE AVISOS POLICIALES 911 (TACTICAL DISPATCH BOARD)
+    ====================================================================== -->
+    <div id="dispatchBoardApp" class="dispatch-board-wrapper hidden">
+        <div class="dispatch-board-backdrop" id="dispatchBoardBackdrop"></div>
+        <div class="dispatch-board-container">
+            <div class="neon-glow-strip"></div>
+            
+            <header class="dispatch-board-header">
+                <div class="header-left">
+                    <div class="dispatch-board-icon">
+                        <i class="fa-solid fa-tower-broadcast"></i>
+                    </div>
+                    <div>
+                        <div class="header-badge-tag">
+                            <span class="pulse-dot"></span>
+                            <span>SISTEMA DE ASIGNACIÓN TÁCTICA 911</span>
+                        </div>
+                        <h2 class="dispatch-board-title">CENTRAL DE AVISOS EN VIVO</h2>
+                        <p class="dispatch-board-subtitle">Supervisión de incidentes activos y gestión de patrullas asignadas</p>
+                    </div>
+                </div>
+
+                <div class="header-right">
+                    <button class="btn-board-refresh" id="btnRefreshBoard" title="Refrescar lista">
+                        <i class="fa-solid fa-arrows-rotate"></i>
+                        <span>Actualizar</span>
+                    </button>
+                    <button class="btn-close" id="btnCloseBoard" title="Cerrar (ESC / U)">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Lista de Avisos Activos -->
+            <main class="dispatch-board-body" id="dispatchBoardList">
+                <!-- Tarjetas inyectadas dinámicamente por app.js -->
+            </main>
+
+            <footer class="dispatch-board-footer">
+                <div class="footer-info">
+                    <i class="fa-solid fa-circle-info"></i>
+                    <span>Máximo de patrullas asignadas por tipo de código para evitar aglomeraciones en un mismo punto.</span>
+                </div>
+                <div class="footer-keys">
+                    <span><kbd>ESC</kbd> o <kbd>U</kbd> para cerrar</span>
+                </div>
+            </footer>
+        </div>
+    </div>
+
     <div id="garageApp" class="garage-wrapper hidden">
         <!-- Backdrop Blur -->
         <div class="garage-backdrop" id="garageBackdrop"></div>

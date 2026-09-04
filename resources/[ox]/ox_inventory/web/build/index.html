@@ -190,6 +190,35 @@
         }
       });
 
+      // Controlador de Posicionamiento Dinámico del Cinturón (F1)
+      function setHotbarPos(x, y) {
+        if (x !== undefined && y !== undefined) {
+          document.documentElement.style.setProperty('--hotbar-left', x + '%');
+          document.documentElement.style.setProperty('--hotbar-bottom', y + '%');
+          document.documentElement.style.setProperty('--hotbar-transform', 'none');
+          try {
+            localStorage.setItem('aura_hotbar_pos', JSON.stringify({ x: Number(x), y: Number(y) }));
+          } catch(e) {}
+        }
+      }
+
+      // Carga instantánea de la posición guardada
+      try {
+        const savedHotbar = localStorage.getItem('aura_hotbar_pos');
+        if (savedHotbar) {
+          const p = JSON.parse(savedHotbar);
+          if (p && p.x !== undefined && p.y !== undefined) {
+            setHotbarPos(p.x, p.y);
+          }
+        }
+      } catch(e) {}
+
+      window.addEventListener('message', function(e) {
+        if (e.data && e.data.action === 'setHotbarPosition') {
+          setHotbarPos(e.data.x, e.data.y);
+        }
+      });
+
       const observer = new MutationObserver(() => {
         setupUI();
       });

@@ -62,12 +62,11 @@ Config.Jobs = {
         canDuty = true,
         grades = {
             [0] = { name = 'Cadete', salary = 850 },
-            [1] = { name = 'Oficial I', salary = 1100 },
-            [2] = { name = 'Oficial II', salary = 1350 },
-            [3] = { name = 'Sargento', salary = 1700 },
-            [4] = { name = 'Teniente', salary = 2100 },
-            [5] = { name = 'Capitán', salary = 2600 },
-            [6] = { name = 'Jefe de Policía', salary = 3200, isBoss = true }
+            [1] = { name = 'Oficial', salary = 1200 },
+            [2] = { name = 'Sargento', salary = 1650 },
+            [3] = { name = 'Teniente', salary = 2100 },
+            [4] = { name = 'Detective', salary = 2600 },
+            [5] = { name = 'Comisario', salary = 3200, isBoss = true }
         }
     },
 
@@ -151,13 +150,70 @@ Config.Jobs = {
     ['salieri'] = {
         label = "Salieri Club",
         isBusiness = true,
+        isGang = true,
         canDuty = true,
         grades = {
-            [0] = { name = 'Lavaplatos', salary = 450 },
-            [1] = { name = 'Camarero', salary = 700 },
-            [2] = { name = 'Barman Coctelero', salary = 1000 },
-            [3] = { name = 'Seguridad / Encargado', salary = 1400 },
-            [4] = { name = 'Director / Dueño', salary = 2200, isBoss = true }
+            [0] = { name = 'Lavaplatos / Recluta', salary = 450 },
+            [1] = { name = 'Camarero / Soldado', salary = 700 },
+            [2] = { name = 'Barman / Caporegime', salary = 1000 },
+            [3] = { name = 'Seguridad / Subjefe', salary = 1400 },
+            [4] = { name = 'Director / Don', salary = 2200, isBoss = true }
+        }
+    },
+
+    ['cartel'] = {
+        label = "Cártel de Sinaloa",
+        isBusiness = false,
+        isGang = true,
+        canDuty = false,
+        grades = {
+            [0] = { name = 'Halcón / Recluta', salary = 200 },
+            [1] = { name = 'Sicario', salary = 450 },
+            [2] = { name = 'Comandante de Plaza', salary = 750 },
+            [3] = { name = 'Lugarteniente', salary = 1200 },
+            [4] = { name = 'Patrón del Cártel', salary = 2000, isBoss = true }
+        }
+    },
+
+    ['ballas'] = {
+        label = "East Los Santos Ballas",
+        isBusiness = false,
+        isGang = true,
+        canDuty = false,
+        grades = {
+            [0] = { name = 'Young Balla', salary = 200 },
+            [1] = { name = 'Original Balla', salary = 450 },
+            [2] = { name = 'Gangster', salary = 750 },
+            [3] = { name = 'Enforcer', salary = 1200 },
+            [4] = { name = 'Original Gangster (OG)', salary = 2000, isBoss = true }
+        }
+    },
+
+    ['families'] = {
+        label = "Chamberlain Gangster Families",
+        isBusiness = false,
+        isGang = true,
+        canDuty = false,
+        grades = {
+            [0] = { name = 'Young Family', salary = 200 },
+            [1] = { name = 'Hustler', salary = 450 },
+            [2] = { name = 'Street Soldier', salary = 750 },
+            [3] = { name = 'Top Dog', salary = 1200 },
+            [4] = { name = 'Big Boss (OG)', salary = 2000, isBoss = true }
+        }
+    },
+
+    ['vagos'] = {
+        label = "Los Santos Vagos",
+        isBusiness = false,
+        isGang = true,
+        canDuty = false,
+        grades = {
+            [0] = { name = 'Iniciado', salary = 200 },
+            [1] = { name = 'Hermano', salary = 450 },
+            [2] = { name = 'Matón de Barrio', salary = 750 },
+            [3] = { name = 'Veterano', salary = 1200 },
+            [4] = { name = 'El Jefe', salary = 2000, isBoss = true }
         }
     },
 
@@ -262,13 +318,14 @@ Config.Jobs = {
     ['vazou'] = {
         label = 'Discoteca Marc Vazou',
         isBusiness = true,
+        isGang = true,
         canDuty = true,
         grades = {
-            [0] = { name = 'Seguridad', salary = 500 },
-            [1] = { name = 'Camarero / Barman', salary = 800 },
-            [2] = { name = 'Jefe de Barra / DJ', salary = 1100 },
-            [3] = { name = 'Encargado de Sala', salary = 1550 },
-            [4] = { name = 'Dueño / Propietario', salary = 2200, isBoss = true }
+            [0] = { name = 'Seguridad / Recluta', salary = 500 },
+            [1] = { name = 'Camarero / Gatillero', salary = 800 },
+            [2] = { name = 'Jefe de Barra / Sicario', salary = 1100 },
+            [3] = { name = 'Encargado / Lugarteniente', salary = 1550 },
+            [4] = { name = 'Dueño / Patrón', salary = 2200, isBoss = true }
         }
     },
 

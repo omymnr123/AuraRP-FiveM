@@ -399,7 +399,7 @@ CreateThread(function()
                             flags = 49
                         }
                     }) then
-                    exports.ox_inventory:openInventory('player', targetSrc)
+                    TriggerServerEvent('aura_police:server:friskPlayer', targetSrc)
                 else
                     lib.notify({ title = 'Policía', description = 'Registro cancelado.', type = 'inform' })
                 end

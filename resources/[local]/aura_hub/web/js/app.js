@@ -150,8 +150,55 @@ async function postFetch(endpoint, data = {}) {
 // ============================================================================
 // GESTIÓN DE MODALES
 // ============================================================================
+window.openPoliceMdt = () => {
+    playTone('click');
+    // Cerrar automáticamente el menú principal del aura_hub
+    const hubContainer = document.getElementById('hubScreenContainer') || document.querySelector('.hub-screen-container');
+    if (hubContainer) {
+        hubContainer.classList.add('hidden');
+    }
+    // Ocultar cualquier otro modal que pudiera estar abierto
+    document.querySelectorAll('.hub-modal-overlay').forEach(m => m.classList.add('hidden'));
+
+    // Abrir el MDT sin fondo oscuro
+    const target = document.getElementById('modalPoliceMdt');
+    if (target) target.classList.remove('hidden');
+
+    switchMdtTab('mdttab-citizens');
+    loadPoliceMdtOverview();
+};
+
+window.openDarkWeb = () => {
+    playTone('click');
+    // Cerrar automáticamente el menú principal del aura_hub
+    const hubContainer = document.getElementById('hubScreenContainer') || document.querySelector('.hub-screen-container');
+    if (hubContainer) {
+        hubContainer.classList.add('hidden');
+    }
+    // Ocultar cualquier otro modal que pudiera estar abierto
+    document.querySelectorAll('.hub-modal-overlay').forEach(m => m.classList.add('hidden'));
+
+    // Abrir la Dark Web sin fondo oscuro
+    const target = document.getElementById('modalDarkWeb');
+    if (target) target.classList.remove('hidden');
+
+    loadDarkWebOverview();
+};
+
 window.openModal = (modalId) => {
     playTone('click');
+    if (modalId === 'modalPoliceMdt') {
+        openPoliceMdt();
+        return;
+    }
+    if (modalId === 'modalDarkWeb') {
+        openDarkWeb();
+        return;
+    }
+    const hubContainer = document.getElementById('hubScreenContainer') || document.querySelector('.hub-screen-container');
+    if (hubContainer) {
+        hubContainer.classList.remove('hidden');
+    }
     document.querySelectorAll('.hub-modal-overlay').forEach(m => m.classList.add('hidden'));
     const target = document.getElementById(modalId);
     if (target) target.classList.remove('hidden');
@@ -159,6 +206,10 @@ window.openModal = (modalId) => {
 
 window.closeModal = (modalId) => {
     playTone('click');
+    if (modalId === 'modalPoliceMdt' || modalId === 'modalDarkWeb') {
+        closeHub();
+        return;
+    }
     const target = document.getElementById(modalId);
     if (target) target.classList.add('hidden');
 };
@@ -168,6 +219,13 @@ window.closeModal = (modalId) => {
 // ============================================================================
 function renderHub(data) {
     currentHubData = data;
+
+    // Asegurar que el contenedor principal del Hub esté visible y el MDT cerrado
+    const hubContainer = document.getElementById('hubScreenContainer') || document.querySelector('.hub-screen-container');
+    if (hubContainer) {
+        hubContainer.classList.remove('hidden');
+    }
+    document.querySelectorAll('.hub-modal-overlay').forEach(m => m.classList.add('hidden'));
 
     // Header Info
     topPlayerName.textContent = data.name;
@@ -240,6 +298,52 @@ function renderHub(data) {
         if (btnPoliceMdt) btnPoliceMdt.style.display = 'flex';
     } else {
         if (btnPoliceMdt) btnPoliceMdt.style.display = 'none';
+    }
+
+    // Identificar si pertenece a banda u organización criminal
+    const isGang = (data.isGang === true) || 
+                   (data.job && data.job.isGang === true) || 
+                   (data.job && ['cartel', 'salieri', 'vazou', 'ballas', 'families', 'vagos'].includes(data.job.name));
+
+    // Botón Terminal Clandestino Dark Web en Header
+    const btnDarkWeb = document.getElementById('btnActionDarkWeb');
+    if (btnDarkWeb) {
+        btnDarkWeb.style.display = isGang ? 'flex' : 'none';
+    }
+
+    // Actualizar Textos y Estado de Tile 4 (Mi Organización)
+    const tileOrgEl = document.getElementById('tileOrg');
+    if (tileOrgEl) {
+        const titleEl = tileOrgEl.querySelector('h4');
+        const pEl = tileOrgEl.querySelector('p');
+        const hintSpan = tileOrgEl.querySelector('.tile-click-hint span');
+        const iconI = tileOrgEl.querySelector('.tile-icon-circle i');
+
+        if (isGang) {
+            if (titleEl) titleEl.textContent = 'MI ORGANIZACIÓN';
+            if (pEl) pEl.textContent = `${(data.job.label || 'BANDA').toUpperCase()} (${data.job.gradeLabel || 'Rango ' + data.job.grade})`;
+            if (hintSpan) hintSpan.textContent = 'TERMINAL DARK WEB & FONDOS OFFSHORE';
+            if (iconI) iconI.className = 'fa-solid fa-skull-crossbones';
+            tileOrgEl.style.borderColor = 'rgba(255, 0, 127, 0.45)';
+        } else if (data.job && (data.job.name === 'police' || data.job.name === 'sheriff')) {
+            if (titleEl) titleEl.textContent = 'DEPARTAMENTO POLICIAL';
+            if (pEl) pEl.textContent = `${data.job.label.toUpperCase()} (${data.job.gradeLabel})`;
+            if (hintSpan) hintSpan.textContent = 'TERMINAL POLICIAL MDT';
+            if (iconI) iconI.className = 'fa-solid fa-shield-halved';
+            tileOrgEl.style.borderColor = 'rgba(64, 224, 208, 0.45)';
+        } else if (data.job && data.job.isBusiness) {
+            if (titleEl) titleEl.textContent = 'MI COMERCIO';
+            if (pEl) pEl.textContent = `${data.job.label.toUpperCase()} (${data.job.gradeLabel})`;
+            if (hintSpan) hintSpan.textContent = 'ADMINISTRAR LOCAL Y RRHH';
+            if (iconI) iconI.className = 'fa-solid fa-store';
+            tileOrgEl.style.borderColor = '';
+        } else {
+            if (titleEl) titleEl.textContent = 'MI PERFIL / SERVICIOS';
+            if (pEl) pEl.textContent = 'SIN ORGANIZACIÓN ASIGNADA';
+            if (hintSpan) hintSpan.textContent = 'CONSULTAR SERVICIOS DISPONIBLES';
+            if (iconI) iconI.className = 'fa-solid fa-user';
+            tileOrgEl.style.borderColor = '';
+        }
     }
 
     // Actualizar Botón de Servicio (Duty)
@@ -337,6 +441,10 @@ window.togglePlayerDuty = async () => {
 function closeHub() {
     hubWrapper.classList.add('hidden');
     document.querySelectorAll('.hub-modal-overlay').forEach(m => m.classList.add('hidden'));
+    const hubContainer = document.getElementById('hubScreenContainer') || document.querySelector('.hub-screen-container');
+    if (hubContainer) {
+        hubContainer.classList.remove('hidden');
+    }
     postFetch('closeHub');
 }
 
@@ -522,7 +630,23 @@ document.getElementById('tileBusiness').addEventListener('click', () => {
 
 // Tile 4: MI ORGANIZACIÓN
 document.getElementById('tileOrg').addEventListener('click', () => {
-    openModal('modalServices');
+    const isGang = currentHubData && (
+        currentHubData.isGang === true ||
+        (currentHubData.job && currentHubData.job.isGang === true) ||
+        (currentHubData.job && ['cartel', 'salieri', 'vazou', 'ballas', 'families', 'vagos'].includes(currentHubData.job.name))
+    );
+
+    if (isGang) {
+        openDarkWeb();
+    } else if (currentHubData && currentHubData.job && (currentHubData.job.name === 'police' || currentHubData.job.name === 'sheriff')) {
+        openPoliceMdt();
+    } else if (currentHubData && currentHubData.job && currentHubData.job.isBusiness) {
+        openModal('modalBusiness');
+        const firstTab = document.querySelectorAll('.modal-tab-btn')[0];
+        if (firstTab) firstTab.click();
+    } else {
+        openModal('modalServices');
+    }
 });
 
 // Botones de Cabecera
@@ -531,7 +655,15 @@ document.getElementById('btnActionInvoices').addEventListener('click', () => ope
 
 btnCloseHub.addEventListener('click', closeHub);
 
-// Desconexión
+// Ajustes y Desconexión
+const btnModalGtaSettings = document.getElementById('btnModalGtaSettings');
+if (btnModalGtaSettings) {
+    btnModalGtaSettings.addEventListener('click', () => {
+        playTone('click');
+        postFetch('openSettings');
+    });
+}
+
 document.getElementById('btnModalDisconnect').addEventListener('click', () => {
     postFetch('disconnect');
 });
@@ -540,6 +672,16 @@ document.getElementById('btnModalDisconnect').addEventListener('click', () => {
 window.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' || e.keyCode === 27) {
         if (!hubWrapper.classList.contains('hidden')) {
+            const mdtModal = document.getElementById('modalPoliceMdt');
+            if (mdtModal && !mdtModal.classList.contains('hidden')) {
+                closeHub();
+                return;
+            }
+            const darkWebModal = document.getElementById('modalDarkWeb');
+            if (darkWebModal && !darkWebModal.classList.contains('hidden')) {
+                closeHub();
+                return;
+            }
             const openModals = document.querySelectorAll('.hub-modal-overlay:not(.hidden)');
             if (openModals.length > 0) {
                 openModals.forEach(m => m.classList.add('hidden'));
@@ -550,12 +692,15 @@ window.addEventListener('keydown', (e) => {
     }
 });
 
-// Pestañas del Modal Negocio
+// Pestañas de Modales (Negocio, Dark Web, MDT)
 document.querySelectorAll('.modal-tab-btn').forEach(btn => {
     btn.addEventListener('click', () => {
         playTone('click');
-        document.querySelectorAll('.modal-tab-btn').forEach(b => b.classList.remove('active'));
-        document.querySelectorAll('.modal-tab-content').forEach(p => p.classList.remove('active'));
+        const modal = btn.closest('.hub-modal-card');
+        if (modal) {
+            modal.querySelectorAll('.modal-tab-btn').forEach(b => b.classList.remove('active'));
+            modal.querySelectorAll('.modal-tab-content').forEach(p => p.classList.remove('active'));
+        }
 
         btn.classList.add('active');
         const target = document.getElementById(`modaltab-${btn.dataset.modaltab}`);
@@ -653,16 +798,12 @@ let mdtOverviewData = null;
 
 // Apertura del MDT desde el Botón de Cabecera o Pill de Policía
 document.getElementById('btnActionPoliceMdt')?.addEventListener('click', () => {
-    openModal('modalPoliceMdt');
-    switchMdtTab('mdttab-citizens');
-    loadPoliceMdtOverview();
+    openPoliceMdt();
 });
 
 document.querySelector('.counter-pill.police')?.addEventListener('click', () => {
     if (currentHubData && currentHubData.job && (currentHubData.job.name === 'police' || currentHubData.job.name === 'sheriff')) {
-        openModal('modalPoliceMdt');
-        switchMdtTab('mdttab-citizens');
-        loadPoliceMdtOverview();
+        openPoliceMdt();
     }
 });
 
@@ -688,6 +829,8 @@ window.switchMdtTab = (tabId) => {
         loadMdtDispatchCalls();
     } else if (tabId === 'mdttab-staff') {
         loadMdtStaff();
+    } else if (tabId === 'mdttab-radio') {
+        loadMdtRadioChannels();
     }
 };
 
@@ -1178,9 +1321,9 @@ async function loadMdtStaff() {
 
         let actionsHtml = '';
         if (isHighCommand) {
-            const canPromote = (callerGrade >= 6 || off.grade < callerGrade - 1) && off.grade < 6;
-            const canDemote = (callerGrade >= 6 || off.grade < callerGrade) && off.grade > 0;
-            const canFire = (callerGrade >= 6 || off.grade < callerGrade);
+            const canPromote = (callerGrade >= 5 || off.grade < callerGrade - 1) && off.grade < 5;
+            const canDemote = (callerGrade >= 5 || off.grade < callerGrade) && off.grade > 0;
+            const canFire = (callerGrade >= 5 || off.grade < callerGrade);
 
             actionsHtml = `
                 <button class="btn-emp-action" title="Ascender (+1 Rango)" onclick="changePoliceGrade(${off.charId}, ${off.grade + 1})" ${!canPromote ? 'disabled style="opacity:0.3; cursor:not-allowed;"' : ''}>
@@ -1235,8 +1378,8 @@ window.changePoliceGrade = async (targetCharId, newGrade) => {
         showToast("El oficial ya tiene el rango mínimo (Cadete).", true);
         return;
     }
-    if (newGrade > 6) {
-        showToast("El oficial ya tiene el rango máximo (Jefe de Policía).", true);
+    if (newGrade > 5) {
+        showToast("El oficial ya tiene el rango máximo (Comisario).", true);
         return;
     }
 
@@ -1261,3 +1404,458 @@ window.firePoliceOfficer = async (targetCharId) => {
         showToast(res ? res.message : "Error al expulsar oficial", true);
     }
 };
+
+// ============================================================================
+// MDT RADIO-PATRULLAS CONTROLLER (MANDO + PATRULLAS 1-20 & SELECTOR DE COLOR)
+// ============================================================================
+
+let activeRadioOverview = null;
+let activePickerChannelId = null;
+
+const RADIO_COLOR_PALETTE = [
+    { hex: '#ffb700', blip: 46, name: 'Oro Mando' },
+    { hex: '#00f2fe', blip: 38, name: 'Cian LSPD' },
+    { hex: '#3b82f6', blip: 3,  name: 'Azul Patrulla' },
+    { hex: '#00ff9d', blip: 2,  name: 'Verde Táctico' },
+    { hex: '#ff007f', blip: 48, name: 'Rosa Neón' },
+    { hex: '#ff6b35', blip: 47, name: 'Naranja Tráfico' },
+    { hex: '#9d4edd', blip: 27, name: 'Púrpura K9' },
+    { hex: '#ff2a55', blip: 1,  name: 'Rojo Asalto' },
+    { hex: '#ffffff', blip: 0,  name: 'Blanco SWAT' },
+    { hex: '#a0aec0', blip: 40, name: 'Gris Nocturno' }
+];
+
+async function loadMdtRadioChannels() {
+    const res = await postFetch('policeGetRadioOverview');
+    if (!res || !res.success) {
+        showToast("Error al cargar la malla de radio policial.", true);
+        return;
+    }
+
+    const rawData = res.data || res;
+    activeRadioOverview = rawData;
+
+    let channels = rawData.channels || [];
+    if (!Array.isArray(channels)) {
+        channels = Object.values(channels);
+    }
+    const activeChannelId = rawData.activeChannelId || rawData.currentChannel;
+    const isMandoGrade = rawData.isMandoGrade ?? rawData.isMandoPermitted;
+
+    // 1. Banner de Estado Activo
+    const bannerTitle = document.getElementById('radioActiveChannelTitle');
+    const bannerDesc = document.getElementById('radioActiveFreqDesc');
+    const bannerDot = document.getElementById('radioActiveDot');
+    const beaconWrapper = document.getElementById('radioBeaconWrapper');
+    const btnDisconnect = document.getElementById('btnDisconnectRadio');
+
+    const currentChannel = channels.find(c => c.id === activeChannelId);
+
+    if (currentChannel) {
+        if (bannerTitle) bannerTitle.textContent = `${currentChannel.label.toUpperCase()} (${parseFloat(currentChannel.frequency).toFixed(1)} MHz)`;
+        if (bannerDesc) bannerDesc.textContent = `Conectado y transmitiendo en vivo. Frecuencia asignada ${parseFloat(currentChannel.frequency).toFixed(1)} MHz.`;
+        if (bannerDot) bannerDot.style.background = currentChannel.color_hex || '#00ff9d';
+        if (beaconWrapper) beaconWrapper.classList.add('active');
+        if (btnDisconnect) btnDisconnect.style.display = 'inline-flex';
+    } else {
+        if (bannerTitle) bannerTitle.textContent = 'DESCONECTADO DE LA RED';
+        if (bannerDesc) bannerDesc.textContent = 'Haz clic en cualquier canal o patrulla para sintonizar en vivo.';
+        if (bannerDot) bannerDot.style.background = '#64748b';
+        if (beaconWrapper) beaconWrapper.classList.remove('active');
+        if (btnDisconnect) btnDisconnect.style.display = 'none';
+    }
+
+    // 2. Canal de Mando (VIP Card)
+    const mandoChannel = channels.find(c => c.id === 'mando');
+    if (mandoChannel) {
+        const mandoIndicator = document.getElementById('colorIndicator_mando');
+        if (mandoIndicator) mandoIndicator.style.backgroundColor = mandoChannel.color_hex || '#ffb700';
+
+        const mandoCount = document.getElementById('count_mando');
+        const membersList = mandoChannel.members || [];
+        if (mandoCount) mandoCount.textContent = `${membersList.length} Mando(s) en frecuencia`;
+
+        const mandoChipsContainer = document.getElementById('members_mando');
+        if (mandoChipsContainer) {
+            mandoChipsContainer.innerHTML = '';
+            if (membersList.length === 0) {
+                mandoChipsContainer.innerHTML = '<span class="empty-chips">Sin mandos conectados actualmente.</span>';
+            } else {
+                membersList.forEach(m => {
+                    const chip = document.createElement('div');
+                    chip.className = 'radio-member-chip';
+                    chip.innerHTML = `
+                        <span class="chip-dot" style="background: ${mandoChannel.color_hex || '#ffb700'};"></span>
+                        <span class="chip-name">${m.name}</span>
+                        <span class="chip-badge">${m.gradeLabel || 'Mando'}</span>
+                    `;
+                    mandoChipsContainer.appendChild(chip);
+                });
+            }
+        }
+
+        const btnConnectMando = document.getElementById('btnConnect_mando');
+        if (btnConnectMando) {
+            if (activeChannelId === 'mando') {
+                btnConnectMando.className = 'btn-channel-connect connected';
+                btnConnectMando.innerHTML = '<i class="fa-solid fa-link-slash"></i> Desconectar';
+                btnConnectMando.onclick = () => leavePoliceRadio();
+            } else {
+                btnConnectMando.className = 'btn-channel-connect';
+                btnConnectMando.innerHTML = '<i class="fa-solid fa-plug"></i> Conectar';
+                btnConnectMando.onclick = () => joinPoliceRadio('mando');
+            }
+        }
+    }
+
+    // 3. Grid de Patrullas (#01 al #20)
+    const patrolsContainer = document.getElementById('radioPatrolsContainer');
+    if (patrolsContainer) {
+        patrolsContainer.innerHTML = '';
+        const patrolChannels = channels.filter(c => c.id !== 'mando');
+
+        patrolChannels.forEach(p => {
+            const isConnected = (p.id === activeChannelId);
+            const pMembers = p.members || [];
+            const hexColor = p.color_hex || p.color || '#00f2fe';
+
+            let membersChips = '';
+            if (pMembers.length === 0) {
+                membersChips = '<span class="patrol-empty-text"><i class="fa-regular fa-circle-check"></i> Disponible</span>';
+            } else {
+                membersChips = '<div class="patrol-chips-wrap">' + pMembers.map(mem => `<span class="patrol-chip" title="${mem.gradeLabel || ''}">${mem.name}</span>`).join('') + '</div>';
+            }
+
+            const card = document.createElement('div');
+            card.className = `patrol-card ${isConnected ? 'active' : ''}`;
+            card.style.setProperty('--patrol-color', hexColor);
+
+            card.innerHTML = `
+                <div class="patrol-card-header">
+                    <div class="patrol-info">
+                        <span class="patrol-dot" style="background:${hexColor}; box-shadow: 0 0 6px ${hexColor};"></span>
+                        <strong class="patrol-title">${p.label}</strong>
+                        <span class="patrol-freq-badge">${parseFloat(p.frequency).toFixed(1)} MHz</span>
+                    </div>
+                    <div class="patrol-btn-group">
+                        <button class="btn-patrol-color-mini" onclick="openRadioColorPicker('${p.id}', event)" title="Personalizar color del canal y blip">
+                            <i class="fa-solid fa-palette"></i>
+                        </button>
+                        ${isConnected ? `
+                            <button class="btn-patrol-join disconnect" onclick="leavePoliceRadio()">
+                                <i class="fa-solid fa-link-slash"></i> Salir
+                            </button>
+                        ` : `
+                            <button class="btn-patrol-join" onclick="joinPoliceRadio('${p.id}')">
+                                <i class="fa-solid fa-plug"></i> Entrar
+                            </button>
+                        `}
+                    </div>
+                </div>
+                <div class="patrol-members-row">
+                    ${membersChips}
+                </div>
+            `;
+            patrolsContainer.appendChild(card);
+        });
+    }
+}
+
+window.joinPoliceRadio = async (channelId) => {
+    playTone('click');
+    const res = await postFetch('policeJoinRadio', { channelId });
+    if (res && res.success) {
+        showToast(res.message || "Conectado a la frecuencia policial.");
+        loadMdtRadioChannels();
+    } else {
+        showToast((res && res.message) ? res.message : "Error al conectar al canal de radio.", true);
+    }
+};
+
+window.leavePoliceRadio = async () => {
+    playTone('click');
+    const res = await postFetch('policeLeaveRadio');
+    if (res && res.success) {
+        showToast(res.message || "Desconectado de la radio policial.");
+        loadMdtRadioChannels();
+    } else {
+        showToast((res && res.message) ? res.message : "Error al desconectar de la radio.", true);
+    }
+};
+
+window.openRadioColorPicker = (channelId, event) => {
+    if (event) {
+        event.stopPropagation();
+        event.preventDefault();
+    }
+    playTone('click');
+    activePickerChannelId = channelId;
+
+    const dropdown = document.getElementById('radioColorPickerDropdown');
+    const grid = document.getElementById('pickerSwatchesGrid');
+    if (!dropdown || !grid) return;
+
+    grid.innerHTML = '';
+    RADIO_COLOR_PALETTE.forEach(c => {
+        const btn = document.createElement('button');
+        btn.className = 'swatch-btn';
+        btn.style.setProperty('--swatch-color', c.hex);
+        btn.title = `${c.name} (${c.hex})`;
+        btn.innerHTML = `
+            <span class="swatch-circle" style="background: ${c.hex}; box-shadow: 0 0 8px ${c.hex};"></span>
+            <span class="swatch-name">${c.name}</span>
+        `;
+        btn.onclick = (e) => {
+            e.stopPropagation();
+            setPoliceRadioColor(c.hex, c.blip);
+        };
+        grid.appendChild(btn);
+    });
+
+    // Posicionar dropdown cerca del botón o en el centro si no cabe
+    if (event && event.target) {
+        const rect = event.target.closest('button')?.getBoundingClientRect() || event.target.getBoundingClientRect();
+        let top = rect.bottom + 8;
+        let left = rect.left - 40;
+
+        // Limitar dentro de la ventana
+        if (left + 260 > window.innerWidth) left = window.innerWidth - 280;
+        if (left < 10) left = 10;
+        if (top + 280 > window.innerHeight) top = rect.top - 290;
+
+        dropdown.style.top = `${top}px`;
+        dropdown.style.left = `${left}px`;
+    }
+
+    dropdown.classList.remove('hidden');
+};
+
+window.setPoliceRadioColor = async (hexColor, blipColor) => {
+    if (!activePickerChannelId) return;
+    playTone('click');
+    const channelId = activePickerChannelId;
+    closeRadioColorPicker();
+
+    const res = await postFetch('policeSetRadioColor', {
+        channelId: channelId,
+        hexColor: hexColor,
+        blipColor: blipColor
+    });
+
+    if (res && res.success) {
+        showToast(res.message || "Color del canal y blip táctico actualizado.");
+        loadMdtRadioChannels();
+    } else {
+        showToast((res && res.message) ? res.message : "Error al actualizar color del canal.", true);
+    }
+};
+
+window.closeRadioColorPicker = () => {
+    const dropdown = document.getElementById('radioColorPickerDropdown');
+    if (dropdown) dropdown.classList.add('hidden');
+    activePickerChannelId = null;
+};
+
+// Cerrar selector al hacer clic fuera
+document.addEventListener('click', (e) => {
+    const dropdown = document.getElementById('radioColorPickerDropdown');
+    if (dropdown && !dropdown.classList.contains('hidden')) {
+        if (!dropdown.contains(e.target) && !e.target.closest('.btn-channel-color') && !e.target.closest('.btn-patrol-color')) {
+            closeRadioColorPicker();
+        }
+    }
+});
+
+// ============================================================================
+// AURA DARK WEB CONTROLLER (BANDAS, MAFIAS Y CÁRTELES)
+// ============================================================================
+
+let currentDarkWebData = null;
+
+// Apertura del Terminal Dark Web
+document.getElementById('btnActionDarkWeb')?.addEventListener('click', () => {
+    openDarkWeb();
+});
+
+async function loadDarkWebOverview() {
+    const res = await postFetch('darkWebGetData');
+    if (!res || !res.success || !res.data) {
+        showToast("Error al conectar con la red clandestina.", true);
+        return;
+    }
+
+    currentDarkWebData = res.data;
+
+    // Actualizar encabezados
+    const titleEl = document.getElementById('modalDarkGangTitle');
+    const subEl = document.getElementById('modalDarkGangSub');
+    const netTag = document.getElementById('darkWebNetworkTag');
+    const balanceEl = document.getElementById('darkOffshoreBalance');
+    const hireBar = document.getElementById('darkWebHireBar');
+    const btnWithdraw = document.getElementById('btnDarkWithdraw');
+
+    if (titleEl) titleEl.textContent = `DARK WEB // ${res.data.label.toUpperCase()}`;
+    if (subEl) subEl.textContent = `Cifrado RSA-4096 | Organización: ${res.data.label}`;
+    if (netTag) netTag.textContent = `RED CLANDESTINA // ${res.data.tag || 'UNDERGROUND'}`;
+    if (balanceEl) balanceEl.textContent = `$${formatNumber(res.data.balance || 0)}`;
+
+    // Controles de jefe
+    if (res.data.isBoss) {
+        if (hireBar) hireBar.style.display = 'flex';
+        if (btnWithdraw) btnWithdraw.style.display = 'inline-flex';
+    } else {
+        if (hireBar) hireBar.style.display = 'none';
+        if (btnWithdraw) btnWithdraw.style.display = 'none';
+    }
+
+    // Asegurar pestaña de Roster Clandestino activa por defecto
+    const firstDarkTab = document.querySelector('#modalDarkWeb .modal-tab-btn[data-modaltab="dark-roster"]');
+    if (firstDarkTab) {
+        document.querySelectorAll('#modalDarkWeb .modal-tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('#modalDarkWeb .modal-tab-content').forEach(p => p.classList.remove('active'));
+        firstDarkTab.classList.add('active');
+        const rosterContent = document.getElementById('modaltab-dark-roster');
+        if (rosterContent) rosterContent.classList.add('active');
+    }
+
+    renderDarkRoster(res.data.members || [], res.data.grades || {}, res.data.isBoss);
+}
+
+function renderDarkRoster(members, grades, isBoss) {
+    const tbody = document.getElementById('darkRosterTableBody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+
+    if (members.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#94a3b8; padding:20px;">Sin miembros registrados en la organización.</td></tr>`;
+        return;
+    }
+
+    members.forEach(m => {
+        const gradeConf = grades[m.job_grade] || { name: `Rango ${m.job_grade}` };
+        const gradeName = gradeConf.name || `Grado ${m.job_grade}`;
+        const isMaxGrade = grades[m.job_grade + 1] === undefined;
+        const isMinGrade = m.job_grade <= 0;
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>
+                <span class="status-indicator online"><span class="dot"></span> MIEMBRO</span>
+            </td>
+            <td><strong>${m.firstname} ${m.lastname}</strong></td>
+            <td><code>${m.citizenid}</code></td>
+            <td><span class="badge-role" style="border-color: #FF007F; color: #ff66b2;">${gradeName}</span></td>
+            <td style="text-align: right;">
+                ${isBoss ? `
+                    <div style="display:inline-flex; gap:6px;">
+                        <button class="btn-table-action" title="Ascender" ${isMaxGrade ? 'disabled style="opacity:0.3;"' : ''} onclick="changeDarkGrade(${m.id}, ${m.job_grade + 1})">
+                            <i class="fa-solid fa-arrow-up"></i>
+                        </button>
+                        <button class="btn-table-action" title="Degradar" ${isMinGrade ? 'disabled style="opacity:0.3;"' : ''} onclick="changeDarkGrade(${m.id}, ${m.job_grade - 1})">
+                            <i class="fa-solid fa-arrow-down"></i>
+                        </button>
+                        <button class="btn-table-action fire" title="Expulsar de la Organización" onclick="fireDarkMember(${m.id})">
+                            <i class="fa-solid fa-user-xmark"></i>
+                        </button>
+                    </div>
+                ` : `<span style="color:#64748b; font-size:12px;">Sin permisos</span>`}
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+// Reclutar Miembro en la Banda
+document.getElementById('btnDarkHire')?.addEventListener('click', async () => {
+    const input = document.getElementById('darkHireId');
+    const targetSrc = parseInt(input?.value);
+    if (!targetSrc || isNaN(targetSrc)) {
+        showToast("Introduce una ID de servidor válida.", true);
+        return;
+    }
+
+    playTone('click');
+    const res = await postFetch('darkWebHire', { targetSrc });
+    if (res && res.success) {
+        showToast(res.message);
+        if (input) input.value = '';
+        loadDarkWebOverview();
+    } else {
+        showToast(res ? res.message : "Error al reclutar", true);
+    }
+});
+
+// Modificar Rango en la Banda
+window.changeDarkGrade = async (charId, newGrade) => {
+    playTone('click');
+    const res = await postFetch('darkWebSetGrade', { charId, newGrade });
+    if (res && res.success) {
+        showToast(res.message);
+        loadDarkWebOverview();
+    } else {
+        showToast(res ? res.message : "Error al actualizar rango", true);
+    }
+};
+
+// Expulsar de la Banda
+window.fireDarkMember = async (charId) => {
+    playTone('click');
+    const res = await postFetch('darkWebFire', { charId });
+    if (res && res.success) {
+        showToast(res.message);
+        loadDarkWebOverview();
+    } else {
+        showToast(res ? res.message : "Error al expulsar", true);
+    }
+};
+
+// Depositar en Cuenta Offshore
+document.getElementById('btnDarkDeposit')?.addEventListener('click', async () => {
+    const amountInput = document.getElementById('darkTransferAmount');
+    const accountSelect = document.getElementById('darkAccountSelect');
+    const amount = parseInt(amountInput?.value);
+    const account = accountSelect?.value || 'black_money';
+
+    if (!amount || isNaN(amount) || amount <= 0) {
+        showToast("Introduce un importe válido a depositar.", true);
+        return;
+    }
+
+    playTone('click');
+    const res = await postFetch('darkWebDeposit', { amount, account });
+    if (res && res.success) {
+        showToast(res.message);
+        if (amountInput) amountInput.value = '';
+        const balanceEl = document.getElementById('darkOffshoreBalance');
+        if (balanceEl && res.newBalance !== undefined) {
+            balanceEl.textContent = `$${formatNumber(res.newBalance)}`;
+        }
+    } else {
+        showToast(res ? res.message : "Error al procesar el depósito", true);
+    }
+});
+
+// Retirar de Cuenta Offshore
+document.getElementById('btnDarkWithdraw')?.addEventListener('click', async () => {
+    const amountInput = document.getElementById('darkTransferAmount');
+    const amount = parseInt(amountInput?.value);
+
+    if (!amount || isNaN(amount) || amount <= 0) {
+        showToast("Introduce un importe válido a retirar.", true);
+        return;
+    }
+
+    playTone('click');
+    const res = await postFetch('darkWebWithdraw', { amount });
+    if (res && res.success) {
+        showToast(res.message);
+        if (amountInput) amountInput.value = '';
+        const balanceEl = document.getElementById('darkOffshoreBalance');
+        if (balanceEl && res.newBalance !== undefined) {
+            balanceEl.textContent = `$${formatNumber(res.newBalance)}`;
+        }
+    } else {
+        showToast(res ? res.message : "Error al procesar la retirada", true);
+    }
+});
+

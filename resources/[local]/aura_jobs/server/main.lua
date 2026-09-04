@@ -124,6 +124,15 @@ local function LoadPlayerJob(src, charId)
     pState:set('job_duty', jobDuty, true)
     pState:set('job_label', jobConfig.label, true)
     pState:set('grade_label', gradeName, true)
+    pState:set('isGang', (jobConfig.isGang == true), true)
+    pState:set('isBusiness', (jobConfig.isBusiness == true), true)
+
+    -- Sincronizar activeCharacter en multichar si existe
+    local activeChar = exports.aura_multichar:GetActiveCharacter(src)
+    if activeChar then
+        activeChar.job = jobName
+        activeChar.job_grade = jobGrade
+    end
 
     -- Sincronizar grupos con ox_inventory
     TriggerEvent('aura_jobs:server:jobUpdated', src, jobName, jobGrade)
@@ -134,6 +143,7 @@ local function LoadPlayerJob(src, charId)
         print(string.format("[Aura Jobs] Empleo cargado para Src #%d (CharID #%d): %s [%d] | Servicio: %s | Placa: %s", src, cid, jobName, jobGrade, tostring(jobDuty), tostring(badge)))
     end
 end
+exports('LoadPlayerJob', LoadPlayerJob)
 
 --- Recalcula y sincroniza el estado abierto/cerrado de todos los negocios según los empleados en servicio
 function UpdateAllBusinessStates()
@@ -175,67 +185,78 @@ exports('IsBusinessOpen', IsBusinessOpen)
 -- EVENTOS DEL CICLO DE VIDA
 -- ============================================================================
 
--- Hook automático al iniciar sesión desde el multicharacter / economía
-AddEventHandler('aura_economy:server:characterLoaded', function(arg1, arg2)
-    local src = (type(arg1) == 'number' and type(arg2) == 'number') and arg1 or source
-    local charId = (type(arg1) == 'number' and type(arg2) == 'number') and arg2 or arg1
+-- Cuando el jugador conecta y selecciona personaje
+RegisterNetEvent('aura_multichar:server:characterLoaded', function(charId, explicitSrc)
+    local src = explicitSrc or source
+    if not src or src == 0 or not GetPlayerName(tostring(src)) then
+        src = explicitSrc
+    end
     LoadPlayerJob(src, charId)
 end)
 
+RegisterNetEvent('aura_jobs:server:loadCharacter', function(targetSrc, charId)
+    local src = targetSrc or source
+    LoadPlayerJob(src, charId)
+end)
+
+-- Guardar servicio al desconectar
 AddEventHandler('playerDropped', function()
     local src = source
+    local pData = AuraJobs.PlayerCache[src]
+    if pData and pData.charId then
+        MySQL.update('UPDATE characters SET job_duty = ? WHERE id = ?', {
+            pData.duty and 1 or 0,
+            pData.charId
+        })
+    end
     AuraJobs.PlayerCache[src] = nil
     UpdateAllBusinessStates()
 end)
 
--- Sincronización en caliente al reiniciar el script
-AddEventHandler('onResourceStart', function(resourceName)
-    if GetCurrentResourceName() ~= resourceName then return end
-    for _, playerId in ipairs(GetPlayers()) do
-        local src = tonumber(playerId)
-        if src then
-            LoadPlayerJob(src)
+-- Limpieza si el recurso se reinicia
+AddEventHandler('onResourceStart', function(resName)
+    if resName ~= GetCurrentResourceName() then return end
+    CreateThread(function()
+        Wait(1000)
+        local players = GetPlayers()
+        for _, pSrc in ipairs(players) do
+            local cid = GetCharacterId(tonumber(pSrc))
+            if cid then
+                LoadPlayerJob(tonumber(pSrc), cid)
+            end
         end
-    end
-    UpdateAllBusinessStates()
+    end)
 end)
 
 -- ============================================================================
--- GESTIÓN DE SERVICIO (DUTY STATE)
+-- EXPORTS DE ACCESO Y MANIPULACIÓN DE EMPLEO
 -- ============================================================================
 
---- Establece o conmuta el estado de servicio de un jugador
+--- Alterna o fuerza el estado de servicio de un jugador
 --- @param src number Source del jugador
---- @param forcedDuty boolean | nil Estado específico o nil para alternar
---- @return boolean success, boolean newDutyState
-local function SetDuty(src, forcedDuty)
+--- @param forceDuty boolean | nil Forzar estado explícito
+--- @return boolean success, boolean isDuty
+local function SetDuty(src, forceDuty)
     src = tonumber(src)
     if not src then return false, false end
 
     local pData = AuraJobs.PlayerCache[src]
-    local cid = pData and pData.charId or GetCharacterId(src)
-    if not cid then return false, false end
+    if not pData then return false, false end
 
-    local currentJob = pData and pData.job or Player(src).state.job or 'unemployed'
+    local cid = pData.charId
+    local currentJob = pData.job
     local jobConfig = Config.Jobs[currentJob]
+
     if not jobConfig or not jobConfig.canDuty then
-        TriggerClientEvent('ox_lib:notify', src, {
-            title = 'Servicio',
-            description = 'Tu profesión actual no dispone de registro de servicio.',
-            type = 'error'
-        })
         return false, false
     end
 
-    local currentDuty = pData and pData.duty or Player(src).state.job_duty or false
-    local newDuty = (forcedDuty ~= nil) and forcedDuty or (not currentDuty)
+    local newDuty = (forceDuty ~= nil) and forceDuty or not pData.duty
 
-    -- 1. Actualizar memoria RAM
-    if AuraJobs.PlayerCache[src] then
-        AuraJobs.PlayerCache[src].duty = newDuty
-    end
+    -- 1. Actualización en memoria
+    pData.duty = newDuty
 
-    -- 2. Actualizar StateBag replicado
+    -- 2. Actualización en StateBags para sincronización cliente inmediata
     Player(src).state:set('job_duty', newDuty, true)
 
     -- 3. Persistencia instantánea en base de datos
@@ -309,6 +330,12 @@ local function SetJob(srcOrCharId, newJob, newGrade)
 
     -- Si el jugador está conectado, sincronizar en vivo
     if src then
+        local activeChar = exports.aura_multichar:GetActiveCharacter(src)
+        if activeChar then
+            activeChar.job = newJob
+            activeChar.job_grade = newGrade
+        end
+
         LoadPlayerJob(src, charId)
         TriggerClientEvent('ox_lib:notify', src, {
             title = 'Contrato Laboral',
@@ -323,7 +350,7 @@ exports('SetJob', SetJob)
 
 --- Obtiene el empleo y datos de un jugador
 --- @param src number Source del jugador
---- @return table { name = string, label = string, grade = number, gradeLabel = string, duty = boolean, isBusiness = boolean, badge = string | nil }
+--- @return table { name = string, label = string, grade = number, gradeLabel = string, duty = boolean, isBusiness = boolean, isGang = boolean, isBoss = boolean, badge = string | nil }
 local function GetJob(src)
     src = tonumber(src)
     if not src then return nil end
@@ -335,6 +362,8 @@ local function GetJob(src)
     local gradeConfig = jobConfig.grades[grade] or jobConfig.grades[0]
 
     local isBoss = (gradeConfig and gradeConfig.isBoss == true) or false
+    local isGang = (jobConfig and jobConfig.isGang == true) or false
+    local isBusiness = (jobConfig and jobConfig.isBusiness == true) or false
     local badge = (jobName == 'police') and (pState.badge or pState.callsign) or nil
 
     return {
@@ -344,8 +373,9 @@ local function GetJob(src)
         gradeLabel = gradeConfig and gradeConfig.name or "Rango 0",
         salary = gradeConfig and gradeConfig.salary or 0,
         duty = duty,
-        isBusiness = jobConfig.isBusiness or false,
+        isBusiness = isBusiness,
         canDuty = jobConfig.canDuty or false,
+        isGang = isGang,
         isBoss = isBoss,
         badge = badge,
         callsign = badge
@@ -432,9 +462,9 @@ RegisterCommand('setjob', function(source, args)
     end
 end, true)
 
--- Comando Administrativo dedicado para asignar Jefe de Policía: /setpolicechief [id] o /setjefepolicia [id]
+-- Comando Administrativo dedicado para asignar Comisario / Jefe de Policía: /setcomisario [id], /setpolicechief [id] o /setjefepolicia [id]
 local function HandleSetPoliceChief(source, args)
-    if source ~= 0 and not IsPlayerAceAllowed(tostring(source), 'command.setpolicechief') and not IsPlayerAceAllowed(tostring(source), 'command.setjob') and not IsPlayerAceAllowed(tostring(source), 'group.admin') then
+    if source ~= 0 and not IsPlayerAceAllowed(tostring(source), 'command.setpolicechief') and not IsPlayerAceAllowed(tostring(source), 'command.setcomisario') and not IsPlayerAceAllowed(tostring(source), 'command.setjob') and not IsPlayerAceAllowed(tostring(source), 'group.admin') then
         if source ~= 0 then
             TriggerClientEvent('ox_lib:notify', source, { title = 'Acceso Denegado', description = 'No tienes permisos de administrador.', type = 'error' })
         end
@@ -443,28 +473,30 @@ local function HandleSetPoliceChief(source, args)
 
     local targetSrc = tonumber(args[1])
     if not targetSrc or not GetPlayerName(tostring(targetSrc)) then
-        local msg = "Uso: /setpolicechief [ID_Servidor] o /setjefepolicia [ID_Servidor]"
+        local msg = "Uso: /setcomisario [ID_Servidor] o /setpolicechief [ID_Servidor]"
         if source == 0 then print(msg) else TriggerClientEvent('ox_lib:notify', source, { title = 'Sintaxis', description = msg, type = 'inform' }) end
         return
     end
 
-    local success, err = SetJob(targetSrc, 'police', 6)
+    local success, err = SetJob(targetSrc, 'police', 5)
     if success then
         local targetName = GetPlayerName(tostring(targetSrc))
-        local msg = string.format("¡%s (ID %d) ha sido nombrado JEFE DE POLICÍA (LSPD - Grado 6) exitosamente!", targetName, targetSrc)
-        if source == 0 then print(msg) else TriggerClientEvent('ox_lib:notify', source, { title = 'Jefe Policial Asignado', description = msg, type = 'success', duration = 8000 }) end
+        local msg = string.format("¡%s (ID %d) ha sido nombrado COMISARIO (LSPD - Grado 5) exitosamente!", targetName, targetSrc)
+        if source == 0 then print(msg) else TriggerClientEvent('ox_lib:notify', source, { title = 'Comisario Asignado', description = msg, type = 'success', duration = 8000 }) end
         TriggerClientEvent('ox_lib:notify', targetSrc, {
             title = 'Nombramiento Oficial LSPD',
-            description = 'Has sido nombrado JEFE DE POLICÍA de Los Santos por la administración del servidor.',
+            description = 'Has sido nombrado COMISARIO de Los Santos por la administración del servidor.',
             type = 'success',
             duration = 10000
         })
     else
-        local msg = string.format("Error al asignar Jefe de Policía: %s", tostring(err))
+        local msg = string.format("Error al asignar Comisario: %s", tostring(err))
         if source == 0 then print(msg) else TriggerClientEvent('ox_lib:notify', source, { title = 'Error', description = msg, type = 'error' }) end
     end
 end
 
+RegisterCommand('setcomisario', HandleSetPoliceChief, true)
+RegisterCommand('darcomisario', HandleSetPoliceChief, true)
 RegisterCommand('setpolicechief', HandleSetPoliceChief, true)
 RegisterCommand('setjefepolicia', HandleSetPoliceChief, true)
 RegisterCommand('darjefepolicia', HandleSetPoliceChief, true)

@@ -217,15 +217,27 @@ window.addEventListener('message', (event) => {
         case 'editMode':
             document.getElementById('edit-overlay').classList.remove('hidden');
             container.classList.add('editing');
+            const hotbarEl = document.getElementById('hotbar-preview');
+            if (hotbarEl) {
+                hotbarEl.classList.remove('hidden');
+                hotbarEl.classList.add('editing');
+            }
             break;
 
         case 'setPosition':
-            if (data.x) {
-                container.style.left = data.x + '%';
-                container.style.bottom = data.y + '%';
-            } else if (data.hud && data.hud.x) {
+            if (data.hud && data.hud.x !== undefined) {
                 container.style.left = data.hud.x + '%';
                 container.style.bottom = data.hud.y + '%';
+            } else if (data.x !== undefined) {
+                container.style.left = data.x + '%';
+                container.style.bottom = data.y + '%';
+            }
+            
+            const hotbarPreviewEl = document.getElementById('hotbar-preview');
+            if (hotbarPreviewEl && data.hotbar && data.hotbar.x !== undefined) {
+                hotbarPreviewEl.style.left = data.hotbar.x + '%';
+                hotbarPreviewEl.style.bottom = data.hotbar.y + '%';
+                hotbarPreviewEl.style.transform = 'none';
             }
             break;
             
@@ -242,50 +254,74 @@ window.addEventListener('message', (event) => {
     }
 });
 
-// Drag & Drop Logic (HUD Anillos)
-let isDraggingHUD = false;
-let startHUDX, startHUDY, initialHUDLeft, initialHUDBottom;
+// Drag & Drop Logic (HUD Anillos y Cinturón de Items)
+const hotbarPreview = document.getElementById('hotbar-preview');
 
-container.addEventListener('mousedown', (e) => {
-    if (!container.classList.contains('editing')) return;
-    isDraggingHUD = true;
-    startHUDX = e.clientX;
-    startHUDY = e.clientY;
-    
-    const rect = container.getBoundingClientRect();
-    initialHUDLeft = rect.left;
-    initialHUDBottom = window.innerHeight - rect.bottom;
-});
+let activeDragElement = null;
+let startDragX, startDragY, initialElemLeft, initialElemBottom;
+
+function setupDraggable(elem) {
+    if (!elem) return;
+    elem.addEventListener('mousedown', (e) => {
+        if (!elem.classList.contains('editing')) return;
+        activeDragElement = elem;
+        startDragX = e.clientX;
+        startDragY = e.clientY;
+        
+        const rect = elem.getBoundingClientRect();
+        initialElemLeft = rect.left;
+        initialElemBottom = window.innerHeight - rect.bottom;
+        elem.style.transform = 'none'; // Quitar transform centrado durante el arrastre
+    });
+}
+
+setupDraggable(container);
+setupDraggable(hotbarPreview);
 
 window.addEventListener('mousemove', (e) => {
-    if (!isDraggingHUD) return;
+    if (!activeDragElement) return;
     
-    const dx = e.clientX - startHUDX;
-    const dy = e.clientY - startHUDY;
+    const dx = e.clientX - startDragX;
+    const dy = e.clientY - startDragY;
     
-    let newLeft = initialHUDLeft + dx;
-    let newBottom = initialHUDBottom - dy;
+    let newLeft = initialElemLeft + dx;
+    let newBottom = initialElemBottom - dy;
     
     const percentX = (newLeft / window.innerWidth) * 100;
     const percentY = (newBottom / window.innerHeight) * 100;
     
-    container.style.left = `${percentX}%`;
-    container.style.bottom = `${percentY}%`;
+    // Limitar dentro de la pantalla (1% a 95%)
+    const clampedX = Math.max(0.5, Math.min(95, percentX));
+    const clampedY = Math.max(0.5, Math.min(95, percentY));
+    
+    activeDragElement.style.left = `${clampedX}%`;
+    activeDragElement.style.bottom = `${clampedY}%`;
 });
 
 window.addEventListener('mouseup', () => {
-    isDraggingHUD = false;
+    activeDragElement = null;
 });
 
-// Guardar Posición Definitiva
-document.getElementById('save-btn').addEventListener('click', () => {
-    // Quitar UI de edición
+// Función para cerrar el modo edición
+function closeEditMode() {
     document.getElementById('edit-overlay').classList.add('hidden');
     container.classList.remove('editing');
+    if (hotbarPreview) {
+        hotbarPreview.classList.add('hidden');
+        hotbarPreview.classList.remove('editing');
+    }
+}
+
+// 1. Guardar Posición Definitiva
+document.getElementById('save-btn').addEventListener('click', () => {
+    closeEditMode();
     
     // Extraer porcentajes actuales
     const hudLeft = parseFloat(container.style.left) || 17.5;
     const hudBottom = parseFloat(container.style.bottom) || 3.5;
+    
+    const hotbarLeft = hotbarPreview ? (parseFloat(hotbarPreview.style.left) || 50) : 50;
+    const hotbarBottom = hotbarPreview ? (parseFloat(hotbarPreview.style.bottom) || 3.5) : 3.5;
     
     // Enviar a LUA para guardar en DB
     fetch(`https://${GetParentResourceName()}/savePos`, {
@@ -294,8 +330,52 @@ document.getElementById('save-btn').addEventListener('click', () => {
             'Content-Type': 'application/json; charset=UTF-8',
         },
         body: JSON.stringify({
-            x: hudLeft,
-            y: hudBottom
+            hud: {
+                x: Number(hudLeft.toFixed(2)),
+                y: Number(hudBottom.toFixed(2))
+            },
+            hotbar: {
+                x: Number(hotbarLeft.toFixed(2)),
+                y: Number(hotbarBottom.toFixed(2))
+            }
         })
     });
+});
+
+// 2. Restablecer Posiciones por Defecto
+document.getElementById('reset-btn').addEventListener('click', () => {
+    container.style.left = '17.5%';
+    container.style.bottom = '3.5%';
+    
+    if (hotbarPreview) {
+        hotbarPreview.style.left = '50%';
+        hotbarPreview.style.bottom = '3.5%';
+        hotbarPreview.style.transform = 'translateX(-50%)';
+    }
+});
+
+// 3. Cancelar Edición
+document.getElementById('cancel-btn').addEventListener('click', () => {
+    closeEditMode();
+    fetch(`https://${GetParentResourceName()}/closeEdit`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: JSON.stringify({})
+    });
+});
+
+// 4. Cancelar con tecla Escape
+window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !document.getElementById('edit-overlay').classList.contains('hidden')) {
+        closeEditMode();
+        fetch(`https://${GetParentResourceName()}/closeEdit`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json; charset=UTF-8',
+            },
+            body: JSON.stringify({})
+        });
+    }
 });

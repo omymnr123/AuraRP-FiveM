@@ -5,6 +5,7 @@
 
 local isHubOpen = false
 local isOpeningMap = false
+local isOpeningSettings = false
 local isLoadingHub = false
 local currentHeadshotHandle = nil
 local currentMugshotTxd = nil
@@ -76,8 +77,8 @@ end)
 -- ============================================================================
 
 local function CanOpenAuraHub()
-    -- Si el Hub ya está abierto o cargando, o abriendo mapa
-    if isHubOpen or isLoadingHub or isOpeningMap then
+    -- Si el Hub ya está abierto o cargando, o abriendo mapa o ajustes nativos
+    if isHubOpen or isLoadingHub or isOpeningMap or isOpeningSettings then
         return false
     end
 
@@ -206,7 +207,7 @@ CreateThread(function()
 
         local pauseActive = IsPauseMenuActive()
 
-        if not pauseActive and not isOpeningMap then
+        if not pauseActive and not isOpeningMap and not isOpeningSettings then
             -- Deshabilitar el control de pausa nativo para capturarlo nosotros
             DisableControlAction(0, 199, true) -- INPUT_FRONTEND_PAUSE
             DisableControlAction(0, 200, true) -- INPUT_FRONTEND_PAUSE_ALTERNATE
@@ -290,6 +291,30 @@ RegisterNUICallback('openMap', function(_, cb)
         end
         Wait(350)
         isOpeningMap = false
+    end)
+end)
+
+-- Apertura SEGURA de los Ajustes / Opciones de GTA V (Gráficos, Teclas, Audio, etc.)
+RegisterNUICallback('openSettings', function(_, cb)
+    isHubOpen = false
+    isLoadingHub = false
+    isOpeningSettings = true
+    lastHubCloseTime = GetGameTimer()
+    SetNuiFocus(false, false)
+    SendNUIMessage({ action = 'closeHub' })
+    cb('ok')
+
+    CreateThread(function()
+        Wait(100)
+        SetFrontendActive(true)
+        ActivateFrontendMenu(GetHashKey('FE_MENU_VERSION_SP_PAUSE'), false, 6)
+        
+        -- Esperar a que el jugador cierre el menú de ajustes nativo
+        while IsPauseMenuActive() do
+            Wait(150)
+        end
+        Wait(350)
+        isOpeningSettings = false
     end)
 end)
 
@@ -463,6 +488,70 @@ RegisterNUICallback('setGpsWaypoint', function(data, cb)
     else
         cb({ success = false, message = "Coordenadas inválidas" })
     end
+end)
+
+RegisterNUICallback('policeGetRadioOverview', function(_, cb)
+    lib.callback('aura_police:server:getRadioOverview', false, function(result)
+        cb(result or { success = false })
+    end)
+end)
+
+RegisterNUICallback('policeJoinRadio', function(data, cb)
+    lib.callback('aura_police:server:joinRadioChannel', false, function(result)
+        cb(result or { success = false })
+    end, data.channelId)
+end)
+
+RegisterNUICallback('policeLeaveRadio', function(_, cb)
+    lib.callback('aura_police:server:leaveRadioChannel', false, function(result)
+        cb(result or { success = false })
+    end)
+end)
+
+RegisterNUICallback('policeSetRadioColor', function(data, cb)
+    lib.callback('aura_police:server:setChannelColor', false, function(result)
+        cb(result or { success = false })
+    end, data)
+end)
+
+-- ============================================================================
+-- NUI CALLBACKS: TERMINAL DARK WEB (BANDAS Y CÁRTELES)
+-- ============================================================================
+
+RegisterNUICallback('darkWebGetData', function(_, cb)
+    lib.callback('aura_gangs:server:getDarkWebData', false, function(data)
+        cb({ success = data ~= nil, data = data })
+    end)
+end)
+
+RegisterNUICallback('darkWebHire', function(data, cb)
+    lib.callback('aura_gangs:server:hireMember', false, function(success, message)
+        cb({ success = success, message = message })
+    end, data.targetSrc)
+end)
+
+RegisterNUICallback('darkWebFire', function(data, cb)
+    lib.callback('aura_gangs:server:fireMember', false, function(success, message)
+        cb({ success = success, message = message })
+    end, data.charId)
+end)
+
+RegisterNUICallback('darkWebSetGrade', function(data, cb)
+    lib.callback('aura_gangs:server:setMemberGrade', false, function(success, message)
+        cb({ success = success, message = message })
+    end, data.charId, data.newGrade)
+end)
+
+RegisterNUICallback('darkWebDeposit', function(data, cb)
+    lib.callback('aura_gangs:server:depositOffshore', false, function(success, message, newBalance)
+        cb({ success = success, message = message, newBalance = newBalance })
+    end, data.amount, data.account)
+end)
+
+RegisterNUICallback('darkWebWithdraw', function(data, cb)
+    lib.callback('aura_gangs:server:withdrawOffshore', false, function(success, message, newBalance)
+        cb({ success = success, message = message, newBalance = newBalance })
+    end, data.amount)
 end)
 
 -- Limpieza de memoria gráfica al detener el recurso

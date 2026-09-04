@@ -176,6 +176,29 @@ local function InitStationPoints()
                 debug = Config.Debug,
                 options = {
                     {
+                        name = 'aura_police_armory_stash_' .. stationKey,
+                        icon = 'fa-solid fa-boxes-stacked',
+                        label = 'Abrir Almacén de Armería (Stash)',
+                        distance = 2.8,
+                        canInteract = function()
+                            local pState = LocalPlayer.state
+                            return pState.job == 'police' and (pState.job_grade or 0) >= (stationData.armory.minGrade or 1)
+                        end,
+                        onSelect = function()
+                            local pState = LocalPlayer.state
+                            if not pState.job_duty then
+                                lib.notify({
+                                    title = 'Armería Policial',
+                                    description = 'Debes entrar EN SERVICIO para acceder al almacén de armería.',
+                                    type = 'error'
+                                })
+                                return
+                            end
+
+                            exports.ox_inventory:openInventory('stash', stationData.armory.stashId)
+                        end
+                    },
+                    {
                         name = 'aura_police_armory_loadout_' .. stationKey,
                         icon = 'fa-solid fa-gun',
                         label = 'Retirar Dotación Reglamentaria',
@@ -303,12 +326,13 @@ local function InitStationPoints()
         -- 4. GARAJE POLICIAL (TERMINAL FÍSICO CON OX_TARGET)
         if stationData.garage then
             local termCoords = stationData.garage.interact
+            local termHeading = stationData.garage.heading or (termCoords.w) or 270.0
             local termModel = `prop_parkingpay`
             lib.requestModel(termModel, 5000)
 
             local terminalObj = CreateObject(termModel, termCoords.x, termCoords.y, termCoords.z - 0.95, false, false, false)
             if terminalObj ~= 0 and DoesEntityExist(terminalObj) then
-                SetEntityHeading(terminalObj, 90.0)
+                SetEntityHeading(terminalObj, termHeading + 0.0)
                 PlaceObjectOnGroundProperly(terminalObj)
                 FreezeEntityPosition(terminalObj, true)
                 SetEntityInvincible(terminalObj, true)
@@ -763,7 +787,8 @@ CreateThread(function()
 
                 for sKey, sData in pairs(Config.Stations) do
                     if sData.garage and sData.garage.interact then
-                        local dist = #(coords - sData.garage.interact)
+                        local gInteract = sData.garage.interact
+                        local dist = #(coords - vec3(gInteract.x, gInteract.y, gInteract.z))
                         if dist < 2.3 then
                             inRange = true
                             currentNearStation = sKey

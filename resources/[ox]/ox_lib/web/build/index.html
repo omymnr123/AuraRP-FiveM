@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800;900&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@600;700;800&display=swap" rel="stylesheet" />
     <title>Aura Roleplay Library UI</title>
     <script type="module" crossorigin src="./assets/index-D3YRIttc.js"></script>
     <link rel="stylesheet" crossorigin href="./assets/index-SonfJNby.css">
@@ -17,16 +17,150 @@
 
     <script>
       (function() {
-        function formatKeycaps() {
-          const textNodes = document.querySelectorAll('#root > div:not(#_rht_toaster) p, #root > div:not(#_rht_toaster) span');
-          textNodes.forEach(el => {
-            if (el.textContent && /\[([A-Za-z0-9\s]+)\]/.test(el.innerHTML) && !el.innerHTML.includes('aura-keycap')) {
+        /* ============================================================
+           AURA RP — Notification Enhancement Engine v3.0
+           Robust icon detection using FA data-icon + inline style color.
+           Debounced processing to let React/FA finish rendering.
+           ============================================================ */
+
+        // Track processed cards to avoid re-processing
+        var _auraProcessedSet = new WeakSet();
+        var _auraDebounceTimer = null;
+
+        function formatAuraKeycaps() {
+          // TextUI keycaps format [E], [F], etc.
+          var textNodes = document.querySelectorAll('#root > div:not(#_rht_toaster) p, #root > div:not(#_rht_toaster) span');
+          for (var i = 0; i < textNodes.length; i++) {
+            var el = textNodes[i];
+            if (el.textContent && /\[([A-Za-z0-9\s]+)\]/.test(el.innerHTML) && el.innerHTML.indexOf('aura-keycap') === -1) {
               el.innerHTML = el.innerHTML.replace(/\[([A-Za-z0-9\s]+)\]/g, '<span class="aura-keycap">$1</span>');
             }
-          });
+          }
         }
 
-        const observer = new MutationObserver(formatKeycaps);
+        function detectToastType(card) {
+          // STRATEGY 1: Read data-icon from the FontAwesome SVG (most reliable)
+          var faSvg = card.querySelector('svg.svg-inline--fa');
+          if (faSvg) {
+            var dataIcon = faSvg.getAttribute('data-icon') || '';
+            if (dataIcon.indexOf('check') !== -1) return 'success';
+            if (dataIcon.indexOf('xmark') !== -1 || dataIcon.indexOf('ban') !== -1 || dataIcon.indexOf('times') !== -1) return 'error';
+            if (dataIcon.indexOf('exclamation') !== -1 || dataIcon.indexOf('triangle') !== -1) return 'warning';
+            if (dataIcon.indexOf('info') !== -1 || dataIcon.indexOf('bell') !== -1 || dataIcon.indexOf('question') !== -1) return 'info';
+          }
+
+          // STRATEGY 2: Check the ThemeIcon's inline style color (set by ox_lib from type)
+          var themeIcon = card.querySelector('[class*="mantine-ThemeIcon"]');
+          if (themeIcon) {
+            var bgStyle = themeIcon.getAttribute('style') || '';
+            // ox_lib sets: teal.6 -> rgb(18,184,134), red.6 -> rgb(250,82,82), yellow.6 -> rgb(252,196,25), blue.6 -> rgb(34,139,230)
+            if (bgStyle.indexOf('18, 184') !== -1 || bgStyle.indexOf('18,184') !== -1 || bgStyle.indexOf('teal') !== -1 || bgStyle.indexOf('12, 166') !== -1) return 'success';
+            if (bgStyle.indexOf('250, 82') !== -1 || bgStyle.indexOf('250,82') !== -1 || bgStyle.indexOf('red') !== -1 || bgStyle.indexOf('224, 49') !== -1) return 'error';
+            if (bgStyle.indexOf('252, 196') !== -1 || bgStyle.indexOf('252,196') !== -1 || bgStyle.indexOf('yellow') !== -1 || bgStyle.indexOf('245, 159') !== -1) return 'warning';
+          }
+
+          // STRATEGY 3: Check RingProgress section color (when showDuration is true)
+          var ringCircle = card.querySelector('[class*="mantine-RingProgress"] circle:nth-of-type(2)');
+          if (ringCircle) {
+            var stroke = ringCircle.getAttribute('stroke') || '';
+            if (stroke.indexOf('teal') !== -1 || stroke.indexOf('18, 184') !== -1) return 'success';
+            if (stroke.indexOf('red') !== -1 || stroke.indexOf('250, 82') !== -1) return 'error';
+            if (stroke.indexOf('yellow') !== -1 || stroke.indexOf('252, 196') !== -1) return 'warning';
+          }
+
+          // STRATEGY 4: Check the FA icon's inline style color directly
+          if (faSvg) {
+            var svgStyle = faSvg.getAttribute('style') || '';
+            if (svgStyle.indexOf('18, 184') !== -1 || svgStyle.indexOf('teal') !== -1) return 'success';
+            if (svgStyle.indexOf('250, 82') !== -1 || svgStyle.indexOf('red') !== -1) return 'error';
+            if (svgStyle.indexOf('252, 196') !== -1 || svgStyle.indexOf('yellow') !== -1) return 'warning';
+          }
+
+          return 'info'; // Default
+        }
+
+        function getTagText(type) {
+          switch(type) {
+            case 'success': return 'ÉXITO';
+            case 'error': return 'ALERTA / ERROR';
+            case 'warning': return 'ADVERTENCIA';
+            default: return 'AVISO DEL SISTEMA';
+          }
+        }
+
+        function enhanceToastCards() {
+          var toaster = document.getElementById('_rht_toaster');
+          if (!toaster) return;
+
+          var toastWrappers = toaster.children;
+          for (var w = 0; w < toastWrappers.length; w++) {
+            var wrap = toastWrappers[w];
+            if (wrap.nodeType !== 1) continue;
+
+            // Find the actual notification card (first child div of the wrapper)
+            var card = null;
+            for (var c = 0; c < wrap.children.length; c++) {
+              if (wrap.children[c].nodeType === 1 && wrap.children[c].tagName === 'DIV') {
+                card = wrap.children[c];
+                break;
+              }
+            }
+
+            if (!card || _auraProcessedSet.has(card)) continue;
+
+            // Detect type
+            var toastType = detectToastType(card);
+            var tagText = getTagText(toastType);
+
+            // Mark as processed and add classes
+            _auraProcessedSet.add(card);
+            card.classList.add('aura-toast-card');
+            card.classList.add('aura-toast-' + toastType);
+
+            // Find the Stack container for the meta row
+            var stack = card.querySelector('[class*="mantine-Stack"]');
+            if (stack && !stack.querySelector('.aura-toast-meta')) {
+              var metaRow = document.createElement('div');
+              metaRow.className = 'aura-toast-meta';
+              metaRow.innerHTML = '<span class="aura-toast-tag">' + tagText + '</span><span class="aura-toast-time">AHORA</span>';
+              stack.insertBefore(metaRow, stack.firstChild);
+            }
+
+            // Tag icon container as badge (RingProgress or ThemeIcon)
+            var ringProgress = card.querySelector('[class*="mantine-RingProgress-root"]');
+            var themeIcon = card.querySelector('[class*="mantine-ThemeIcon-root"]');
+
+            if (ringProgress) {
+              if (!ringProgress.classList.contains('aura-toast-icon-badge')) {
+                ringProgress.classList.add('aura-toast-icon-badge');
+              }
+              if (themeIcon) {
+                themeIcon.style.setProperty('background', 'transparent', 'important');
+                themeIcon.style.setProperty('background-color', 'transparent', 'important');
+                themeIcon.style.setProperty('border-radius', '0px', 'important');
+                themeIcon.style.setProperty('box-shadow', 'none', 'important');
+                themeIcon.style.setProperty('border', 'none', 'important');
+              }
+            } else if (themeIcon) {
+              if (!themeIcon.classList.contains('aura-toast-icon-badge')) {
+                themeIcon.classList.add('aura-toast-icon-badge');
+              }
+              themeIcon.style.setProperty('border-radius', '11px', 'important');
+            }
+          }
+        }
+
+        function debouncedProcess() {
+          // Debounce: wait 30ms after last mutation to process
+          // This lets React + FontAwesome finish rendering the SVG icons
+          if (_auraDebounceTimer) clearTimeout(_auraDebounceTimer);
+          _auraDebounceTimer = setTimeout(function() {
+            formatAuraKeycaps();
+            enhanceToastCards();
+          }, 30);
+        }
+
+        var observer = new MutationObserver(debouncedProcess);
         observer.observe(document.body, { childList: true, subtree: true });
       })();
     </script>

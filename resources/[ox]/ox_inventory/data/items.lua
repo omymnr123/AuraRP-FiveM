@@ -200,6 +200,14 @@ return {
 		description = 'Dólares estadounidenses en billetes de curso legal en circulación.',
 	},
 
+	['black_money'] = {
+		label = 'Dinero Negro',
+		weight = 0,
+		stack = true,
+		close = true,
+		description = 'Fajos de billetes no declarados y marcados procedentes de actividades clandestinas. Requiere blanqueo.',
+	},
+
 	['mustard'] = {
 		label = 'Bote de Mostaza',
 		weight = 500,
@@ -517,6 +525,331 @@ return {
 		description = 'Dispositivo de precisión para medir el nivel de alcohol en aire espirado.',
 		client = {
 			image = 'phone.png'
+		}
+	},
+
+	['spray_can'] = {
+		label = 'Bote de Spray',
+		weight = 350,
+		stack = true,
+		close = true,
+		description = 'Aerosol de pintura de secado rápido. Usado por bandas urbanas para marcar y delimitar su territorio.',
+		client = {
+			image = 'spray_can.png',
+			anim = { dict = 'anim@amb@business@weed@weed_inspecting_high_prio@', clip = 'weed_cured_inspect_base' },
+			usetime = 1500,
+			export = 'aura_gangs.useSprayCan'
+		}
+	},
+
+	['lockpick'] = {
+		label = 'Ganzúa Básica',
+		weight = 80,
+		stack = true,
+		close = true,
+		description = 'Herramienta de cerrajería clandestina para forzar cerraduras estándar de puertas de vehículos.',
+		client = {
+			image = 'lockpick.png',
+			export = 'aura_gangs.useLockpick'
+		}
+	},
+
+	['adv_lockpick'] = {
+		label = 'Ganzúa Electrónica Avanzada',
+		weight = 150,
+		stack = true,
+		close = true,
+		description = 'Dispositivo bypass de alta precisión capaz de decodificar bombines y puentear el sistema de encendido.',
+		client = {
+			image = 'adv_lockpick.png',
+			export = 'aura_gangs.useAdvLockpick'
+		}
+	},
+
+	['blueprint_ak47'] = {
+		label = 'Esquema de Fusil AK-47',
+		weight = 50,
+		stack = false,
+		close = true,
+		description = 'Plano técnico clasificado con especificaciones de armería militar para ensamblar fusiles de asalto soviéticos.',
+		client = {
+			image = 'blueprint.png'
+		}
+	},
+
+	['weed_seed'] = {
+		label = 'Semillas de Cannabis',
+		weight = 10,
+		stack = true,
+		close = true,
+		description = 'Semillas híbridas seleccionadas para cultivo hidropónico y producción de marihuana de alta pureza.',
+		client = {
+			image = 'weed_seed.png'
+		}
+	},
+
+	['meth_ingredients'] = {
+		label = 'Precursores Químicos',
+		weight = 1200,
+		stack = true,
+		close = true,
+		description = 'Reactivos químicos peligrosos e inestables indispensables para la síntesis de metanfetamina en laboratorios.',
+		client = {
+			image = 'chemical.png'
+		}
+	},
+
+	['pseudoephedrine'] = {
+		label = 'Pseudoefedrina',
+		weight = 150,
+		stack = true,
+		close = true,
+		description = 'Cajas de pastillas con alta concentración de pseudoefedrina, precursor químico base para sintetizar metanfetamina.',
+		client = {
+			image = 'pseudoephedrine.png'
+		}
+	},
+
+	['hydrochloric_acid'] = {
+		label = 'Ácido Clorhídrico',
+		weight = 1500,
+		stack = true,
+		close = true,
+		description = 'Garrafa de ácido concentrado corrosivo de grado industrial usado como reactivo catalizador en la síntesis química.',
+		client = {
+			image = 'hydrochloric_acid.png'
+		}
+	},
+
+	['liquid_acetone'] = {
+		label = 'Acetona Industrial',
+		weight = 1000,
+		stack = true,
+		close = true,
+		description = 'Solvente orgánico volátil de alta pureza indispensable para la cristalización de sustancias químicas.',
+		client = {
+			image = 'liquid_acetone.png'
+		}
+	},
+
+	['empty_baggies'] = {
+		label = 'Bolsitas Herméticas',
+		weight = 5,
+		stack = true,
+		close = true,
+		description = 'Paquete de bolsitas de plástico transparente con autocierre hermético para dosificar y envasar sustancias.',
+		client = {
+			image = 'empty_baggies.png'
+		}
+	},
+
+	['meth'] = {
+		label = 'Metanfetamina Cristalina',
+		weight = 50,
+		stack = true,
+		close = true,
+		description = 'Bolsa con cristales de metanfetamina azul de máxima pureza (99.1%) lista para su distribución clandestina.',
+		client = {
+			image = 'meth.png'
+		}
+	},
+
+	['coca_leaf'] = {
+		label = 'Hojas de Coca',
+		weight = 50,
+		stack = true,
+		close = true,
+		description = 'Fardo de hojas de coca seleccionadas, materia prima vegetal indispensable para el proceso de maceración y extracción de cocaína.',
+		client = {
+			image = 'coca_leaf.png'
+		}
+	},
+
+	['sulfuric_acid'] = {
+		label = 'Ácido Sulfúrico',
+		weight = 1500,
+		stack = true,
+		close = true,
+		description = 'Garrafa de ácido mineral corrosivo de alta concentración utilizado para lixiviar y extraer la pasta base de cocaína.',
+		client = {
+			image = 'sulfuric_acid.png'
+		}
+	},
+
+	['baking_soda'] = {
+		label = 'Bicarbonato de Sodio',
+		weight = 250,
+		stack = true,
+		close = true,
+		description = 'Polvo alcalino puro utilizado para neutralizar la acidez, precipitar los alcaloides y refinar el clorhidrato de cocaína.',
+		client = {
+			image = 'baking_soda.png'
+		}
+	},
+
+	['cocaine'] = {
+		label = 'Bolsa de Cocaína',
+		weight = 50,
+		stack = true,
+		close = true,
+		description = 'Bolsita hermética con polvo de cocaína purificada (95%) lista para corte, distribución y venta en las calles.',
+		client = {
+			image = 'cocaine.png'
+		}
+	},
+
+	['car_parts'] = {
+		label = 'Piezas de Desguace',
+		weight = 3500,
+		stack = true,
+		close = true,
+		description = 'Componentes mecánicos, puertas y cableado extraídos de vehículos robados y despiezados en talleres clandestinos.',
+		client = {
+			image = 'scrapmetal.png'
+		}
+	},
+
+	['car_door'] = {
+		label = 'Puerta de Vehículo',
+		weight = 1200,
+		stack = true,
+		close = true,
+		description = 'Puerta metálica con guarnecido y ventanilla desmontada de un vehículo en desguace clandestino.',
+		client = {
+			image = 'car_door.png'
+		}
+	},
+
+	['car_hood'] = {
+		label = 'Capó de Vehículo',
+		weight = 1500,
+		stack = true,
+		close = true,
+		description = 'Capó delantero de carrocería extraído manualmente de un vehículo.',
+		client = {
+			image = 'car_hood.png'
+		}
+	},
+
+	['car_wheel'] = {
+		label = 'Rueda Completa',
+		weight = 1500,
+		stack = true,
+		close = true,
+		description = 'Llanta y neumático desmontados de los ejes de un vehículo.',
+		client = {
+			image = 'car_wheel.png'
+		}
+	},
+
+	['car_engine'] = {
+		label = 'Bloque Motor',
+		weight = 3000,
+		stack = true,
+		close = true,
+		description = 'Bloque motor desanclado mediante corte de soplete y herramientas pesadas de taller.',
+		client = {
+			image = 'car_engine.png'
+		}
+	},
+
+	['car_exhaust'] = {
+		label = 'Tubo de Escape',
+		weight = 1000,
+		stack = true,
+		close = true,
+		description = 'Línea de escape y silenciador seccionados de los bajos del vehículo.',
+		client = {
+			image = 'car_exhaust.png'
+		}
+	},
+
+	['scrap_metal'] = {
+		label = 'Chatarra de Bastidor',
+		weight = 400,
+		stack = true,
+		close = true,
+		description = 'Restos de chapa y bastidor compactados tras el desguace final de un chasis.',
+		client = {
+			image = 'scrap_metal.png'
+		}
+	},
+
+	-- Alias en español vinculados a las imágenes personalizadas
+	['capo_coche'] = {
+		label = 'Capó de Vehículo',
+		weight = 1500,
+		stack = true,
+		close = true,
+		description = 'Capó delantero de carrocería extraído manualmente de un vehículo.',
+		client = {
+			image = 'capo_coche.png'
+		}
+	},
+
+	['puerta_coche'] = {
+		label = 'Puerta de Vehículo',
+		weight = 1200,
+		stack = true,
+		close = true,
+		description = 'Puerta metálica desmontada de un vehículo en desguace.',
+		client = {
+			image = 'puerta_coche.png'
+		}
+	},
+
+	['rueda_coche'] = {
+		label = 'Rueda Completa',
+		weight = 1500,
+		stack = true,
+		close = true,
+		description = 'Llanta y neumático desmontados de un vehículo.',
+		client = {
+			image = 'rueda_coche.png'
+		}
+	},
+
+	['motor_coche'] = {
+		label = 'Bloque Motor',
+		weight = 3000,
+		stack = true,
+		close = true,
+		description = 'Bloque motor desanclado de un vehículo en desguace.',
+		client = {
+			image = 'motor_coche.png'
+		}
+	},
+
+	['tuboescape_coche'] = {
+		label = 'Tubo de Escape',
+		weight = 1000,
+		stack = true,
+		close = true,
+		description = 'Línea de escape desmontada de los bajos del vehículo.',
+		client = {
+			image = 'tuboescape_coche.png'
+		}
+	},
+
+	['scrapmetal'] = {
+		label = 'Chatarra de Bastidor',
+		weight = 400,
+		stack = true,
+		close = true,
+		description = 'Restos de chapa y bastidor compactados tras el desguace final de un chasis.',
+		client = {
+			image = 'scrapmetal.png'
+		}
+	},
+
+	['chatarra'] = {
+		label = 'Chatarra de Bastidor',
+		weight = 400,
+		stack = true,
+		close = true,
+		description = 'Restos de chapa y bastidor compactados tras el desguace final de un chasis.',
+		client = {
+			image = 'scrap_metal.png'
 		}
 	}
 }

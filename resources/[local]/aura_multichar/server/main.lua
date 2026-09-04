@@ -15,6 +15,54 @@ exports('GetActiveCharacter', function(source)
     return activeCharacters[tonumber(source)]
 end)
 
+-- Helper para asegurar que la apariencia no esté vacía o machacada (Fallback a playerskins)
+local function EnsureCharacterAppearance(charId, metadata)
+    metadata = metadata or {}
+    local app = metadata.appearance
+    local needsFallback = false
+
+    if not app or type(app) ~= "table" or next(app) == nil then
+        needsFallback = true
+    elseif app.components then
+        local hasAnyClothing = false
+        for _, comp in ipairs(app.components) do
+            if comp.drawable and comp.drawable > 0 then
+                hasAnyClothing = true
+                break
+            end
+        end
+        if not hasAnyClothing and app.props then
+            for _, prop in ipairs(app.props) do
+                if prop.drawable and prop.drawable >= 0 then
+                    hasAnyClothing = true
+                    break
+                end
+            end
+        end
+        if not hasAnyClothing then
+            needsFallback = true
+        end
+    else
+        needsFallback = true
+    end
+
+    if needsFallback and charId then
+        local skinRow = MySQL.scalar.await('SELECT skin FROM playerskins WHERE citizenid = ? AND active = 1 ORDER BY id DESC LIMIT 1', { tostring(charId) })
+        if skinRow then
+            local decodedSkin = json.decode(skinRow)
+            if decodedSkin and type(decodedSkin) == "table" and next(decodedSkin) ~= nil then
+                metadata.appearance = decodedSkin
+                MySQL.update('UPDATE characters SET metadata = ? WHERE id = ?', {
+                    json.encode(metadata),
+                    charId
+                })
+            end
+        end
+    end
+
+    return metadata
+end
+
 -- Función interna para actualizar la ubicación en memoria
 local function UpdateCharacterLocation(src, coords, heading)
     local char = activeCharacters[tonumber(src)]
@@ -51,6 +99,8 @@ local function SaveCharacterToDatabase(src)
     local char = activeCharacters[tonumber(src)]
     if not char or not char.id then return end
     
+    char.metadata = EnsureCharacterAppearance(char.id, char.metadata)
+
     MySQL.update('UPDATE characters SET metadata = ? WHERE id = ?', {
         json.encode(char.metadata),
         char.id
@@ -59,6 +109,76 @@ end
 
 -- Export para forzar guardado desde otros scripts
 exports('SaveCharacterLocation', SaveCharacterToDatabase)
+
+-- Función para actualizar la apariencia en memoria activa y en la base de datos sincronizadamente
+local function SetCharacterAppearance(target, appearanceData)
+    if not appearanceData or type(appearanceData) ~= "table" then return false end
+
+    local char = nil
+    local charId = nil
+    local targetNum = tonumber(target)
+
+    if targetNum and activeCharacters[targetNum] then
+        char = activeCharacters[targetNum]
+        charId = char.id
+    else
+        for _, activeChar in pairs(activeCharacters) do
+            if activeChar and activeChar.id == targetNum then
+                char = activeChar
+                charId = targetNum
+                break
+            end
+        end
+        charId = charId or targetNum
+    end
+
+    if char then
+        char.metadata = char.metadata or {}
+        char.metadata.appearance = appearanceData
+    end
+
+    if charId then
+        local charRow = MySQL.single.await('SELECT metadata FROM characters WHERE id = ?', { charId })
+        local meta = (charRow and json.decode(charRow.metadata)) or (char and char.metadata) or {}
+        meta.appearance = appearanceData
+
+        MySQL.update.await('UPDATE characters SET metadata = ? WHERE id = ?', {
+            json.encode(meta),
+            charId
+        })
+
+        pcall(function()
+            MySQL.update.await('UPDATE playerskins SET active = 0 WHERE citizenid = ?', { tostring(charId) })
+            if appearanceData.model then
+                MySQL.query.await('DELETE FROM playerskins WHERE citizenid = ? AND model = ?', { tostring(charId), appearanceData.model })
+            end
+            MySQL.insert.await('INSERT INTO playerskins (citizenid, model, skin, active) VALUES (?, ?, ?, 1)', {
+                tostring(charId),
+                appearanceData.model or 'mp_m_freemode_01',
+                json.encode(appearanceData)
+            })
+        end)
+
+        return true
+    end
+
+    return false
+end
+
+exports('SetCharacterAppearance', SetCharacterAppearance)
+
+exports('UpdateCharacterMetadata', function(src, key, value)
+    local char = activeCharacters[tonumber(src)]
+    if not char or not char.id then return false end
+    char.metadata = char.metadata or {}
+    char.metadata[key] = value
+    return true
+end)
+
+RegisterNetEvent('aura_multichar:server:setAppearance', function(appearanceData)
+    local src = source
+    SetCharacterAppearance(src, appearanceData)
+end)
 
 -- Evento de cliente para sincronización periódica de coordenadas (SOLO EN MEMORIA)
 RegisterNetEvent('aura_multichar:server:updateLocation', function(locationData)
@@ -100,7 +220,8 @@ lib.callback.register('aura_multichar:getCharacters', function(source)
     local chars = MySQL.query.await('SELECT * FROM characters WHERE citizenid = ?', {citizenRecord.citizenid})
     
     for i = 1, #chars do
-        chars[i].metadata = json.decode(chars[i].metadata)
+        chars[i].metadata = json.decode(chars[i].metadata) or {}
+        chars[i].metadata = EnsureCharacterAppearance(chars[i].id, chars[i].metadata)
         if chars[i].accounts then
             chars[i].accounts = json.decode(chars[i].accounts)
         else
@@ -187,8 +308,15 @@ lib.callback.register('aura_multichar:createCharacter', function(source, data)
             end
         end)
 
-        -- Notificar carga a aura_economy
+        -- Notificar carga a aura_economy y aura_jobs
         TriggerEvent('aura_economy:server:characterLoaded', src, insertId, accounts)
+        pcall(function()
+            if exports.aura_jobs and exports.aura_jobs.LoadPlayerJob then
+                exports.aura_jobs:LoadPlayerJob(src, insertId)
+            else
+                TriggerEvent('aura_multichar:server:characterLoaded', insertId, src)
+            end
+        end)
 
         return newChar
     end
@@ -227,7 +355,8 @@ lib.callback.register('aura_multichar:selectCharacter', function(source, id)
         end)
     end
 
-    char.metadata = json.decode(char.metadata)
+    char.metadata = json.decode(char.metadata) or {}
+    char.metadata = EnsureCharacterAppearance(char.id, char.metadata)
     if char.accounts then
         char.accounts = json.decode(char.accounts)
     else
@@ -248,8 +377,15 @@ lib.callback.register('aura_multichar:selectCharacter', function(source, id)
         end
     end)
 
-    -- Sincronizar estado en memoria en aura_economy
+    -- Sincronizar estado en memoria en aura_economy y aura_jobs
     TriggerEvent('aura_economy:server:characterLoaded', src, char.id, char.accounts)
+    pcall(function()
+        if exports.aura_jobs and exports.aura_jobs.LoadPlayerJob then
+            exports.aura_jobs:LoadPlayerJob(src, char.id)
+        else
+            TriggerEvent('aura_multichar:server:characterLoaded', char.id, src)
+        end
+    end)
 
     return char
 end)

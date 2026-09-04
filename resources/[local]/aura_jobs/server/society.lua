@@ -51,7 +51,7 @@ local function LoadSocieties()
 
     -- Inicializar cualquier trabajo de Config.Jobs que no exista en la DB
     for jobName, jobData in pairs(Config.Jobs) do
-        if jobData.isBusiness and not AuraSociety.Societies[jobName] then
+        if (jobData.isBusiness or jobData.isGang) and not AuraSociety.Societies[jobName] then
             MySQL.insert.await('INSERT INTO aura_societies (name, label, balance) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE `label` = VALUES(`label`)', {
                 jobName,
                 jobData.label,

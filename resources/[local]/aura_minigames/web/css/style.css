@@ -1,0 +1,1145 @@
+/* ============================================================================
+   AURA MINIGAMES: MASTER STYLESHEET (AURARP GLASSMORPHISM)
+   Modern AAA Cyber Aesthetic: Turquoise (#40E0D0) to Neon Pink (#FF007F)
+   ============================================================================ */
+
+:root {
+    --aurarp-cyan: #40E0D0;
+    --aurarp-pink: #FF007F;
+    --aurarp-gradient: linear-gradient(135deg, #40E0D0 0%, #FF007F 100%);
+    --aurarp-bg: rgba(10, 15, 29, 0.94);
+    --aurarp-card-bg: rgba(14, 22, 42, 0.88);
+    --aurarp-border: rgba(64, 224, 208, 0.25);
+    --aurarp-border-pink: rgba(255, 0, 127, 0.35);
+    --aurarp-glow-cyan: 0 0 20px rgba(64, 224, 208, 0.45);
+    --aurarp-glow-pink: 0 0 20px rgba(255, 0, 127, 0.45);
+    --font-heading: 'Rajdhani', sans-serif;
+    --font-body: 'Montserrat', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+}
+
+/* 1. RESET Y CRÍTICO DE FIVEM CEF TRANSPARENCY */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+html, body {
+    background: transparent !important;
+    background-color: transparent !important;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    font-family: var(--font-body);
+    color: #e2e8f0;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Contenedor maestro a pantalla completa (100% TRANSPARENTE - SOLUCIÓN CHROMIUM FIVE M) */
+.app-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent !important;
+    background-color: transparent !important;
+}
+
+/* Tarjeta base: Fondo oscuro sólido de alta fidelidad SIN backdrop-filter para erradicar recuadro negro */
+.minigame-card {
+    background: rgba(10, 15, 29, 0.96) !important;
+    background-color: rgba(10, 15, 29, 0.96) !important;
+    border: 1px solid var(--aurarp-border);
+    border-radius: 16px;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9), 0 0 25px rgba(64, 224, 208, 0.25);
+    padding: 24px 30px;
+    width: 680px;
+    max-width: 92vw;
+    position: relative;
+    overflow: hidden;
+    animation: slideUp 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    transform: translateZ(0);
+}
+
+.minigame-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--aurarp-gradient);
+    box-shadow: 0 0 15px var(--aurarp-cyan);
+}
+
+/* Encabezado común */
+.minigame-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.header-tag {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.pulse-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--aurarp-cyan);
+    box-shadow: 0 0 10px var(--aurarp-cyan);
+    animation: pulseGlow 1.5s infinite alternate;
+}
+
+.tag-text {
+    font-family: var(--font-heading);
+    font-size: 1.15rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    background: var(--aurarp-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-transform: uppercase;
+}
+
+/* Pie y controles */
+.minigame-footer {
+    margin-top: 20px;
+    padding-top: 14px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.controls-hint {
+    font-size: 0.82rem;
+    color: #94a3b8;
+    font-weight: 500;
+}
+
+.badge {
+    background: rgba(64, 224, 208, 0.15);
+    color: var(--aurarp-cyan);
+    border: 1px solid rgba(64, 224, 208, 0.35);
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.status-indicator {
+    font-size: 0.95rem;
+    font-family: var(--font-body);
+    color: #cbd5e1;
+    min-height: 24px;
+}
+
+/* ============================================================================
+   1. ESTILOS: MINIJUEGO DE CERRAJERÍA (LOCKPICK)
+   ============================================================================ */
+.lockpick-card {
+    width: 680px;
+}
+
+.durability-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.durability-label {
+    font-size: 0.78rem;
+    color: #94a3b8;
+    font-weight: 600;
+}
+
+.durability-bar-container {
+    width: 90px;
+    height: 8px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 4px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.durability-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--aurarp-cyan), #38bdf8);
+    transition: width 0.15s ease, background 0.3s;
+}
+
+.durability-num {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--aurarp-cyan);
+    font-weight: 700;
+    min-width: 38px;
+}
+
+.lock-viewport {
+    width: 100%;
+    height: 250px;
+    background: radial-gradient(circle at center, #111a33 0%, #080d1a 100%);
+    border: 1px solid rgba(64, 224, 208, 0.2);
+    border-radius: 12px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.8);
+}
+
+/* Guía de Línea de Corte (Shear Line) */
+.shear-line-guide {
+    position: absolute;
+    top: 100px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: repeating-linear-gradient(90deg, rgba(64, 224, 208, 0.7) 0, rgba(64, 224, 208, 0.7) 8px, transparent 8px, transparent 16px);
+    box-shadow: 0 0 8px var(--aurarp-cyan);
+    z-index: 5;
+}
+
+.shear-line-label {
+    position: absolute;
+    right: 12px;
+    top: -16px;
+    font-size: 0.65rem;
+    font-family: var(--font-mono);
+    color: var(--aurarp-cyan);
+    letter-spacing: 1px;
+    opacity: 0.8;
+}
+
+/* Pista de cámaras de pernos */
+.chambers-track {
+    position: absolute;
+    top: 20px;
+    bottom: 20px;
+    left: 40px;
+    right: 40px;
+    display: flex;
+    justify-content: space-around;
+    align-items: stretch;
+    z-index: 10;
+}
+
+.pin-chamber {
+    width: 46px;
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 6px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow: hidden;
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.7);
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.pin-spring {
+    width: 12px;
+    height: 35px;
+    background: repeating-linear-gradient(0deg, #64748b 0, #64748b 2px, transparent 2px, transparent 6px);
+    margin-top: 4px;
+}
+
+.driver-pin {
+    width: 26px;
+    height: 48px;
+    background: linear-gradient(180deg, #d97706, #92400e);
+    border: 1px solid #f59e0b;
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+    transition: transform 0.05s ease-out;
+}
+
+.key-pin {
+    width: 26px;
+    height: 60px;
+    background: linear-gradient(180deg, #0284c7, #0369a1);
+    border: 1px solid #38bdf8;
+    border-radius: 4px 4px 6px 6px;
+    margin-top: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+    transition: transform 0.05s ease-out;
+}
+
+.pin-number {
+    position: absolute;
+    bottom: 4px;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: #64748b;
+    font-weight: 700;
+}
+
+/* Estado de perno fijado con éxito */
+.pin-set {
+    border-color: var(--aurarp-cyan) !important;
+    box-shadow: 0 0 15px rgba(64, 224, 208, 0.4) !important;
+}
+
+.pin-set .key-pin {
+    background: linear-gradient(180deg, var(--aurarp-cyan), #0d9488) !important;
+    border-color: #5eead4 !important;
+    box-shadow: 0 0 12px var(--aurarp-cyan) !important;
+}
+
+.pin-set .driver-pin {
+    background: linear-gradient(180deg, #10b981, #047857) !important;
+    border-color: #34d399 !important;
+}
+
+/* Estado de punto de corte detectado (Sweet spot) */
+.pin-near {
+    border-color: #f59e0b !important;
+    box-shadow: 0 0 15px rgba(245, 158, 11, 0.6) !important;
+}
+
+.pin-near .key-pin {
+    background: linear-gradient(180deg, #f59e0b, #d97706) !important;
+    border-color: #fcd34d !important;
+    box-shadow: 0 0 12px rgba(245, 158, 11, 0.7) !important;
+}
+
+/* Estado de sobrepresión (Over-set) */
+.pin-over {
+    border-color: var(--aurarp-pink) !important;
+    box-shadow: 0 0 15px rgba(255, 0, 127, 0.4) !important;
+    animation: jitter 0.08s infinite alternate;
+}
+
+.pin-over .key-pin {
+    background: linear-gradient(180deg, var(--aurarp-pink), #be123c) !important;
+    border-color: #fb7185 !important;
+}
+
+/* Ganzúa interactiva */
+.pick-tool {
+    position: absolute;
+    bottom: 12px;
+    width: 40px;
+    pointer-events: none;
+    z-index: 20;
+    transition: left 0.15s ease-out;
+}
+
+.pick-tip {
+    width: 14px;
+    height: 14px;
+    background: var(--aurarp-cyan);
+    border-radius: 50% 50% 0 0;
+    margin: 0 auto;
+    box-shadow: 0 0 10px var(--aurarp-cyan);
+}
+
+.pick-shaft {
+    width: 6px;
+    height: 70px;
+    background: linear-gradient(180deg, #cbd5e1, #475569);
+    margin: 0 auto;
+    border-radius: 2px;
+}
+
+/* Rotor desbloqueado rotación */
+.cylinder-unlocked {
+    box-shadow: inset 0 0 50px rgba(64, 224, 208, 0.4);
+    animation: rotateSuccess 0.8s forwards;
+}
+
+/* ============================================================================
+   2. ESTILOS: OSCILOSCOPIO DE CENTRALITA ECU (adv_lockpick)
+   ============================================================================ */
+.ecu-card {
+    width: 720px;
+}
+
+.ecu-timer-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.timer-label {
+    font-size: 0.78rem;
+    color: #94a3b8;
+    font-weight: 600;
+}
+
+.timer-num {
+    font-family: var(--font-mono);
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--aurarp-cyan);
+    background: rgba(0, 0, 0, 0.4);
+    padding: 2px 8px;
+    border-radius: 4px;
+    border: 1px solid rgba(64, 224, 208, 0.3);
+}
+
+.timer-danger {
+    color: var(--aurarp-pink) !important;
+    border-color: var(--aurarp-pink) !important;
+    animation: pulseAlert 0.5s infinite alternate;
+}
+
+.oscilloscope-container {
+    position: relative;
+    width: 100%;
+    height: 280px;
+    background: #060a14;
+    border: 1px solid rgba(64, 224, 208, 0.3);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.9);
+}
+
+.oscilloscope-canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.oscilloscope-overlay {
+    position: absolute;
+    top: 12px;
+    left: 14px;
+    right: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    pointer-events: none;
+}
+
+.legend {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    background: rgba(10, 15, 29, 0.75);
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.legend-item {
+    font-size: 0.72rem;
+    font-family: var(--font-mono);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.pink-dot {
+    background: var(--aurarp-pink);
+    box-shadow: 0 0 6px var(--aurarp-pink);
+}
+
+.cyan-dot {
+    background: var(--aurarp-cyan);
+    box-shadow: 0 0 6px var(--aurarp-cyan);
+}
+
+.resonance-hud {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(10, 15, 29, 0.85);
+    padding: 6px 14px;
+    border-radius: 6px;
+    border: 1px solid rgba(64, 224, 208, 0.3);
+}
+
+.hud-title {
+    font-size: 0.75rem;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    color: var(--aurarp-cyan);
+}
+
+.resonance-bar-wrap {
+    width: 110px;
+    height: 10px;
+    background: rgba(0, 0, 0, 0.6);
+    border-radius: 5px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.resonance-bar {
+    height: 100%;
+    background: var(--aurarp-gradient);
+    box-shadow: 0 0 10px var(--aurarp-cyan);
+    transition: width 0.1s linear;
+}
+
+.resonance-val {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: #fff;
+    min-width: 40px;
+}
+
+/* Panel de diales */
+.ecu-controls-panel {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-top: 18px;
+}
+
+.dial-group {
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 12px 14px;
+    border-radius: 8px;
+}
+
+.dial-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.dial-title {
+    font-family: var(--font-heading);
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #94a3b8;
+}
+
+.dial-val {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--aurarp-cyan);
+}
+
+.dial-hint {
+    font-size: 0.68rem;
+    color: #64748b;
+    margin-top: 6px;
+    transition: color 0.2s, font-weight 0.2s;
+}
+
+/* Estado de dial en calibración fina (zona próxima) */
+.dial-tuning {
+    border-color: #f59e0b !important;
+    background: rgba(245, 158, 11, 0.08) !important;
+    box-shadow: 0 0 14px rgba(245, 158, 11, 0.25) !important;
+}
+
+.dial-tuning .dial-title {
+    color: #fef08a !important;
+}
+
+.dial-tuning .dial-val {
+    color: #f59e0b !important;
+    text-shadow: 0 0 6px rgba(245, 158, 11, 0.6);
+}
+
+.dial-tuning .dial-hint {
+    color: #fbbf24 !important;
+    font-weight: 600;
+}
+
+/* Estado de dial sintonizado y acoplado */
+.dial-locked {
+    border-color: var(--aurarp-cyan) !important;
+    background: rgba(64, 224, 208, 0.12) !important;
+    box-shadow: 0 0 16px rgba(64, 224, 208, 0.35) !important;
+}
+
+.dial-locked .dial-title {
+    color: #fff !important;
+}
+
+.dial-locked .dial-val {
+    color: #40E0D0 !important;
+    text-shadow: 0 0 8px #40E0D0;
+}
+
+.dial-locked .dial-hint {
+    color: #40E0D0 !important;
+    font-weight: 700;
+}
+
+/* Sliders interactivos */
+.cyber-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    outline: none;
+}
+
+.cyber-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--aurarp-cyan);
+    cursor: pointer;
+    box-shadow: 0 0 10px var(--aurarp-cyan);
+    border: 2px solid #fff;
+    transition: transform 0.1s;
+}
+
+.cyber-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+    box-shadow: 0 0 15px var(--aurarp-pink);
+}
+
+/* ============================================================================
+   3. ESTILOS: REACTOR TERMOQUÍMICO (METH LAB)
+   ============================================================================ */
+.reactor-card {
+    width: 740px;
+}
+
+.reactor-status-badge {
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-family: var(--font-heading);
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.badge-safe {
+    background: rgba(64, 224, 208, 0.15);
+    color: var(--aurarp-cyan);
+    border: 1px solid rgba(64, 224, 208, 0.4);
+}
+
+.badge-danger {
+    background: rgba(255, 0, 127, 0.2);
+    color: var(--aurarp-pink);
+    border: 1px solid var(--aurarp-pink);
+    animation: pulseAlert 0.4s infinite alternate;
+}
+
+.reactor-synthesis-box {
+    margin-bottom: 20px;
+}
+
+.synthesis-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 6px;
+}
+
+.synthesis-title {
+    font-family: var(--font-heading);
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #94a3b8;
+}
+
+.synthesis-pct {
+    font-family: var(--font-mono);
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: var(--aurarp-cyan);
+}
+
+.synthesis-track {
+    width: 100%;
+    height: 10px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 5px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.synthesis-bar {
+    height: 100%;
+    background: var(--aurarp-gradient);
+    box-shadow: 0 0 10px var(--aurarp-cyan);
+    transition: width 0.15s linear;
+}
+
+.reactor-gauges-grid {
+    display: grid;
+    grid-template-columns: 180px 1fr 180px;
+    gap: 18px;
+    align-items: center;
+}
+
+.gauge-card {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    padding: 12px;
+}
+
+.gauge-header {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-bottom: 10px;
+}
+
+.gauge-name {
+    font-family: var(--font-heading);
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #94a3b8;
+}
+
+.gauge-reading {
+    font-family: var(--font-mono);
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #fff;
+}
+
+.gauge-bar-vertical-wrap {
+    height: 140px;
+    background: rgba(0, 0, 0, 0.6);
+    border-radius: 6px;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: flex-end;
+}
+
+.safe-zone-marker {
+    position: absolute;
+    left: 0;
+    right: 0;
+    background: rgba(64, 224, 208, 0.15);
+    border-top: 1px dashed var(--aurarp-cyan);
+    border-bottom: 1px dashed var(--aurarp-cyan);
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.marker-pressure {
+    bottom: 32%;
+    height: 36%;
+}
+
+.marker-temp {
+    bottom: 34%;
+    height: 30%;
+}
+
+.marker-text {
+    font-size: 0.58rem;
+    font-family: var(--font-mono);
+    color: var(--aurarp-cyan);
+    font-weight: 700;
+}
+
+.danger-zone-marker {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 20%;
+    background: rgba(255, 0, 127, 0.18);
+    border-bottom: 1px solid var(--aurarp-pink);
+    z-index: 2;
+    font-size: 0.58rem;
+    font-family: var(--font-mono);
+    color: var(--aurarp-pink);
+    text-align: center;
+    padding-top: 2px;
+    font-weight: 700;
+}
+
+.gauge-fill-vertical {
+    width: 100%;
+    background: linear-gradient(0deg, var(--aurarp-cyan) 0%, #38bdf8 65%, var(--aurarp-pink) 95%);
+    transition: height 0.12s linear;
+    box-shadow: 0 0 10px rgba(64, 224, 208, 0.5);
+}
+
+.gauge-sub {
+    font-size: 0.65rem;
+    color: #64748b;
+    margin-top: 8px;
+    text-align: center;
+}
+
+/* Matraz de destilación central */
+.reactor-vessel-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.vessel-flask {
+    width: 140px;
+    height: 160px;
+    background: rgba(10, 18, 35, 0.6);
+    border: 2px solid rgba(64, 224, 208, 0.35);
+    border-radius: 20px 20px 50px 50px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8), 0 0 15px rgba(64, 224, 208, 0.15);
+}
+
+.flask-liquid {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 65%;
+    background: linear-gradient(180deg, rgba(64, 224, 208, 0.85) 0%, rgba(255, 0, 127, 0.75) 100%);
+    box-shadow: 0 0 20px var(--aurarp-cyan);
+}
+
+.flask-bubbles {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 65%;
+    pointer-events: none;
+}
+
+.bubble {
+    position: absolute;
+    bottom: -10px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #fff;
+    opacity: 0.7;
+    animation: riseBubble linear infinite;
+}
+
+.overload-warning-text {
+    display: none;
+    font-family: var(--font-heading);
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: var(--aurarp-pink);
+    text-align: center;
+    margin-top: 10px;
+    animation: pulseAlert 0.3s infinite alternate;
+}
+
+/* Botones de válvulas */
+.reactor-valves-panel {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-top: 20px;
+}
+
+.valve-btn {
+    background: rgba(14, 22, 42, 0.7);
+    border: 1px solid rgba(64, 224, 208, 0.3);
+    border-radius: 10px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.valve-btn:hover {
+    background: rgba(64, 224, 208, 0.12);
+    border-color: var(--aurarp-cyan);
+    box-shadow: 0 0 15px rgba(64, 224, 208, 0.3);
+    transform: translateY(-2px);
+}
+
+.btn-active-flash {
+    background: rgba(255, 0, 127, 0.3) !important;
+    border-color: var(--aurarp-pink) !important;
+    box-shadow: 0 0 20px var(--aurarp-pink) !important;
+    transform: scale(0.97) !important;
+}
+
+.valve-key {
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--aurarp-cyan);
+    font-family: var(--font-mono);
+    font-size: 1.1rem;
+    font-weight: 800;
+    padding: 4px 10px;
+    border-radius: 6px;
+}
+
+.valve-info {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
+.valve-name {
+    font-family: var(--font-heading);
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #fff;
+}
+
+.valve-desc {
+    font-size: 0.7rem;
+    color: #94a3b8;
+    margin-top: 2px;
+}
+
+/* ============================================================================
+   4. ESTILOS: DESCIFRADOR DE MATRIZ HEXADECIMAL (CIPHER MATRIX)
+   ============================================================================ */
+.cipher-card {
+    width: 720px;
+}
+
+.cipher-timer-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.cipher-body {
+    display: grid;
+    grid-template-columns: 1fr 220px;
+    gap: 22px;
+}
+
+.panel-subtitle {
+    font-family: var(--font-heading);
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #94a3b8;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+}
+
+.hex-grid {
+    display: grid;
+    gap: 8px;
+    background: rgba(0, 0, 0, 0.35);
+    padding: 14px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.hex-cell {
+    background: rgba(14, 22, 42, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #cbd5e1;
+    font-family: var(--font-mono);
+    font-size: 1.05rem;
+    font-weight: 700;
+    height: 48px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s;
+    outline: none;
+}
+
+.cell-selectable {
+    border-color: var(--aurarp-cyan) !important;
+    color: #fff !important;
+    background: rgba(64, 224, 208, 0.15) !important;
+    box-shadow: 0 0 10px rgba(64, 224, 208, 0.3);
+}
+
+.cell-selectable:hover {
+    background: rgba(64, 224, 208, 0.35) !important;
+    border-color: #fff !important;
+    transform: scale(1.05);
+    box-shadow: 0 0 15px var(--aurarp-cyan);
+}
+
+.cell-dim {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+.cell-used {
+    background: rgba(0, 0, 0, 0.5) !important;
+    border-color: transparent !important;
+    color: #475569 !important;
+    cursor: not-allowed;
+    text-decoration: line-through;
+}
+
+.sequence-list {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.target-token {
+    background: rgba(255, 0, 127, 0.15);
+    border: 1px solid var(--aurarp-pink);
+    color: #fff;
+    font-family: var(--font-mono);
+    font-size: 0.95rem;
+    font-weight: 800;
+    padding: 8px 12px;
+    border-radius: 6px;
+    box-shadow: 0 0 10px rgba(255, 0, 127, 0.3);
+}
+
+.buffer-slots {
+    display: flex;
+    gap: 8px;
+}
+
+.buffer-slot {
+    width: 44px;
+    height: 44px;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px dashed rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-mono);
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: #64748b;
+}
+
+.slot-filled {
+    border: 1px solid var(--aurarp-cyan) !important;
+    background: rgba(64, 224, 208, 0.2) !important;
+    color: #fff !important;
+    box-shadow: 0 0 8px rgba(64, 224, 208, 0.4);
+}
+
+.cipher-guide-box {
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 6px;
+    padding: 10px 12px;
+    margin-top: 20px;
+}
+
+.guide-title {
+    font-family: var(--font-heading);
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--aurarp-cyan);
+}
+
+.guide-text {
+    font-size: 0.72rem;
+    color: #94a3b8;
+    margin-top: 4px;
+    line-height: 1.4;
+}
+
+/* ============================================================================
+   ANIMACIONES GENERALES
+   ============================================================================ */
+@keyframes fadeIn {
+    from { opacity: 1; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(10px) scale(0.98);
+    }
+    to {
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes pulseGlow {
+    from {
+        box-shadow: 0 0 5px var(--aurarp-cyan);
+        transform: scale(0.9);
+    }
+    to {
+        box-shadow: 0 0 15px var(--aurarp-cyan), 0 0 25px var(--aurarp-pink);
+        transform: scale(1.1);
+    }
+}
+
+@keyframes pulseAlert {
+    from { opacity: 0.6; }
+    to { opacity: 1; }
+}
+
+@keyframes jitter {
+    0% { transform: translate(0, 0); }
+    50% { transform: translate(-1.5px, 1px); }
+    100% { transform: translate(1.5px, -1px); }
+}
+
+@keyframes riseBubble {
+    0% {
+        bottom: 0;
+        transform: scale(0.5);
+        opacity: 0.8;
+    }
+    100% {
+        bottom: 100%;
+        transform: scale(1.3);
+        opacity: 0;
+    }
+}
+
+@keyframes rotateSuccess {
+    to {
+        transform: rotate(90deg);
+    }
+}
+
+.glitch-shake {
+    animation: shake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+@keyframes shake {
+    10%, 90% { transform: translate3d(-2px, 0, 0); }
+    20%, 80% { transform: translate3d(3px, 0, 0); }
+    30%, 50%, 70% { transform: translate3d(-5px, 0, 0); }
+    40%, 60% { transform: translate3d(5px, 0, 0); }
+}
+
+.pulse-success {
+    box-shadow: 0 0 35px var(--aurarp-cyan) !important;
+    border-color: var(--aurarp-cyan) !important;
+}
+
+.card-exploded {
+    background: radial-gradient(circle at center, rgba(255, 0, 127, 0.9) 0%, rgba(10, 15, 29, 0.95) 100%) !important;
+    border-color: #ff4444 !important;
+    box-shadow: 0 0 60px #ff0000 !important;
+}

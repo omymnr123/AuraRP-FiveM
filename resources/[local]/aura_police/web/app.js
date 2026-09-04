@@ -4,12 +4,11 @@
 
 const GRADE_TITLES = {
     0: "Cadete",
-    1: "Oficial I",
-    2: "Oficial II",
-    3: "Sargento",
-    4: "Teniente",
-    5: "Capitán",
-    6: "Jefe de Policía"
+    1: "Oficial",
+    2: "Sargento",
+    3: "Teniente",
+    4: "Detective",
+    5: "Comisario"
 };
 
 const CATEGORY_ICONS = {
@@ -248,6 +247,307 @@ class PoliceGarageApp {
     }
 }
 
+// ============================================================================
+// AuraRP - Tactical Dispatch HUD & Active Calls Board Manager
+// ============================================================================
+
+class DispatchHUD {
+    constructor() {
+        this.container = document.getElementById("dispatchContainer");
+        this.init();
+    }
+
+    init() {
+        window.addEventListener("message", (event) => {
+            const data = event.data;
+            if (data.action === "dispatchAlert" && data.alert) {
+                this.showAlert(data.alert);
+            }
+        });
+    }
+
+    showAlert(alert) {
+        if (!this.container) return;
+
+        const isGunshot = alert.type === 'gunshot';
+        const card = document.createElement("div");
+        card.className = `dispatch-alert-card ${isGunshot ? 'gunshot' : 'theft'}`;
+
+        card.innerHTML = `
+            <div class="dispatch-glow-strip"></div>
+            <div class="dispatch-card-inner">
+                <div class="dispatch-icon-badge ${isGunshot ? 'gun-icon-red' : 'veh-icon-orange'}">
+                    <i class="fa-solid ${isGunshot ? 'fa-gun' : 'fa-car-side'}"></i>
+                </div>
+                <div class="dispatch-content">
+                    <div class="dispatch-meta-row">
+                        <span class="dispatch-code ${isGunshot ? 'code-red' : 'code-orange'}">${alert.code}</span>
+                        <span class="dispatch-time"><i class="fa-regular fa-clock"></i> ${alert.time || 'AHORA'}</span>
+                    </div>
+                    <div class="dispatch-title-row">
+                        <span class="dispatch-title">${alert.title}</span>
+                    </div>
+                    <div class="dispatch-location-row">
+                        <i class="fa-solid fa-location-dot"></i>
+                        <span>${alert.street} <strong class="zone-highlight">(${alert.zone})</strong></span>
+                    </div>
+                    ${alert.plate ? `
+                        <div class="dispatch-plate-tag">
+                            <i class="fa-solid fa-car"></i> Matrícula: <strong>${alert.plate}</strong> <span style="color:#64748b;">|</span> ${alert.model || 'Vehículo'}
+                        </div>
+                    ` : ''}
+                    <div class="dispatch-footer-tip">
+                        <div class="dispatch-pill-btn">
+                            <kbd>G</kbd> <span>ACUDIR / GPS</span>
+                        </div>
+                        <div class="dispatch-pill-btn alt">
+                            <kbd>U</kbd> <span>CENTRAL 911</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="dispatch-progress-bar">
+                <div class="dispatch-progress-fill"></div>
+            </div>
+        `;
+
+        this.container.prepend(card);
+
+        requestAnimationFrame(() => {
+            card.classList.add("visible");
+        });
+
+        setTimeout(() => {
+            card.classList.remove("visible");
+            card.classList.add("removing");
+            setTimeout(() => {
+                card.remove();
+            }, 400);
+        }, 8500);
+    }
+}
+
+class DispatchBoard {
+    constructor() {
+        this.wrapper = document.getElementById("dispatchBoardApp");
+        this.listEl = document.getElementById("dispatchBoardList");
+        this.btnClose = document.getElementById("btnCloseBoard");
+        this.btnRefresh = document.getElementById("btnRefreshBoard");
+        this.backdrop = document.getElementById("dispatchBoardBackdrop");
+
+        this.calls = [];
+        this.mySrc = 0;
+        this.isOpen = false;
+
+        this.init();
+    }
+
+    init() {
+        window.addEventListener("message", (event) => {
+            const data = event.data;
+            if (data.action === "openDispatchBoard") {
+                this.calls = data.calls || [];
+                this.mySrc = data.mySrc || 0;
+                this.show();
+            } else if (data.action === "closeDispatchBoard") {
+                this.hide();
+            } else if (data.action === "syncCallUpdate" && data.call) {
+                this.updateCall(data.call);
+            }
+        });
+
+        if (this.btnClose) this.btnClose.addEventListener("click", () => this.close());
+        if (this.backdrop) this.backdrop.addEventListener("click", () => this.close());
+        if (this.btnRefresh) {
+            this.btnRefresh.addEventListener("click", () => {
+                fetch(`https://${GetParentResourceName()}/getDispatchBoardCalls`, {
+                    method: 'POST',
+                    body: JSON.stringify({})
+                }).catch(() => {});
+            });
+        }
+
+        window.addEventListener("keydown", (e) => {
+            if (this.isOpen && (e.key === "Escape" || e.key === "u" || e.key === "U")) {
+                this.close();
+            }
+        });
+    }
+
+    show() {
+        this.isOpen = true;
+        this.wrapper.classList.remove("hidden");
+        this.renderCalls();
+    }
+
+    hide() {
+        this.isOpen = false;
+        this.wrapper.classList.add("hidden");
+    }
+
+    close() {
+        this.hide();
+        fetch(`https://${GetParentResourceName()}/closeDispatchBoard`, {
+            method: 'POST',
+            body: JSON.stringify({})
+        }).catch(() => {});
+    }
+
+    renderCalls() {
+        if (!this.listEl) return;
+        this.listEl.innerHTML = "";
+
+        if (!this.calls || this.calls.length === 0) {
+            this.listEl.innerHTML = `
+                <div class="board-empty-state">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <h4>Sin Incidentes Activos</h4>
+                    <p>La central de emergencias no registra llamadas de despacho pendientes en este momento.</p>
+                </div>
+            `;
+            return;
+        }
+
+        this.calls.forEach(call => {
+            const isGunshot = call.type === 'gunshot';
+            const isResolved = call.status === 'resolved';
+            const units = call.units || [];
+            const maxUnits = call.maxUnits || 2;
+            const isFull = units.length >= maxUnits;
+            const amIAttending = units.some(u => u.src === this.mySrc);
+
+            let statusPillClass = 'status-pending';
+            let statusLabel = `PENDIENTE (0/${maxUnits})`;
+
+            if (isResolved) {
+                statusPillClass = 'status-resolved';
+                statusLabel = 'RESUELTO';
+            } else if (isFull) {
+                statusPillClass = 'status-full';
+                statusLabel = `CUPO COMPLETO (${units.length}/${maxUnits})`;
+            } else if (units.length > 0) {
+                statusPillClass = 'status-responding';
+                statusLabel = `EN CURSO (${units.length}/${maxUnits})`;
+            }
+
+            const card = document.createElement("div");
+            card.className = `board-call-card ${isResolved ? 'resolved' : ''}`;
+            card.id = `boardCall_${call.id}`;
+
+            card.innerHTML = `
+                <div class="board-card-header">
+                    <div class="board-header-info">
+                        <span class="board-code-pill ${isGunshot ? 'red' : 'orange'}">${call.code}</span>
+                        <h4 class="board-call-title">${call.title}</h4>
+                        <span class="board-call-time"><i class="fa-regular fa-clock"></i> ${call.time}</span>
+                    </div>
+                    <div class="board-status-pill ${statusPillClass}">
+                        <span class="pulse-dot"></span>
+                        <span>${statusLabel}</span>
+                    </div>
+                </div>
+
+                <div class="board-card-body">
+                    <div class="board-loc-row">
+                        <i class="fa-solid fa-location-dot"></i>
+                        <span>${call.street} <strong>(${call.zone})</strong></span>
+                    </div>
+                    ${call.plate ? `
+                        <div class="board-veh-tag">
+                            <i class="fa-solid fa-car"></i> Matrícula: <strong>${call.plate}</strong> | Modelo: <span>${call.model || 'Desconocido'}</span>
+                        </div>
+                    ` : ''}
+                    <p class="board-call-desc">${call.description || ''}</p>
+                </div>
+
+                <div class="board-units-section">
+                    <div class="board-units-label">
+                        <i class="fa-solid fa-car-side"></i> Patrullas en camino (${units.length}/${maxUnits}):
+                    </div>
+                    <div class="board-units-list">
+                        ${units.length > 0 ? units.map(u => `
+                            <span class="unit-badge ${u.src === this.mySrc ? 'my-unit' : ''}">
+                                <i class="fa-solid fa-user-shield"></i> ${u.name} <small>(${u.callsign || 'UNIT'})</small>
+                            </span>
+                        `).join('') : '<span class="no-units-text">Ninguna patrulla asignada todavía</span>'}
+                    </div>
+                </div>
+
+                <div class="board-card-actions">
+                    <button class="btn-board-action gps" onclick="window.dispatchBoardApp.setGps(${call.coords ? call.coords.x : 0}, ${call.coords ? call.coords.y : 0})">
+                        <i class="fa-solid fa-location-crosshairs"></i>
+                        <span>Fijar GPS</span>
+                    </button>
+
+                    ${!isResolved ? `
+                        ${amIAttending ? `
+                            <button class="btn-board-action cancel" onclick="window.dispatchBoardApp.cancelCall(${call.id})">
+                                <i class="fa-solid fa-user-xmark"></i>
+                                <span>Cancelar Respuesta</span>
+                            </button>
+                        ` : `
+                            <button class="btn-board-action respond ${isFull ? 'disabled' : ''}" ${isFull ? 'disabled' : ''} onclick="window.dispatchBoardApp.respondCall(${call.id})">
+                                <i class="fa-solid fa-shield-heart"></i>
+                                <span>${isFull ? 'Cupo Completo' : 'Acudir / Responder'}</span>
+                            </button>
+                        `}
+
+                        <button class="btn-board-action resolve" onclick="window.dispatchBoardApp.resolveCall(${call.id})">
+                            <i class="fa-solid fa-check-double"></i>
+                            <span>Marcar Resuelto</span>
+                        </button>
+                    ` : ''}
+                </div>
+            `;
+
+            this.listEl.appendChild(card);
+        });
+    }
+
+    updateCall(updatedCall) {
+        const index = this.calls.findIndex(c => c.id === updatedCall.id);
+        if (index !== -1) {
+            this.calls[index] = updatedCall;
+        } else {
+            this.calls.unshift(updatedCall);
+        }
+        if (this.isOpen) {
+            this.renderCalls();
+        }
+    }
+
+    respondCall(callId) {
+        fetch(`https://${GetParentResourceName()}/respondDispatchCall`, {
+            method: 'POST',
+            body: JSON.stringify({ callId: callId })
+        }).catch(() => {});
+    }
+
+    cancelCall(callId) {
+        fetch(`https://${GetParentResourceName()}/cancelDispatchCall`, {
+            method: 'POST',
+            body: JSON.stringify({ callId: callId })
+        }).catch(() => {});
+    }
+
+    resolveCall(callId) {
+        fetch(`https://${GetParentResourceName()}/resolveDispatchCall`, {
+            method: 'POST',
+            body: JSON.stringify({ callId: callId })
+        }).catch(() => {});
+    }
+
+    setGps(x, y) {
+        fetch(`https://${GetParentResourceName()}/setDispatchGps`, {
+            method: 'POST',
+            body: JSON.stringify({ x: x, y: y })
+        }).catch(() => {});
+    }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     window.PoliceGarageApp = new PoliceGarageApp();
+    window.DispatchHUD = new DispatchHUD();
+    window.dispatchBoardApp = new DispatchBoard();
 });
+

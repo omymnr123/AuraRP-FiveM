@@ -12,6 +12,7 @@ RegisterNetEvent('aura_police:client:onJailed', function(minutes, reason)
     remainingMinutes = minutes
     jailReason = reason or "Condena Penitenciaria"
     LocalPlayer.state:set('isJailed', true, true)
+    LocalPlayer.state:set('invBusy', true, false)
 
     DoScreenFadeOut(500)
     Wait(600)
@@ -30,6 +31,7 @@ RegisterNetEvent('aura_police:client:onUnjailed', function()
     isJailed = false
     remainingMinutes = 0
     LocalPlayer.state:set('isJailed', false, true)
+    LocalPlayer.state:set('invBusy', false, false)
 
     DoScreenFadeOut(500)
     Wait(600)

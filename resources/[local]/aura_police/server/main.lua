@@ -239,6 +239,33 @@ AddEventHandler('playerDropped', function()
 end)
 
 -- ============================================================================
+-- 5. CUSTODIA FÍSICA: CACHEO E INVENTARIO CON FORCEOPENINVENTORY
+-- ============================================================================
+
+RegisterNetEvent('aura_police:server:friskPlayer', function(targetSrc)
+    local copSrc = source
+    targetSrc = tonumber(targetSrc)
+
+    if not IsCopOnDuty(copSrc) or not targetSrc or not GetPlayerName(tostring(targetSrc)) then
+        return
+    end
+
+    local copPed = GetPlayerPed(copSrc)
+    local targetPed = GetPlayerPed(targetSrc)
+    if #(GetEntityCoords(copPed) - GetEntityCoords(targetPed)) > 4.0 then
+        TriggerClientEvent('ox_lib:notify', copSrc, {
+            title = 'Custodia Policial',
+            description = 'El sospechoso se encuentra demasiado lejos para registrarlo.',
+            type = 'error'
+        })
+        return
+    end
+
+    -- Apertura forzada nativa y segura desde ox_inventory servidor
+    exports.ox_inventory:forceOpenInventory(copSrc, 'player', targetSrc)
+end)
+
+-- ============================================================================
 -- 5. DOTACIÓN DE ARMERÍA REGLAMENTARIA SEGÚN RANGO
 -- ============================================================================
 
