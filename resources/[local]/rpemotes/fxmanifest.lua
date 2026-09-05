@@ -68,26 +68,15 @@ client_scripts {
 ---- Loads all ytyp files for custom props to stream ---
 ---- You will need to add a data_file 'DLC_ITYP_REQUEST' for your own to work in game ---
 
-data_file 'DLC_ITYP_REQUEST' 'stream/taymckenzienz_rpemotes.ytyp'
-
-data_file 'DLC_ITYP_REQUEST' 'stream/brummie_props.ytyp'
-
-data_file 'DLC_ITYP_REQUEST' 'stream/bzzz_props.ytyp'
-
-data_file 'DLC_ITYP_REQUEST' 'bzzz_camp_props.ytyp'
-
-data_file 'DLC_ITYP_REQUEST' 'stream/apple_1.ytyp'
-
-data_file 'DLC_ITYP_REQUEST' 'stream/kaykaymods_props.ytyp'
-
-data_file 'DLC_ITYP_REQUEST' 'stream/knjgh_pizzas.ytyp'
-
-data_file 'DLC_ITYP_REQUEST' 'stream/natty_props_lollipops.ytyp'
-
-data_file 'DLC_ITYP_REQUEST' 'stream/ultra_ringcase.ytyp'
-
-data_file 'DLC_ITYP_REQUEST' 'stream/pata_props.ytyp'
-
-data_file 'DLC_ITYP_REQUEST' 'stream/vedere_props.ytyp'
-
-data_file 'DLC_ITYP_REQUEST' 'stream/pnwsigns.ytyp'
+data_file 'DLC_ITYP_REQUEST' 'stream/[Props]/Brummiee/brummie_props.ytyp'
+data_file 'DLC_ITYP_REQUEST' 'stream/[Props]/BzzziProps/bzzz_camp_props.ytyp'
+data_file 'DLC_ITYP_REQUEST' 'stream/[Props]/BzzziProps/bzzz_props.ytyp'
+data_file 'DLC_ITYP_REQUEST' 'stream/[Props]/CandyApple/apple_1.ytyp'
+data_file 'DLC_ITYP_REQUEST' 'stream/[Props]/KayKayMods/kaykaymods_props.ytyp'
+data_file 'DLC_ITYP_REQUEST' 'stream/[Props]/KnjghPizzaSlices/knjgh_pizzas.ytyp'
+data_file 'DLC_ITYP_REQUEST' 'stream/[Props]/NattyLollipops/natty_props_lollipops.ytyp'
+data_file 'DLC_ITYP_REQUEST' 'stream/[Props]/PataMods/pata_props.ytyp'
+data_file 'DLC_ITYP_REQUEST' 'stream/[Props]/PNWParksFan/pnwsigns.ytyp'
+data_file 'DLC_ITYP_REQUEST' 'stream/[Props]/TayMcKenzieNZ/taymckenzienz_rpemotes.ytyp'
+data_file 'DLC_ITYP_REQUEST' 'stream/[Props]/UltraRingCase/ultra_ringcase.ytyp'
+data_file 'DLC_ITYP_REQUEST' 'stream/[Props]/vedere/vedere_props.ytyp'

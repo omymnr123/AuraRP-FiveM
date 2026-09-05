@@ -19,6 +19,7 @@ ui_page 'web/index.html'
 files {
     'web/index.html',
     'web/css/style.css',
+    'web/js/animations_data.js',
     'web/js/app.js'
 }
 

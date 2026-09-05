@@ -79,18 +79,21 @@ function pairsByKeys(t, f)
 end
 
 function LoadAnim(dict)
-    if not DoesAnimDictExist(dict) then
+    if not dict or type(dict) ~= "string" or dict == "" then
         return false
     end
+    if HasAnimDictLoaded(dict) then
+        return true
+    end
 
-    local timeout = 2000
+    RequestAnimDict(dict)
+    local timeout = 2500
     while not HasAnimDictLoaded(dict) and timeout > 0 do
-        RequestAnimDict(dict)
         Wait(5)
         timeout = timeout - 5
     end
-    if timeout == 0 then
-        DebugPrint("Loading anim dict " .. dict .. " timed out")
+    if timeout <= 0 then
+        DebugPrint("Loading anim dict " .. tostring(dict) .. " timed out")
         return false
     else
         return true
@@ -98,19 +101,25 @@ function LoadAnim(dict)
 end
 
 function LoadPropDict(model)
-    -- load the model if it's not loaded and wait until it's loaded or timeout
-    if not HasModelLoaded(joaat(model)) then
-        RequestModel(joaat(model))
-        local timeout = 2000
-        while not HasModelLoaded(joaat(model)) and timeout > 0 do
+    if not model then return false end
+    local hash = (type(model) == "number") and model or joaat(model)
+    if not IsModelValid(hash) and not IsModelValid(model) then
+        DebugPrint("Model " .. tostring(model) .. " is not valid!")
+        return false
+    end
+    if not HasModelLoaded(hash) then
+        RequestModel(hash)
+        local timeout = 2500
+        while not HasModelLoaded(hash) and timeout > 0 do
             Wait(5)
             timeout = timeout - 5
         end
-        if timeout == 0 then
-            DebugPrint("Loading model " .. model .. " timed out")
-            return
+        if timeout <= 0 then
+            DebugPrint("Loading model " .. tostring(model) .. " timed out")
+            return false
         end
     end
+    return true
 end
 
 function tableHasKey(table, key)

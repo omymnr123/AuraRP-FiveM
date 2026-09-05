@@ -32,23 +32,22 @@ CurrentAnimationName = nil
 CurrentTextureVariation = nil
 inHandsup = false
 
--- Remove emotes if needed
-
-local emoteTypes = {
-    "Shared",
-    "Dances",
-    "AnimalEmotes",
-    "Emotes",
-    "PropEmotes",
-}
-
-for i = 1, #emoteTypes do
-    local emoteType = emoteTypes[i]
-    for emoteName, emoteData in pairs(RP[emoteType]) do
-        local shouldRemove = false
-        if Config.AdultEmotesDisabled and emoteData.AdultAnimation then shouldRemove = true end
-        if emoteData[1] and not ((emoteData[1] == 'Scenario') or (emoteData[1] == 'ScenarioObject') or (emoteData[1] == 'MaleScenario')) and not DoesAnimDictExist(emoteData[1]) then shouldRemove = true end
-        if shouldRemove then RP[emoteType][emoteName] = nil end
+-- Remove emotes if adult emotes are explicitly disabled in config
+if Config.AdultEmotesDisabled then
+    local emoteTypes = {
+        "Shared",
+        "Dances",
+        "AnimalEmotes",
+        "Emotes",
+        "PropEmotes",
+    }
+    for i = 1, #emoteTypes do
+        local emoteType = emoteTypes[i]
+        for emoteName, emoteData in pairs(RP[emoteType]) do
+            if emoteData.AdultAnimation then
+                RP[emoteType][emoteName] = nil
+            end
+        end
     end
 end
 
@@ -263,69 +262,94 @@ local function HandsUpLoop()
     end)
 end
 
-if Config.HandsupEnabled then
-    RegisterCommand('handsup', function()
-        if IsPedInAnyVehicle(PlayerPedId(), false) and not Config.HandsupKeybindInCarEnabled and not inHandsup then
-            return
-        end
+local cancelledAnimOnPress = false
 
-        Handsup()
-    end, false)
+local function StartHandsup()
+    local playerPed = PlayerPedId()
+    if not IsPedHuman(playerPed) or IsEntityDead(playerPed) then
+        return
+    end
+    if IsPedInAnyVehicle(playerPed, false) and not Config.HandsupKeybindInCarEnabled then
+        return
+    end
+    if isInActionWithErrorMessage() then
+        return
+    end
 
-    function Handsup()
+    -- Si el jugador está ejecutando una animación, cancelar la animación y no levantar las manos
+    if IsInAnimation then
+        cancelledAnimOnPress = true
+        EmoteCancel(true)
+        return
+    end
+
+    cancelledAnimOnPress = false
+    inHandsup = true
+    DestroyAllProps()
+    local dict = "random@mugging3"
+    RequestAnimDict(dict)
+    while not HasAnimDictLoaded(dict) do
+        Wait(0)
+    end
+    TaskPlayAnim(playerPed, dict, "handsup_standing_base", 2.0, 2.0, -1, 49, 0, false, IsThisModelABike(GetEntityModel(GetVehiclePedIsIn(playerPed, false))) and 4127 or false, false)
+    HandsUpLoop()
+end
+
+local function StopHandsup()
+    if cancelledAnimOnPress then
+        cancelledAnimOnPress = false
+        return
+    end
+
+    if inHandsup then
+        inHandsup = false
         local playerPed = PlayerPedId()
-        if not IsPedHuman(playerPed) then
-            return
+        ClearPedSecondaryTask(playerPed)
+        if not IsPedInjured(playerPed) then
+            ClearPedTasks(playerPed)
         end
-        if isInActionWithErrorMessage() then
-            return
-        end
-
-        -- Si el jugador está ejecutando una animación y presiona X, primero cancela la animación
-        if IsInAnimation and not inHandsup then
-            EmoteCancel(true)
-            return
-        end
-
-        inHandsup = not inHandsup
-        if inHandsup then
-            DestroyAllProps()
-            local dict = "random@mugging3"
-            RequestAnimDict(dict)
-            while not HasAnimDictLoaded(dict) do
-                Wait(0)
-            end
-            TaskPlayAnim(PlayerPedId(), dict, "handsup_standing_base", 2.0, 2.0, -1, 49, 0, false, IsThisModelABike(GetEntityModel(GetVehiclePedIsIn(PlayerPedId(), false))) and 4127 or false, false)
-            HandsUpLoop()
-        else
-            ClearPedSecondaryTask(PlayerPedId())
-            if not IsPedInjured(PlayerPedId()) then
-                ClearPedTasks(PlayerPedId())
-            end
-            if Config.PersistentEmoteAfterHandsup and IsInAnimation then
-                local emote = RP.Emotes[CurrentAnimationName]
-                if not emote then
-                    emote = RP.PropEmotes[CurrentAnimationName]
-                end
-
-                if not emote then
-                    return
-                end
-
+        if Config.PersistentEmoteAfterHandsup and IsInAnimation then
+            local emote = RP.Emotes[CurrentAnimationName] or RP.PropEmotes[CurrentAnimationName]
+            if emote then
                 emote.name = CurrentAnimationName
-
-                ClearPedSecondaryTask(PlayerPedId())
+                ClearPedSecondaryTask(playerPed)
                 Wait(400)
                 DestroyAllProps()
                 OnEmotePlay(emote, emote.name, CurrentTextureVariation)
             end
         end
     end
+end
 
-    TriggerEvent('chat:addSuggestion', '/handsup', 'Put your arms up.')
+if Config.HandsupEnabled then
+    RegisterCommand('+handsup', function()
+        StartHandsup()
+    end, false)
+
+    RegisterCommand('-handsup', function()
+        StopHandsup()
+    end, false)
+
+    RegisterCommand('handsup', function()
+        if inHandsup then
+            StopHandsup()
+        else
+            StartHandsup()
+        end
+    end, false)
+
+    function Handsup()
+        if inHandsup then
+            StopHandsup()
+        else
+            StartHandsup()
+        end
+    end
+
+    TriggerEvent('chat:addSuggestion', '/handsup', 'Put your arms up (Hold key).')
 
     if Config.HandsupKeybindEnabled then
-        RegisterKeyMapping("handsup", "Put your arms up", "keyboard", Config.HandsupKeybind)
+        RegisterKeyMapping("+handsup", "Levantar las manos (Mantener pulsado)", "keyboard", Config.HandsupKeybind)
     end
 
     local function IsPlayerInHandsUp()
@@ -634,17 +658,27 @@ end
 function AddPropToPlayer(prop1, bone, off1, off2, off3, rot1, rot2, rot3, textureVariation)
     local Player = PlayerPedId()
     local x, y, z = table.unpack(GetEntityCoords(Player))
+    local modelHash = (type(prop1) == 'number') and prop1 or joaat(prop1)
 
-    if not IsModelValid(prop1) then
+    if not IsModelValid(modelHash) and not IsModelValid(prop1) then
         DebugPrint(tostring(prop1).." is not a valid model!")
         return false
     end
 
-    if not HasModelLoaded(prop1) then
+    if not HasModelLoaded(modelHash) then
         LoadPropDict(prop1)
     end
 
-    prop = CreateObject(joaat(prop1), x, y, z + 0.2, true, true, true)
+    if not HasModelLoaded(modelHash) then
+        DebugPrint("Could not load model " .. tostring(prop1))
+        return false
+    end
+
+    prop = CreateObject(modelHash, x, y, z + 0.2, true, true, true)
+    if not DoesEntityExist(prop) then
+        return false
+    end
+
     if textureVariation ~= nil then
         SetObjectTextureVariation(prop, textureVariation)
     end
@@ -652,7 +686,7 @@ function AddPropToPlayer(prop1, bone, off1, off2, off3, rot1, rot2, rot3, textur
         false, true, 1, true)
     table.insert(PlayerProps, prop)
     PlayerHasProp = true
-    SetModelAsNoLongerNeeded(prop1)
+    SetModelAsNoLongerNeeded(modelHash)
     DebugPrint("Added prop to player")
     return true
 end
