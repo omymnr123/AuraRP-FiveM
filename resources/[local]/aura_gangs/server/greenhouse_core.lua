@@ -312,8 +312,9 @@ RegisterNetEvent('aura_gangs:server:checkPlayerInteriorState', function()
     CheckAndRestorePlayerInterior(src)
 end)
 
-AddEventHandler('aura_multichar:server:characterLoaded', function(charId, explicitSrc)
-    local src = explicitSrc or source
+RegisterNetEvent('aura_multichar:server:characterLoaded', function(charId, explicitSrc)
+    local src = (source and source ~= 0 and source ~= '') and source or explicitSrc
+    if not src then return end
     SetTimeout(1000, function()
         CheckAndRestorePlayerInterior(src)
     end)
