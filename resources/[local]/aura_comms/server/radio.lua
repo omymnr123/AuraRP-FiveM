@@ -1,9 +1,10 @@
 local AuraComms = {}
 
--- Validar si el jugador tiene una radio en su inventario
+-- Validar si el jugador tiene una radio (estándar o satelital) en su inventario
 local function HasRadio(source)
-    local count = exports.ox_inventory:Search(source, 'count', 'radio')
-    return count and count > 0
+    local countStandard = exports.ox_inventory:Search(source, 'count', 'radio') or 0
+    local countSatellite = exports.ox_inventory:Search(source, 'count', 'radio_satelite') or 0
+    return (countStandard + countSatellite) > 0
 end
 
 -- Evento invocado desde el cliente para unirse a una frecuencia
@@ -18,7 +19,7 @@ RegisterNetEvent('aura_comms:server:joinRadio', function(frequency)
         -- Rechazado
         TriggerClientEvent('ox_lib:notify', src, {
             title = 'Comunicaciones',
-            description = 'No tienes un dispositivo de radio',
+            description = 'No dispones de un transmisor de radio o radio satelital.',
             type = 'error',
             style = {
                 backgroundColor = '#1e1e2f',
@@ -34,7 +35,7 @@ end)
 
 -- Cuando el jugador suelta/pierde el item de la radio, desconectarlo
 AddEventHandler('ox_inventory:updateInventory', function(action, payload)
-    if action == 'remove' and payload.item.name == 'radio' then
+    if action == 'remove' and (payload.item.name == 'radio' or payload.item.name == 'radio_satelite') then
         local src = payload.source
         if not HasRadio(src) then
             TriggerClientEvent('aura_comms:client:forceLeaveRadio', src)

@@ -146,6 +146,57 @@ local function CanOpenAuraHub()
 end
 
 -- ============================================================================
+-- GESTIÓN DE PROP Y ANIMACIÓN DE TABLET ELECTRÓNICA
+-- ============================================================================
+
+local tabletProp = 0
+
+local function AttachTabletProp()
+    if DoesEntityExist(tabletProp) then return end
+    local ped = PlayerPedId()
+    local model = joaat('prop_cs_tablet')
+    
+    RequestModel(model)
+    local timer = GetGameTimer()
+    while not HasModelLoaded(model) do
+        Wait(10)
+        if GetGameTimer() - timer > 2000 then break end
+    end
+    if not HasModelLoaded(model) then return end
+
+    local animDict = "amb@world_human_seat_wall_tablet@female@base"
+    RequestAnimDict(animDict)
+    timer = GetGameTimer()
+    while not HasAnimDictLoaded(animDict) do
+        Wait(10)
+        if GetGameTimer() - timer > 2000 then break end
+    end
+
+    local coords = GetEntityCoords(ped)
+    tabletProp = CreateObject(model, coords.x, coords.y, coords.z, true, true, false)
+    if DoesEntityExist(tabletProp) then
+        local boneIndex = GetPedBoneIndex(ped, 60309) -- Mano izquierda
+        AttachEntityToEntity(tabletProp, ped, boneIndex, 0.03, 0.002, -0.0, 10.0, 160.0, 0.0, true, false, false, false, 2, true)
+        SetModelAsNoLongerNeeded(model)
+        if HasAnimDictLoaded(animDict) then
+            TaskPlayAnim(ped, animDict, "base", 2.0, 2.0, -1, 49, 0, false, false, false)
+        end
+    end
+end
+
+local function RemoveTabletProp()
+    if DoesEntityExist(tabletProp) then
+        DetachEntity(tabletProp, true, false)
+        DeleteEntity(tabletProp)
+        tabletProp = 0
+    end
+    local ped = PlayerPedId()
+    if DoesEntityExist(ped) then
+        StopAnimTask(ped, "amb@world_human_seat_wall_tablet@female@base", "base", 3.0)
+    end
+end
+
+-- ============================================================================
 -- APERTURA Y CIERRE DEL HUB
 -- ============================================================================
 
@@ -183,11 +234,95 @@ local function OpenAuraHub()
     end)
 end
 
+local function OpenTabletMode(targetMode)
+    if not CanOpenAuraHub() then return end
+
+    local hasTablet = false
+    if exports.ox_inventory then
+        hasTablet = (exports.ox_inventory:Search('count', 'tablet') or 0) > 0
+    end
+
+    if not hasTablet then
+        lib.notify({
+            title = 'Tablet',
+            description = 'No dispones de una Tablet en tu inventario.',
+            type = 'error',
+            position = 'top-right'
+        })
+        return
+    end
+
+    isLoadingHub = true
+
+    lib.callback('aura_hub:server:getHubData', false, function(data)
+        isLoadingHub = false
+
+        if not data then
+            lib.notify({
+                title = 'Tablet',
+                description = 'No se pudo conectar a los servidores centrales.',
+                type = 'error'
+            })
+            return
+        end
+
+        if not CanOpenAuraHub() and not isHubOpen then
+            return
+        end
+
+        data.mugshot = currentMugshotTxd or RefreshPlayerMugshot()
+
+        local openModal = nil
+        local isPolice = (data.job and (data.job.name == 'police' or data.job.name == 'sheriff'))
+        local isGang = (data.isGang == true) or (data.job and (data.job.isGang == true or data.job.name == 'cartel' or data.job.name == 'salieri' or data.job.name == 'vazou' or data.job.name == 'ballas' or data.job.name == 'families' or data.job.name == 'vagos'))
+
+        if targetMode == 'modalPoliceMdt' or targetMode == 'police' then
+            if isPolice then
+                openModal = 'modalPoliceMdt'
+            else
+                lib.notify({
+                    title = 'MDT Policial',
+                    description = 'Acceso denegado: No perteneces al cuerpo de seguridad del Estado.',
+                    type = 'error'
+                })
+                return
+            end
+        elseif targetMode == 'modalDarkWeb' or targetMode == 'gang' then
+            if isGang then
+                openModal = 'modalDarkWeb'
+            else
+                lib.notify({
+                    title = 'Dark Web',
+                    description = 'Conexión rechazada: Red clandestina encriptada.',
+                    type = 'error'
+                })
+                return
+            end
+        elseif targetMode == 'auto' then
+            if isPolice then
+                openModal = 'modalPoliceMdt'
+            elseif isGang then
+                openModal = 'modalDarkWeb'
+            end
+        end
+
+        isHubOpen = true
+        AttachTabletProp()
+        SetNuiFocus(true, true)
+        SendNUIMessage({
+            action = 'openHub',
+            data = data,
+            openModal = openModal
+        })
+    end)
+end
+
 local function CloseAuraHub()
     if not isHubOpen and not isLoadingHub then return end
     isHubOpen = false
     isLoadingHub = false
     lastHubCloseTime = GetGameTimer()
+    RemoveTabletProp()
     SetNuiFocus(false, false)
     SendNUIMessage({ action = 'closeHub' })
 end
@@ -497,6 +632,18 @@ RegisterNUICallback('policeGetRadioOverview', function(_, cb)
 end)
 
 RegisterNUICallback('policeJoinRadio', function(data, cb)
+    if not exports.aura_core:CanConnectToRadio() then
+        lib.notify({
+            title = 'MDT Policial LSPD',
+            description = 'Se requiere un Transmisor de Radio o Radio Satelital en el inventario para sintonizar frecuencias.',
+            type = 'error',
+            icon = 'walkie-talkie',
+            duration = 5000
+        })
+        cb({ success = false, message = "No dispones de un dispositivo de radio en tu inventario." })
+        return
+    end
+
     lib.callback('aura_police:server:joinRadioChannel', false, function(result)
         cb(result or { success = false })
     end, data.channelId)
@@ -562,6 +709,18 @@ RegisterNUICallback('gangGetRadioOverview', function(_, cb)
 end)
 
 RegisterNUICallback('gangJoinRadio', function(data, cb)
+    if not exports.aura_core:CanConnectToRadio() then
+        lib.notify({
+            title = 'Red Clandestina de Radio',
+            description = 'Se requiere un Transmisor de Radio o Radio Satelital en el inventario para sintonizar emisoras.',
+            type = 'error',
+            icon = 'walkie-talkie',
+            duration = 5000
+        })
+        cb({ success = false, message = "No dispones de un dispositivo de radio en tu inventario." })
+        return
+    end
+
     lib.callback('aura_gangs:server:joinRadioChannel', false, function(res)
         cb(res or { success = false, message = "Error al unirse a la emisora." })
     end, data.channelIndex)
@@ -579,9 +738,49 @@ RegisterNUICallback('gangSetRadioColor', function(data, cb)
     end, data.channelIndex, data.hexColor, data.blipColor)
 end)
 
--- Limpieza de memoria gráfica al detener el recurso
+-- Notificación NUI cuando se intenta abrir MDT o Dark Web sin tablet
+RegisterNUICallback('notifyNoTablet', function(data, cb)
+    local isPolice = (data and data.type == 'police')
+    lib.notify({
+        title = isPolice and 'MDT Policial LSPD' or 'Dark Web',
+        description = isPolice 
+            and 'Se requiere tener una Tablet en el inventario para inicializar el MDT Policial.' 
+            or 'Se requiere tener una Tablet en el inventario para acceder a la Dark Web.',
+        type = 'error',
+        position = 'top-right',
+        duration = 5000
+    })
+    cb('ok')
+end)
+
+-- ============================================================================
+-- EXPORTS Y COMANDOS DE ACCESO A LA TABLET
+-- ============================================================================
+
+--- Export llamado por ox_inventory al usar el ítem 'tablet'
+exports('useTablet', function(data, slotData)
+    OpenTabletMode('auto')
+end)
+
+--- Comando general para abrir la tablet
+RegisterCommand('tablet', function()
+    OpenTabletMode('auto')
+end, false)
+
+--- Comando de acceso directo para agentes de policía
+RegisterCommand('mdt', function()
+    OpenTabletMode('modalPoliceMdt')
+end, false)
+
+--- Comando de acceso directo para miembros de bandas
+RegisterCommand('darkweb', function()
+    OpenTabletMode('modalDarkWeb')
+end, false)
+
+-- Limpieza de memoria gráfica y props al detener el recurso
 AddEventHandler('onResourceStop', function(res)
     if res == GetCurrentResourceName() then
+        RemoveTabletProp()
         if currentHeadshotHandle then
             UnregisterPedheadshot(currentHeadshotHandle)
             currentHeadshotHandle = nil

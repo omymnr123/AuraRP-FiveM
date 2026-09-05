@@ -43,6 +43,36 @@ Config.Gangs = {
         society = 'vagos',
         color = '#f7b731',
         tag = 'VAGOS'
+    },
+    ['lostmc'] = {
+        label = 'The Lost MC',
+        society = 'lostmc',
+        color = '#e67e22',
+        tag = 'LOSTMC'
+    },
+    ['bratva'] = {
+        label = 'Bratva (Mafia Rusa)',
+        society = 'bratva',
+        color = '#e74c3c',
+        tag = 'BRATVA'
+    },
+    ['triada'] = {
+        label = 'Tríada',
+        society = 'triada',
+        color = '#c0392b',
+        tag = 'TRIADA'
+    },
+    ['yakuza'] = {
+        label = 'Yakuza',
+        society = 'yakuza',
+        color = '#9b59b6',
+        tag = 'YAKUZA'
+    },
+    ['marabunta'] = {
+        label = 'Marabunta Grande',
+        society = 'marabunta',
+        color = '#00a8ff',
+        tag = 'MARABUNTA'
     }
 }
 
@@ -281,7 +311,12 @@ Config.Graffiti = {
         ['cartel']   = { label = 'CARTEL', color = { r = 255, g = 165, b = 2 } },
         ['ballas']   = { label = 'BALLAS', color = { r = 136, g = 84, b = 208 } },
         ['families'] = { label = 'FAMILIES', color = { r = 32, g = 191, b = 107 } },
-        ['vagos']    = { label = 'VAGOS', color = { r = 247, g = 183, b = 49 } }
+        ['vagos']     = { label = 'VAGOS',     color = { r = 247, g = 183, b = 49 } },
+        ['lostmc']    = { label = 'LOST MC',   color = { r = 230, g = 126, b = 34 } },
+        ['bratva']    = { label = 'BRATVA',    color = { r = 231, g = 76,  b = 60 } },
+        ['triada']    = { label = 'TRIADA',    color = { r = 192, g = 57,  b = 43 } },
+        ['yakuza']    = { label = 'YAKUZA',    color = { r = 155, g = 89,  b = 182 } },
+        ['marabunta'] = { label = 'MARABUNTA', color = { r = 0,   g = 168, b = 255 } }
     }
 }
 
@@ -309,7 +344,12 @@ Config.Greenhouse = {
         ['cartel']   = 103,
         ['ballas']   = 104,
         ['families'] = 105,
-        ['vagos']    = 106
+        ['vagos']     = 106,
+        ['lostmc']    = 107,
+        ['bratva']    = 108,
+        ['triada']    = 109,
+        ['yakuza']    = 110,
+        ['marabunta'] = 111
     },
 
     -- Límites de cultivo por invernadero

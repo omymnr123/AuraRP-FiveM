@@ -100,7 +100,10 @@ local function InitVendorPoints()
                         distance = 2.5,
                         canInteract = function()
                             local playerJob = LocalPlayer.state.job or (Player(PlayerPedId()) and Player(PlayerPedId()).state.job)
-                            return playerJob == vendorConfig.job
+                            if playerJob == vendorConfig.job then return true end
+                            if vendorConfig.gang and playerJob == vendorConfig.gang then return true end
+                            if Config.GangBusinessMap and Config.GangBusinessMap[playerJob] == vendorConfig.job then return true end
+                            return false
                         end,
                         onSelect = function()
                             local stashId = 'vendor_stock_' .. vendorConfig.job

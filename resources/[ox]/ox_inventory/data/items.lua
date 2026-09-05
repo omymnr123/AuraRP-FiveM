@@ -184,6 +184,19 @@ return {
 		}
 	},
 
+	['tablet'] = {
+		label = 'Tablet Electrónica',
+		weight = 500,
+		stack = false,
+		consume = 0,
+		close = true,
+		description = 'Dispositivo táctil inteligente de alta tecnología. Conexión táctica con el MDT de seguridad ciudadana y acceso encriptado a la Dark Web.',
+		client = {
+			image = 'tablet.png',
+			export = 'aura_hub.useTablet'
+		}
+	},
+
 	['money'] = {
 		label = 'Efectivo',
 		weight = 0,
@@ -965,6 +978,36 @@ return {
 		client = {
 			image = 'ariete_policial.png'
 		}
+	},
+
+	-- ============================================================================
+	-- AURA RP - SISTEMA DE COMUNICACIONES TÁCTICAS Y RADIO DUAL-TIER
+	-- ============================================================================
+	['radio'] = {
+		label = 'Radio Transmisor Estándar',
+		weight = 500,
+		stack = false,
+		close = true,
+		description = 'Transmisor de radiofrecuencia analógico estándar (Half-Duplex). La recepción de audio queda silenciada mientras se transmite (PTT).',
+		client = {
+			image = 'radio.png',
+			anim = { dict = 'cellphone@', clip = 'cellphone_text_read_base' },
+			export = 'aura_comms.openRadio'
+		}
+	},
+
+	['radio_satelite'] = {
+		label = 'Radio Satelital Encriptada',
+		weight = 750,
+		stack = false,
+		close = true,
+		description = 'Terminal satelital táctica encriptada de grado militar (Full-Duplex). Permite recepción y transmisión de audio simultáneas en tiempo real.',
+		client = {
+			image = 'radio_satelite.png',
+			anim = { dict = 'cellphone@', clip = 'cellphone_text_read_base' },
+			export = 'aura_comms.openRadio'
+		}
 	}
 }
+
 

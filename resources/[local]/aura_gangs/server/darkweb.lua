@@ -28,9 +28,19 @@ local function GetPlayerCurrentGang(src)
     return jobName, gangConfig, jobData
 end
 
+local function HasPlayerTablet(src)
+    if not src or src <= 0 then return false end
+    if not exports.ox_inventory then return false end
+    return (exports.ox_inventory:GetItemCount(src, 'tablet') or 0) > 0
+end
+
 --- Obtiene los datos del terminal Dark Web para la organización del jugador
 lib.callback.register('aura_gangs:server:getDarkWebData', function(source)
     local src = source
+    if not HasPlayerTablet(src) then
+        return nil -- Requiere tablet en inventario
+    end
+
     local gangName, gangConfig, jobData = GetPlayerCurrentGang(src)
 
     if not gangConfig or not jobData then
@@ -149,6 +159,10 @@ end)
 --- Depositar fondos en la cuenta offshore de la organización
 lib.callback.register('aura_gangs:server:depositOffshore', function(source, amount, accountType)
     local src = source
+    if not HasPlayerTablet(src) then
+        return false, "Se requiere una Tablet encriptada para operar con fondos offshore."
+    end
+
     local gangName, gangConfig, jobData = GetPlayerCurrentGang(src)
 
     if not gangConfig or not jobData then
@@ -179,6 +193,10 @@ end)
 --- Retirar fondos de la cuenta offshore de la organización (Solo líderes)
 lib.callback.register('aura_gangs:server:withdrawOffshore', function(source, amount)
     local src = source
+    if not HasPlayerTablet(src) then
+        return false, "Se requiere una Tablet encriptada para operar con fondos offshore."
+    end
+
     local gangName, gangConfig, jobData = GetPlayerCurrentGang(src)
 
     if not gangConfig or not jobData or not jobData.isBoss then

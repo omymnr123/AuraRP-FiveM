@@ -154,6 +154,14 @@ CreateThread(function()
     InitDoors()
 end)
 
+local function HasDoorPermission(playerJob, doorJob)
+    if not playerJob or not doorJob then return false end
+    if playerJob == doorJob then return true end
+    if Config.GangBusinessMap and Config.GangBusinessMap[playerJob] == doorJob then return true end
+    if Config.BusinessVendors and Config.BusinessVendors[doorJob] and Config.BusinessVendors[doorJob].gang == playerJob then return true end
+    return false
+end
+
 -- Keymapping para abrir/cerrar puertas con la tecla 'I'
 RegisterCommand('toggle_doorlock', function()
     if not currentClosestDoor then return end
@@ -167,7 +175,7 @@ RegisterCommand('toggle_doorlock', function()
     -- Margen de interacción
     if dist <= math.max(doorData.distance or 2.5, 3.0) then
         local myJobInfo = exports.aura_jobs:GetJob()
-        if myJobInfo.job == doorData.job then
+        if HasDoorPermission(myJobInfo.job, doorData.job) then
             TriggerServerEvent('aura_jobs:server:toggleDoorlock', currentClosestDoor)
             
             -- Animación inmersiva de llaves / tarjeta

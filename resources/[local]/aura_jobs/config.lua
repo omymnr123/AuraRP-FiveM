@@ -148,7 +148,7 @@ Config.Jobs = {
     },
 
     ['salieri'] = {
-        label = "Salieri Club",
+        label = "Familia Salieri",
         isBusiness = true,
         isGang = true,
         canDuty = true,
@@ -161,59 +161,143 @@ Config.Jobs = {
         }
     },
 
+    ['vazou'] = {
+        label = 'Cártel Marc Vazou',
+        isBusiness = true,
+        isGang = true,
+        canDuty = true,
+        grades = {
+            [0] = { name = 'Seguridad / Recluta', salary = 500 },
+            [1] = { name = 'Camarero / Gatillero', salary = 800 },
+            [2] = { name = 'Jefe de Barra / Sicario', salary = 1100 },
+            [3] = { name = 'Encargado / Lugarteniente', salary = 1550 },
+            [4] = { name = 'Dueño / Patrón', salary = 2200, isBoss = true }
+        }
+    },
+
     ['cartel'] = {
         label = "Cártel de Sinaloa",
-        isBusiness = false,
+        isBusiness = true,
         isGang = true,
-        canDuty = false,
+        canDuty = true,
         grades = {
-            [0] = { name = 'Halcón / Recluta', salary = 200 },
-            [1] = { name = 'Sicario', salary = 450 },
-            [2] = { name = 'Comandante de Plaza', salary = 750 },
-            [3] = { name = 'Lugarteniente', salary = 1200 },
-            [4] = { name = 'Patrón del Cártel', salary = 2000, isBoss = true }
+            [0] = { name = 'Halcón / Recluta', salary = 450 },
+            [1] = { name = 'Sicario', salary = 750 },
+            [2] = { name = 'Comandante de Plaza', salary = 1100 },
+            [3] = { name = 'Lugarteniente', salary = 1550 },
+            [4] = { name = 'Patrón del Cártel', salary = 2200, isBoss = true }
         }
     },
 
     ['ballas'] = {
         label = "East Los Santos Ballas",
-        isBusiness = false,
+        isBusiness = true,
         isGang = true,
-        canDuty = false,
+        canDuty = true,
         grades = {
-            [0] = { name = 'Young Balla', salary = 200 },
-            [1] = { name = 'Original Balla', salary = 450 },
-            [2] = { name = 'Gangster', salary = 750 },
-            [3] = { name = 'Enforcer', salary = 1200 },
-            [4] = { name = 'Original Gangster (OG)', salary = 2000, isBoss = true }
+            [0] = { name = 'Young Balla', salary = 450 },
+            [1] = { name = 'Original Balla', salary = 750 },
+            [2] = { name = 'Gangster', salary = 1100 },
+            [3] = { name = 'Enforcer', salary = 1550 },
+            [4] = { name = 'Original Gangster (OG)', salary = 2200, isBoss = true }
         }
     },
 
     ['families'] = {
         label = "Chamberlain Gangster Families",
-        isBusiness = false,
+        isBusiness = true,
         isGang = true,
-        canDuty = false,
+        canDuty = true,
         grades = {
-            [0] = { name = 'Young Family', salary = 200 },
-            [1] = { name = 'Hustler', salary = 450 },
-            [2] = { name = 'Street Soldier', salary = 750 },
-            [3] = { name = 'Top Dog', salary = 1200 },
-            [4] = { name = 'Big Boss (OG)', salary = 2000, isBoss = true }
+            [0] = { name = 'Young Family', salary = 450 },
+            [1] = { name = 'Hustler', salary = 750 },
+            [2] = { name = 'Street Soldier', salary = 1100 },
+            [3] = { name = 'Top Dog', salary = 1550 },
+            [4] = { name = 'Big Boss (OG)', salary = 2200, isBoss = true }
         }
     },
 
     ['vagos'] = {
         label = "Los Santos Vagos",
-        isBusiness = false,
+        isBusiness = true,
         isGang = true,
-        canDuty = false,
+        canDuty = true,
         grades = {
-            [0] = { name = 'Iniciado', salary = 200 },
-            [1] = { name = 'Hermano', salary = 450 },
-            [2] = { name = 'Matón de Barrio', salary = 750 },
-            [3] = { name = 'Veterano', salary = 1200 },
-            [4] = { name = 'El Jefe', salary = 2000, isBoss = true }
+            [0] = { name = 'Iniciado', salary = 450 },
+            [1] = { name = 'Hermano', salary = 750 },
+            [2] = { name = 'Matón de Barrio', salary = 1100 },
+            [3] = { name = 'Veterano', salary = 1550 },
+            [4] = { name = 'El Jefe', salary = 2200, isBoss = true }
+        }
+    },
+
+    ['lostmc'] = {
+        label = "The Lost MC",
+        isBusiness = true,
+        isGang = true,
+        canDuty = true,
+        grades = {
+            [0] = { name = 'Prospect (Aspirante)', salary = 450 },
+            [1] = { name = 'Full Patch Member', salary = 750 },
+            [2] = { name = 'Road Captain', salary = 1100 },
+            [3] = { name = 'Vice President', salary = 1550 },
+            [4] = { name = 'President', salary = 2200, isBoss = true }
+        }
+    },
+
+    ['bratva'] = {
+        label = "Bratva (Mafia Rusa)",
+        isBusiness = true,
+        isGang = true,
+        canDuty = true,
+        grades = {
+            [0] = { name = 'Shestyorka (Novato)', salary = 450 },
+            [1] = { name = 'Boets (Soldado)', salary = 750 },
+            [2] = { name = 'Brigadir (Capitán)', salary = 1100 },
+            [3] = { name = 'Sovetnik (Consejero)', salary = 1550 },
+            [4] = { name = 'Pakhan (Líder / Jefe)', salary = 2200, isBoss = true }
+        }
+    },
+
+    ['triada'] = {
+        label = "Tríada",
+        isBusiness = true,
+        isGang = true,
+        canDuty = true,
+        grades = {
+            [0] = { name = 'Linterna Azul (Recluta)', salary = 450 },
+            [1] = { name = 'Sandalia de Paja (Miembro)', salary = 750 },
+            [2] = { name = 'Palo Rojo (Enforcer)', salary = 1100 },
+            [3] = { name = 'Abanico de Papel Blanco (Subjefe)', salary = 1550 },
+            [4] = { name = 'Cabeza de Dragón (Don)', salary = 2200, isBoss = true }
+        }
+    },
+
+    ['yakuza'] = {
+        label = "Yakuza",
+        isBusiness = true,
+        isGang = true,
+        canDuty = true,
+        grades = {
+            [0] = { name = 'Kobun (Iniciado)', salary = 450 },
+            [1] = { name = 'Shingiin (Miembro)', salary = 750 },
+            [2] = { name = 'Kyodai (Hermano Mayor)', salary = 1100 },
+            [3] = { name = 'Wakagashira (Lugarteniente)', salary = 1550 },
+            [4] = { name = 'Kumicho (Oyabun / Jefe)', salary = 2200, isBoss = true }
+        }
+    },
+
+    ['marabunta'] = {
+        label = "Marabunta Grande",
+        isBusiness = true,
+        isGang = true,
+        canDuty = true,
+        grades = {
+            [0] = { name = 'Novato / Chequeador', salary = 450 },
+            [1] = { name = 'Gatillero / Marero', salary = 750 },
+            [2] = { name = 'Palabrero de Barrio', salary = 1100 },
+            [3] = { name = 'Comandante de Clica', salary = 1550 },
+            [4] = { name = 'Corredor General / Jefe', salary = 2200, isBoss = true }
         }
     },
 
@@ -315,20 +399,6 @@ Config.Jobs = {
         }
     },
 
-    ['vazou'] = {
-        label = 'Discoteca Marc Vazou',
-        isBusiness = true,
-        isGang = true,
-        canDuty = true,
-        grades = {
-            [0] = { name = 'Seguridad / Recluta', salary = 500 },
-            [1] = { name = 'Camarero / Gatillero', salary = 800 },
-            [2] = { name = 'Jefe de Barra / Sicario', salary = 1100 },
-            [3] = { name = 'Encargado / Lugarteniente', salary = 1550 },
-            [4] = { name = 'Dueño / Patrón', salary = 2200, isBoss = true }
-        }
-    },
-
     ['paletoliquor'] = {
         label = 'Paleto Bay Liquor Store',
         isBusiness = true,
@@ -352,7 +422,89 @@ Config.Jobs = {
             [3] = { name = 'Encargado de Local', salary = 1550 },
             [4] = { name = 'Dueño / Propietario', salary = 2200, isBoss = true }
         }
+    },
+
+    ['antiquebar'] = {
+        label = 'Antique Bar & Pub',
+        isBusiness = true,
+        canDuty = true,
+        grades = {
+            [0] = { name = 'Seguridad / Ayudante', salary = 500 },
+            [1] = { name = 'Camarero / Barman', salary = 800 },
+            [2] = { name = 'Jefe de Barra', salary = 1100 },
+            [3] = { name = 'Encargado de Local', salary = 1550 },
+            [4] = { name = 'Dueño / Propietario', salary = 2200, isBoss = true }
+        }
+    },
+
+    ['barthedrink'] = {
+        label = 'Bar The Drink',
+        isBusiness = true,
+        canDuty = true,
+        grades = {
+            [0] = { name = 'Seguridad / Portero', salary = 500 },
+            [1] = { name = 'Camarero / Barman', salary = 800 },
+            [2] = { name = 'Jefe de Barra', salary = 1100 },
+            [3] = { name = 'Encargado de Sala', salary = 1550 },
+            [4] = { name = 'Dueño / Propietario', salary = 2200, isBoss = true }
+        }
+    },
+
+    ['sandyhookah'] = {
+        label = 'Sandy Hookah Lounge',
+        isBusiness = true,
+        canDuty = true,
+        grades = {
+            [0] = { name = 'Seguridad / Ayudante', salary = 500 },
+            [1] = { name = 'Camarero / Shishamaker', salary = 800 },
+            [2] = { name = 'Jefe de Barra & Shishas', salary = 1100 },
+            [3] = { name = 'Encargado de Local', salary = 1550 },
+            [4] = { name = 'Dueño / Propietario', salary = 2200, isBoss = true }
+        }
+    },
+
+    ['himenbar'] = {
+        label = 'Himen Bar & Club',
+        isBusiness = true,
+        canDuty = true,
+        grades = {
+            [0] = { name = 'Seguridad / Portero', salary = 500 },
+            [1] = { name = 'Camarero / Barman', salary = 800 },
+            [2] = { name = 'Jefe de Barra', salary = 1100 },
+            [3] = { name = 'Encargado de Club', salary = 1550 },
+            [4] = { name = 'Dueño / Propietario', salary = 2200, isBoss = true }
+        }
+    },
+
+    ['route68bar'] = {
+        label = 'Route 68 Clubhouse & Bar',
+        isBusiness = true,
+        canDuty = true,
+        grades = {
+            [0] = { name = 'Seguridad / Aspirante', salary = 500 },
+            [1] = { name = 'Camarero / Barman', salary = 800 },
+            [2] = { name = 'Jefe de Barra', salary = 1100 },
+            [3] = { name = 'Encargado de Local', salary = 1550 },
+            [4] = { name = 'Dueño / Propietario', salary = 2200, isBoss = true }
+        }
     }
+}
+
+-- ============================================================================
+-- MAPEO INTEGRAL DE ORGANIZACIONES CRIMINALES A NEGOCIOS / TAPADERAS DE HOSTELERÍA
+-- ============================================================================
+Config.GangBusinessMap = {
+    ['salieri']   = 'salieri',      -- Familia Salieri -> Salieri Club (MLO salieris_bar)
+    ['vazou']     = 'vazou',        -- Cártel Marc Vazou -> Discoteca Marc Vazou (MLO Marc_vazou)
+    ['cartel']    = 'tequilala',    -- Cártel de Sinaloa -> Tequi-la-la Bar (MLO tequila)
+    ['ballas']    = 'himenbar',     -- East Los Santos Ballas -> Himen Bar & Club (MLO quimii_himen)
+    ['families']  = 'vanilla',      -- Chamberlain Families -> Vanilla Unicorn Club
+    ['vagos']     = 'henhouse',     -- Los Santos Vagos -> The Hen House Bar (MLO henhouse_milo)
+    ['lostmc']    = 'route68bar',   -- The Lost MC -> Route 68 Clubhouse & Bar (MLO russ_68cus)
+    ['bratva']    = 'barthedrink',  -- Bratva (Mafia Rusa) -> Bar The Drink & Moscou Club (MLO Giant_BarTheDrink)
+    ['triada']    = 'antiquebar',   -- Tríada -> Antique Bar & Pub (MLO ds_antique_bar)
+    ['yakuza']    = 'sandyhookah',  -- Yakuza -> Sandy Hookah Lounge (MLO moreo_sandyhookah)
+    ['marabunta'] = 'yellowjack'    -- Marabunta Grande -> Yellow Jack Inn (MLO H3fty-JJ)
 }
 
 -- ============================================================================
@@ -361,18 +513,21 @@ Config.Jobs = {
 Config.BusinessVendors = {
     ['tequilala'] = {
         job = 'tequilala',
-        label = 'Tequi-la-la Bar',
+        gang = 'cartel',
+        label = 'Tequi-la-la Bar & Club',
         pedModel = 'u_m_y_party_01',
         coords = vec3(-561.74, 280.53, 82.18),
         heading = 353.43,
         scenario = 'WORLD_HUMAN_STAND_IMPARTIAL',
         society = 'tequilala',
+        maxWeight = 300000,
+        slots = 50,
         blip = {
             enabled = true,
             coords = vec3(-561.74, 280.53, 82.18),
             sprite = 93,      -- Copa de cóctel / Hostelería
             scale = 0.8,
-            openColor = 48,   -- Morado / Neón
+            openColor = 47,   -- Naranja Cártel
             closedColor = 39, -- Gris cuando está cerrado
             name = 'Tequi-la-la Bar'
         },
@@ -394,6 +549,8 @@ Config.BusinessVendors = {
         heading = 34.55,
         scenario = 'WORLD_HUMAN_STAND_IMPARTIAL',
         society = 'burgershot',
+        maxWeight = 300000,
+        slots = 50,
         blip = {
             enabled = true,
             coords = vec3(-1220.57, -907.40, 12.33),
@@ -419,6 +576,8 @@ Config.BusinessVendors = {
         coords = vec4(-1392.54, -606.32, 30.32, 35.0),
         scenario = 'WORLD_HUMAN_STAND_IMPARTIAL',
         society = 'bahama',
+        maxWeight = 300000,
+        slots = 50,
         blip = {
             enabled = true,
             coords = vec3(-1392.54, -606.32, 30.32),
@@ -439,20 +598,23 @@ Config.BusinessVendors = {
 
     ['vanilla'] = {
         job = 'vanilla',
-        label = 'Vanilla Unicorn',
+        gang = 'families',
+        label = 'Vanilla Unicorn Club',
         pedModel = 's_m_y_barman_01',
         coords = vec3(125.23, -1281.55, 29.28),
         heading = 205.88,
         scenario = 'WORLD_HUMAN_STAND_IMPARTIAL',
         society = 'vanilla',
+        maxWeight = 300000,
+        slots = 50,
         blip = {
             enabled = true,
             coords = vec3(125.23, -1281.55, 29.28),
             sprite = 93,      -- Copa de cóctel / Hostelería
             scale = 0.8,
-            openColor = 8,    -- Rosa Neón
+            openColor = 2,    -- Verde Families
             closedColor = 39, -- Gris cuando está cerrado
-            name = 'Vanilla Unicorn'
+            name = 'Vanilla Unicorn Club'
         },
         items = {
             { name = 'cocktail',     label = 'Cóctel Unicorn',     price = 20, category = 'alcohol', icon = 'martini-glass-citrus' },
@@ -465,18 +627,21 @@ Config.BusinessVendors = {
 
     ['yellowjack'] = {
         job = 'yellowjack',
+        gang = 'marabunta',
         label = 'Yellow Jack Inn',
         pedModel = 'ig_claypain',
         coords = vec3(1986.04, 3048.36, 47.22),
         heading = 357.93,
         scenario = 'WORLD_HUMAN_STAND_IMPARTIAL',
         society = 'yellowjack',
+        maxWeight = 300000,
+        slots = 50,
         blip = {
             enabled = true,
             coords = vec3(1986.04, 3048.36, 47.22),
             sprite = 93,      -- Copa de cóctel / Hostelería
             scale = 0.8,
-            openColor = 5,    -- Amarillo
+            openColor = 3,    -- Azul Marabunta Grande
             closedColor = 39, -- Gris cuando está cerrado
             name = 'Yellow Jack Inn'
         },
@@ -488,9 +653,9 @@ Config.BusinessVendors = {
         }
     },
 
-
     ['vazou'] = {
         job = 'vazou',
+        gang = 'vazou',
         label = 'Discoteca Marc Vazou',
         pedModel = 's_m_y_barman_01',
         coords = vec3(-1566.23, -968.23, 13.02),
@@ -550,6 +715,7 @@ Config.BusinessVendors = {
 
     ['henhouse'] = {
         job = 'henhouse',
+        gang = 'vagos',
         label = 'The Hen House Bar',
         pedModel = 's_m_y_barman_01',
         coords = vec3(-297.59, 6271.26, 31.51),
@@ -563,7 +729,7 @@ Config.BusinessVendors = {
             coords = vec3(-297.59, 6271.26, 31.51),
             sprite = 93,      -- Copa de cóctel / Hostelería
             scale = 0.8,
-            openColor = 5,    -- Amarillo Hen House
+            openColor = 5,    -- Amarillo Vagos
             closedColor = 39, -- Gris cuando está cerrado
             name = 'The Hen House Bar'
         },
@@ -725,7 +891,8 @@ Config.BusinessVendors = {
 
     ['salieri'] = {
         job = 'salieri',
-        label = 'Salieri Club',
+        gang = 'salieri',
+        label = 'Salieri Club & Bar',
         pedModel = 's_m_y_barman_01',
         coords = vec3(322.11, -1095.43, 29.39),
         heading = 88.48,
@@ -738,18 +905,173 @@ Config.BusinessVendors = {
             coords = vec3(322.11, -1095.43, 29.39),
             sprite = 93,      -- Copa de cóctel / Hostelería
             scale = 0.8,
-            openColor = 5,    -- Amarillo Hen House
+            openColor = 1,    -- Rojo Familia Salieri
             closedColor = 39, -- Gris cuando está cerrado
             name = 'Salieri Club'
         },
         items = {
             { name = 'beer',         label = 'Cerveza Pißwasser',  price = 10, category = 'alcohol', icon = 'beer-mug-empty' },
             { name = 'whiskey',      label = 'Whisky de Taberna',  price = 18, category = 'alcohol', icon = 'whiskey-glass' },
-            { name = 'cocktail',     label = 'Cóctel Hen House',   price = 20, category = 'alcohol', icon = 'martini-glass-citrus' },
+            { name = 'cocktail',     label = 'Cóctel Salieri Special', price = 20, category = 'alcohol', icon = 'martini-glass-citrus' },
             { name = 'tequila_shot', label = 'Chupito de Tequila', price = 15, category = 'alcohol', icon = 'wine-glass' },
             { name = 'sandwich',     label = 'Sándwich Rústico',   price = 12, category = 'food',    icon = 'utensils' },
             { name = 'water',        label = 'Botella de Agua',    price = 4,  category = 'drink',   icon = 'bottle-water' },
             { name = 'chips',        label = 'Patatas Fritas',     price = 8,  category = 'food',    icon = 'bowl-food' }
+        }
+    },
+
+    ['antiquebar'] = {
+        job = 'antiquebar',
+        gang = 'triada',
+        label = 'Antique Bar & Pub',
+        pedModel = 's_m_y_barman_01',
+        coords = vec3(740.50, -2305.20, 20.84),
+        heading = 88.0,
+        scenario = 'WORLD_HUMAN_STAND_IMPARTIAL',
+        society = 'antiquebar',
+        maxWeight = 300000,
+        slots = 50,
+        blip = {
+            enabled = true,
+            coords = vec3(740.50, -2305.20, 20.84),
+            sprite = 93,      -- Copa de cóctel / Hostelería
+            scale = 0.8,
+            openColor = 75,   -- Rojo Dragón Tríada
+            closedColor = 39, -- Gris cuando está cerrado
+            name = 'Antique Bar & Pub'
+        },
+        items = {
+            { name = 'whiskey',      label = 'Whisky Richards Añejo', price = 20, category = 'alcohol', icon = 'whiskey-glass' },
+            { name = 'cocktail',     label = 'Cóctel Antique Vintage', price = 22, category = 'alcohol', icon = 'martini-glass-citrus' },
+            { name = 'beer',         label = 'Cerveza Pißwasser',     price = 10, category = 'alcohol', icon = 'beer-mug-empty' },
+            { name = 'tequila_shot', label = 'Chupito de Tequila',    price = 15, category = 'alcohol', icon = 'wine-glass' },
+            { name = 'sandwich',     label = 'Sándwich Rústico',      price = 12, category = 'food',    icon = 'utensils' },
+            { name = 'water',        label = 'Botella de Agua',       price = 4,  category = 'drink',   icon = 'bottle-water' },
+            { name = 'chips',        label = 'Patatas Fritas',        price = 8,  category = 'food',    icon = 'bowl-food' }
+        }
+    },
+
+    ['barthedrink'] = {
+        job = 'barthedrink',
+        gang = 'bratva',
+        label = 'Bar The Drink & Moscou Club',
+        pedModel = 's_m_y_barman_01',
+        coords = vec3(1982.50, 3053.80, 47.21),
+        heading = 180.0,
+        scenario = 'WORLD_HUMAN_STAND_IMPARTIAL',
+        society = 'barthedrink',
+        maxWeight = 300000,
+        slots = 50,
+        blip = {
+            enabled = true,
+            coords = vec3(1982.50, 3053.80, 47.21),
+            sprite = 93,      -- Copa de cóctel / Hostelería
+            scale = 0.8,
+            openColor = 48,   -- Morado Club Bratva
+            closedColor = 39, -- Gris cuando está cerrado
+            name = 'Bar The Drink'
+        },
+        items = {
+            { name = 'cocktail',     label = 'Cóctel The Drink Especial', price = 22, category = 'alcohol', icon = 'martini-glass-citrus' },
+            { name = 'whiskey',      label = 'Whisky Richards',           price = 20, category = 'alcohol', icon = 'whiskey-glass' },
+            { name = 'tequila_shot', label = 'Chupito de Tequila',        price = 15, category = 'alcohol', icon = 'wine-glass' },
+            { name = 'beer',         label = 'Cerveza Pißwasser',         price = 12, category = 'alcohol', icon = 'beer-mug-empty' },
+            { name = 'sprunk',       label = 'Lata de Sprunk',            price = 6,  category = 'drink',   icon = 'bottle-droplet' },
+            { name = 'water',        label = 'Botella de Agua',           price = 5,  category = 'drink',   icon = 'bottle-water' },
+            { name = 'chips',        label = 'Patatas Fritas',            price = 8,  category = 'food',    icon = 'bowl-food' }
+        }
+    },
+
+    ['sandyhookah'] = {
+        job = 'sandyhookah',
+        gang = 'yakuza',
+        label = 'Sandy Hookah Lounge',
+        pedModel = 'u_m_y_party_01',
+        coords = vec3(1888.62, 3747.54, 32.88),
+        heading = 120.0,
+        scenario = 'WORLD_HUMAN_STAND_IMPARTIAL',
+        society = 'sandyhookah',
+        maxWeight = 300000,
+        slots = 50,
+        blip = {
+            enabled = true,
+            coords = vec3(1888.62, 3747.54, 32.88),
+            sprite = 93,      -- Copa de cóctel / Hostelería
+            scale = 0.8,
+            openColor = 19,   -- Violeta Loto Yakuza
+            closedColor = 39, -- Gris cuando está cerrado
+            name = 'Sandy Hookah Lounge'
+        },
+        items = {
+            { name = 'cocktail',     label = 'Cóctel Shisha Lounge', price = 22, category = 'alcohol', icon = 'martini-glass-citrus' },
+            { name = 'whiskey',      label = 'Whisky Richards',      price = 20, category = 'alcohol', icon = 'whiskey-glass' },
+            { name = 'tequila_shot', label = 'Chupito de Tequila',   price = 15, category = 'alcohol', icon = 'wine-glass' },
+            { name = 'beer',         label = 'Cerveza Pißwasser',    price = 12, category = 'alcohol', icon = 'beer-mug-empty' },
+            { name = 'cola',         label = 'Lata de eCola',        price = 5,  category = 'drink',   icon = 'mug-hot' },
+            { name = 'water',        label = 'Botella de Agua',      price = 5,  category = 'drink',   icon = 'bottle-water' },
+            { name = 'chips',        label = 'Snacks & Patatas',     price = 8,  category = 'food',    icon = 'bowl-food' }
+        }
+    },
+
+    ['himenbar'] = {
+        job = 'himenbar',
+        gang = 'ballas',
+        label = 'Himen Bar & Club',
+        pedModel = 's_m_y_barman_01',
+        coords = vec3(981.20, -1806.40, 31.00),
+        heading = 270.0,
+        scenario = 'WORLD_HUMAN_STAND_IMPARTIAL',
+        society = 'himenbar',
+        maxWeight = 300000,
+        slots = 50,
+        blip = {
+            enabled = true,
+            coords = vec3(981.20, -1806.40, 31.00),
+            sprite = 93,      -- Copa de cóctel / Hostelería
+            scale = 0.8,
+            openColor = 83,   -- Morado Ballas
+            closedColor = 39, -- Gris cuando está cerrado
+            name = 'Himen Bar & Club'
+        },
+        items = {
+            { name = 'cocktail',     label = 'Cóctel Himen Seduction', price = 22, category = 'alcohol', icon = 'martini-glass-citrus' },
+            { name = 'whiskey',      label = 'Whisky Richards',        price = 20, category = 'alcohol', icon = 'whiskey-glass' },
+            { name = 'tequila_shot', label = 'Chupito de Tequila',     price = 15, category = 'alcohol', icon = 'wine-glass' },
+            { name = 'beer',         label = 'Cerveza Pißwasser',      price = 10, category = 'alcohol', icon = 'beer-mug-empty' },
+            { name = 'burger',       label = 'Hamburguesa Clásica',    price = 12, category = 'food',    icon = 'burger' },
+            { name = 'water',        label = 'Botella de Agua',        price = 4,  category = 'drink',   icon = 'bottle-water' },
+            { name = 'chips',        label = 'Patatas Fritas',         price = 8,  category = 'food',    icon = 'bowl-food' }
+        }
+    },
+
+    ['route68bar'] = {
+        job = 'route68bar',
+        gang = 'lostmc',
+        label = 'Route 68 Clubhouse & Bar',
+        pedModel = 's_m_y_barman_01',
+        coords = vec3(983.50, 2665.20, 40.20),
+        heading = 90.0,
+        scenario = 'WORLD_HUMAN_STAND_IMPARTIAL',
+        society = 'route68bar',
+        maxWeight = 300000,
+        slots = 50,
+        blip = {
+            enabled = true,
+            coords = vec3(983.50, 2665.20, 40.20),
+            sprite = 93,      -- Copa de cóctel / Hostelería
+            scale = 0.8,
+            openColor = 46,   -- Marrón Biker Lost MC
+            closedColor = 39, -- Gris cuando está cerrado
+            name = 'Route 68 Clubhouse'
+        },
+        items = {
+            { name = 'beer',         label = 'Cerveza Pißwasser Biker', price = 10, category = 'alcohol', icon = 'beer-mug-empty' },
+            { name = 'whiskey',      label = 'Whisky de Taberna',       price = 18, category = 'alcohol', icon = 'whiskey-glass' },
+            { name = 'tequila_shot', label = 'Chupito de Tequila',      price = 15, category = 'alcohol', icon = 'wine-glass' },
+            { name = 'sandwich',     label = 'Sándwich Rústico Biker',  price = 12, category = 'food',    icon = 'utensils' },
+            { name = 'cola',         label = 'Lata de eCola',           price = 5,  category = 'drink',   icon = 'mug-hot' },
+            { name = 'water',        label = 'Botella de Agua',         price = 4,  category = 'drink',   icon = 'bottle-water' },
+            { name = 'chips',        label = 'Patatas Fritas',          price = 8,  category = 'food',    icon = 'bowl-food' }
         }
     },
 }
@@ -783,12 +1105,66 @@ Config.Doors = {
         locked = true                           -- Estado por defecto
     },
 
-    -- Ejemplo: Puerta de The Hen House
+    -- Puerta de The Hen House
     ['henhouse_main'] = {
         job = 'henhouse',
         model = `v_ilev_ss_door04`,
         coords = vec3(-297.59, 6271.26, 31.51),
         distance = 2.0,
+        locked = true
+    },
+
+    -- Puerta de Antique Bar
+    ['antiquebar_main'] = {
+        job = 'antiquebar',
+        model = `v_ilev_ss_door04`,
+        coords = vec3(742.84, -2304.53, 20.84),
+        distance = 2.5,
+        locked = true
+    },
+
+    -- Puerta de Bar The Drink
+    ['barthedrink_main'] = {
+        job = 'barthedrink',
+        model = `v_ilev_ss_door04`,
+        coords = vec3(1985.39, 3054.49, 47.21),
+        distance = 2.5,
+        locked = true
+    },
+
+    -- Puerta de Yellow Jack Inn
+    ['yellowjack_main'] = {
+        job = 'yellowjack',
+        model = `v_ilev_ss_door04`,
+        coords = vec3(1986.04, 3048.36, 47.22),
+        distance = 2.5,
+        locked = true
+    },
+
+    -- Puerta de Sandy Hookah Lounge
+    ['sandyhookah_main'] = {
+        job = 'sandyhookah',
+        model = `v_ilev_ss_door04`,
+        coords = vec3(1888.62, 3747.54, 32.88),
+        distance = 2.5,
+        locked = true
+    },
+
+    -- Puerta de Himen Bar
+    ['himenbar_main'] = {
+        job = 'himenbar',
+        model = `v_ilev_ss_door04`,
+        coords = vec3(980.50, -1805.20, 31.00),
+        distance = 2.5,
+        locked = true
+    },
+
+    -- Puerta de Route 68 Clubhouse & Bar
+    ['route68bar_main'] = {
+        job = 'route68bar',
+        model = `v_ilev_ss_door04`,
+        coords = vec3(982.00, 2664.00, 40.00),
+        distance = 2.5,
         locked = true
     }
 }

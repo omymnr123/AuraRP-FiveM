@@ -145,7 +145,7 @@ local function LoadPlayerJob(src, charId)
 end
 exports('LoadPlayerJob', LoadPlayerJob)
 
---- Recalcula y sincroniza el estado abierto/cerrado de todos los negocios según los empleados en servicio
+--- Recalcula y sincroniza el estado abierto/cerrado de todos los negocios según los empleados y miembros en servicio
 function UpdateAllBusinessStates()
     local activeDutyByJob = {}
 
@@ -158,13 +158,31 @@ function UpdateAllBusinessStates()
     for jobName, jobConfig in pairs(Config.Jobs) do
         if jobConfig.isBusiness then
             local count = activeDutyByJob[jobName] or 0
+
+            -- Sincronizar si una banda asociada está de servicio
+            if Config.GangBusinessMap then
+                for gangName, mappedFront in pairs(Config.GangBusinessMap) do
+                    if mappedFront == jobName and activeDutyByJob[gangName] then
+                        count = count + activeDutyByJob[gangName]
+                    end
+                end
+            end
+
+            -- Si es la propia banda y su tapadera tiene personal en servicio
+            if jobConfig.isGang and Config.GangBusinessMap and Config.GangBusinessMap[jobName] then
+                local mappedFront = Config.GangBusinessMap[jobName]
+                if mappedFront ~= jobName and activeDutyByJob[mappedFront] then
+                    count = count + activeDutyByJob[mappedFront]
+                end
+            end
+
             local stateKey = 'business_' .. jobName .. '_open'
             local isOpen = count > 0
 
             if GlobalState[stateKey] ~= isOpen then
                 GlobalState[stateKey] = isOpen
                 if Config.Debug then
-                    print(string.format("[Aura Jobs] Negocio '%s' sincronizado en GlobalState: %s (Empleados en servicio: %d)", jobName, isOpen and "ABIERTO" or "CERRADO", count))
+                    print(string.format("[Aura Jobs] Negocio/Tapadera '%s' sincronizado en GlobalState: %s (Personal en servicio: %d)", jobName, isOpen and "ABIERTO" or "CERRADO", count))
                 end
             end
         end

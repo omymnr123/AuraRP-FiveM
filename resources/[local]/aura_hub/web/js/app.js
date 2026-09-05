@@ -152,6 +152,12 @@ async function postFetch(endpoint, data = {}) {
 // ============================================================================
 window.openPoliceMdt = () => {
     playTone('click');
+    if (currentHubData && !currentHubData.hasTablet) {
+        showToast('Se requiere tener una Tablet en el inventario para inicializar el MDT Policial.', true);
+        postFetch('notifyNoTablet', { type: 'police' });
+        return;
+    }
+
     // Cerrar automáticamente el menú principal del aura_hub
     const hubContainer = document.getElementById('hubScreenContainer') || document.querySelector('.hub-screen-container');
     if (hubContainer) {
@@ -170,6 +176,12 @@ window.openPoliceMdt = () => {
 
 window.openDarkWeb = () => {
     playTone('click');
+    if (currentHubData && !currentHubData.hasTablet) {
+        showToast('Se requiere tener una Tablet en el inventario para acceder a la Dark Web.', true);
+        postFetch('notifyNoTablet', { type: 'gang' });
+        return;
+    }
+
     // Cerrar automáticamente el menú principal del aura_hub
     const hubContainer = document.getElementById('hubScreenContainer') || document.querySelector('.hub-screen-container');
     if (hubContainer) {
@@ -519,6 +531,11 @@ window.addEventListener('message', (event) => {
 
     if (payload.action === 'openHub') {
         renderHub(payload.data);
+        if (payload.openModal === 'modalPoliceMdt' || payload.openModal === 'police') {
+            setTimeout(() => { openPoliceMdt(); }, 50);
+        } else if (payload.openModal === 'modalDarkWeb' || payload.openModal === 'gang') {
+            setTimeout(() => { openDarkWeb(); }, 50);
+        }
     } else if (payload.action === 'closeHub') {
         hubWrapper.classList.add('hidden');
     } else if (payload.action === 'showAnnouncement') {

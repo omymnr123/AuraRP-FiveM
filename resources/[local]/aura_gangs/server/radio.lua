@@ -243,6 +243,13 @@ lib.callback.register('aura_gangs:server:joinRadioChannel', function(source, cha
         return { success = false, message = "Emisora no encontrada en la red de la banda." }
     end
 
+    -- Validar tenencia de hardware de radio (Estándar o Satelital)
+    local standardCount = exports.ox_inventory:Search(src, 'count', 'radio') or 0
+    local satelliteCount = exports.ox_inventory:Search(src, 'count', 'radio_satelite') or 0
+    if (standardCount + satelliteCount) <= 0 then
+        return { success = false, message = "No dispones de un dispositivo de radio o radio satelital en tu inventario." }
+    end
+
     local memInfo = GetMemberInfo(src)
     GangRadioMembers[src] = {
         gang = gangName,

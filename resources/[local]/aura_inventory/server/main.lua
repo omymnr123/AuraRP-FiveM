@@ -64,3 +64,29 @@ exports.ox_inventory:registerHook('buyItem', function(payload)
 
     return true
 end)
+
+-- ============================================================================
+-- 4. HELPERS Y EXPORTS DE VALIDACIÓN DE INVENTARIO
+-- ============================================================================
+
+--- Comprueba si un jugador en el servidor dispone de al menos una tablet
+--- @param src number
+--- @return boolean
+exports('HasTablet', function(src)
+    if not src or src <= 0 then return false end
+    if not exports.ox_inventory then return false end
+    return (exports.ox_inventory:GetItemCount(src, 'tablet') or 0) > 0
+end)
+
+--- Comprueba si un jugador en el servidor dispone de un ítem y cantidad específica
+--- @param src number
+--- @param itemName string
+--- @param count? number
+--- @return boolean
+exports('HasItem', function(src, itemName, count)
+    if not src or src <= 0 or not itemName then return false end
+    if not exports.ox_inventory then return false end
+    local required = count or 1
+    return (exports.ox_inventory:GetItemCount(src, itemName) or 0) >= required
+end)
+

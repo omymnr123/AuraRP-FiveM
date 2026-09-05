@@ -31,9 +31,12 @@ CREATE TABLE IF NOT EXISTS `aura_doors` (
   PRIMARY KEY (`door_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
--- Volcando datos para la tabla aurarp.aura_doors: ~14 rows (aproximadamente)
+-- Volcando datos para la tabla aurarp.aura_doors: ~20 rows (aproximadamente)
 INSERT INTO `aura_doors` (`door_id`, `is_locked`, `job`, `coords_x`, `coords_y`, `coords_z`, `distance`) VALUES
+	('antiquebar_main', 1, 'antiquebar', 742.84, -2304.53, 20.84, 2.5),
+	('barthedrink_main', 1, 'barthedrink', 1985.39, 3054.49, 47.21, 2.5),
 	('henhouse_main', 1, 'henhouse', -297.5899963378906, 6271.259765625, 31.510000228881836, 2),
+	('himenbar_main', 1, 'himenbar', 980.5, -1805.2, 31, 2.5),
 	('police_armory1', 0, 'police', 444.3560485839844, -984.0791015625, 34.3011474609375, 2.5),
 	('police_automatica1', 1, 'police', 445.71429443359375, -974.10986328125, 30.7120361328125, 2.5),
 	('police_automatica2', 0, 'police', 445.6351623535156, -986.2813110351562, 30.7120361328125, 2.5),
@@ -43,10 +46,13 @@ INSERT INTO `aura_doors` (`door_id`, `is_locked`, `job`, `coords_x`, `coords_y`,
 	('police_main2', 0, 'police', 438.3164978027344, -981.982421875, 30.7120361328125, 2.5),
 	('police_main3', 0, 'police', 441.5208740234375, -998.8483276367188, 30.7120361328125, 2.5),
 	('police_main4', 0, 'police', 457.0681457519531, -972.4747314453125, 30.7120361328125, 2.5),
+	('route68bar_main', 1, 'route68bar', 982, 2664, 40, 2.5),
 	('salieri_1', 1, 'salieri', 316.5758361816406, -1092.6065673828125, 29.4146728515625, 2.5),
 	('salieri_main', 1, 'salieri', 316.82000732421875, -1092.6199951171875, 29.420000076293945, 2),
+	('sandyhookah_main', 1, 'sandyhookah', 1888.62, 3747.54, 32.88, 2.5),
 	('vazou_main', 1, 'vazou', -1564.43994140625, -974.6099853515625, 13.020000457763672, 2),
-	('vazou_secundaria', 1, 'vazou', -1558.6600341796875, -972.219970703125, 13.020000457763672, 2);
+	('vazou_secundaria', 1, 'vazou', -1558.6600341796875, -972.219970703125, 13.020000457763672, 2),
+	('yellowjack_main', 1, 'yellowjack', 1986.04, 3048.36, 47.22, 2.5);
 
 -- Volcando estructura para tabla aurarp.aura_gang_laundry
 CREATE TABLE IF NOT EXISTS `aura_gang_laundry` (
@@ -82,9 +88,9 @@ CREATE TABLE IF NOT EXISTS `aura_gang_radio_channels` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx_gang_channel` (`gang`,`channel_index`),
   KEY `idx_frequency` (`frequency`)
-) ENGINE=InnoDB AUTO_INCREMENT=241 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=341 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Volcando datos para la tabla aurarp.aura_gang_radio_channels: ~120 rows (aproximadamente)
+-- Volcando datos para la tabla aurarp.aura_gang_radio_channels: ~220 rows (aproximadamente)
 INSERT INTO `aura_gang_radio_channels` (`id`, `gang`, `channel_index`, `label`, `color`, `blip_color`, `frequency`, `is_encrypted`, `updated_at`) VALUES
 	(1, 'salieri', 1, 'Emisora #01', '#00f2fe', 38, 201.0, 1, '2026-09-05 08:12:33'),
 	(2, 'salieri', 2, 'Emisora #02', '#3b82f6', 3, 202.0, 1, '2026-09-05 08:12:33'),
@@ -205,7 +211,107 @@ INSERT INTO `aura_gang_radio_channels` (`id`, `gang`, `channel_index`, `label`, 
 	(117, 'vagos', 17, 'Emisora #17', '#e0aaff', 19, 317.0, 1, '2026-09-05 08:12:33'),
 	(118, 'vagos', 18, 'Emisora #18', '#b5179e', 21, 318.0, 1, '2026-09-05 08:12:33'),
 	(119, 'vagos', 19, 'Emisora #19', '#a0aec0', 40, 319.0, 1, '2026-09-05 08:12:33'),
-	(120, 'vagos', 20, 'Emisora #20', '#4cc9f0', 68, 320.0, 1, '2026-09-05 08:12:33');
+	(120, 'vagos', 20, 'Emisora #20', '#4cc9f0', 68, 320.0, 1, '2026-09-05 08:12:33'),
+	(241, 'lostmc', 1, 'Emisora #01', '#00f2fe', 38, 321.0, 1, '2026-09-05 16:12:50'),
+	(242, 'lostmc', 2, 'Emisora #02', '#3b82f6', 3, 322.0, 1, '2026-09-05 16:12:50'),
+	(243, 'lostmc', 3, 'Emisora #03', '#00ff9d', 2, 323.0, 1, '2026-09-05 16:12:50'),
+	(244, 'lostmc', 4, 'Emisora #04', '#ff007f', 48, 324.0, 1, '2026-09-05 16:12:50'),
+	(245, 'lostmc', 5, 'Emisora #05', '#ff6b35', 47, 325.0, 1, '2026-09-05 16:12:50'),
+	(246, 'lostmc', 6, 'Emisora #06', '#9d4edd', 27, 326.0, 1, '2026-09-05 16:12:50'),
+	(247, 'lostmc', 7, 'Emisora #07', '#ff2a55', 1, 327.0, 1, '2026-09-05 16:12:50'),
+	(248, 'lostmc', 8, 'Emisora #08', '#ffffff', 0, 328.0, 1, '2026-09-05 16:12:50'),
+	(249, 'lostmc', 9, 'Emisora #09', '#ffff00', 5, 329.0, 1, '2026-09-05 16:12:50'),
+	(250, 'lostmc', 10, 'Emisora #10', '#06d6a0', 25, 330.0, 1, '2026-09-05 16:12:50'),
+	(251, 'lostmc', 11, 'Emisora #11', '#8338ec', 7, 331.0, 1, '2026-09-05 16:12:50'),
+	(252, 'lostmc', 12, 'Emisora #12', '#ff477e', 8, 332.0, 1, '2026-09-05 16:12:50'),
+	(253, 'lostmc', 13, 'Emisora #13', '#3a86ff', 18, 333.0, 1, '2026-09-05 16:12:50'),
+	(254, 'lostmc', 14, 'Emisora #14', '#fb5607', 17, 334.0, 1, '2026-09-05 16:12:50'),
+	(255, 'lostmc', 15, 'Emisora #15', '#70e000', 43, 335.0, 1, '2026-09-05 16:12:50'),
+	(256, 'lostmc', 16, 'Emisora #16', '#0077b6', 29, 336.0, 1, '2026-09-05 16:12:50'),
+	(257, 'lostmc', 17, 'Emisora #17', '#e0aaff', 19, 337.0, 1, '2026-09-05 16:12:50'),
+	(258, 'lostmc', 18, 'Emisora #18', '#b5179e', 21, 338.0, 1, '2026-09-05 16:12:50'),
+	(259, 'lostmc', 19, 'Emisora #19', '#a0aec0', 40, 339.0, 1, '2026-09-05 16:12:50'),
+	(260, 'lostmc', 20, 'Emisora #20', '#4cc9f0', 68, 340.0, 1, '2026-09-05 16:12:50'),
+	(261, 'bratva', 1, 'Emisora #01', '#00f2fe', 38, 341.0, 1, '2026-09-05 16:12:50'),
+	(262, 'bratva', 2, 'Emisora #02', '#3b82f6', 3, 342.0, 1, '2026-09-05 16:12:50'),
+	(263, 'bratva', 3, 'Emisora #03', '#00ff9d', 2, 343.0, 1, '2026-09-05 16:12:50'),
+	(264, 'bratva', 4, 'Emisora #04', '#ff007f', 48, 344.0, 1, '2026-09-05 16:12:50'),
+	(265, 'bratva', 5, 'Emisora #05', '#ff6b35', 47, 345.0, 1, '2026-09-05 16:12:50'),
+	(266, 'bratva', 6, 'Emisora #06', '#9d4edd', 27, 346.0, 1, '2026-09-05 16:12:50'),
+	(267, 'bratva', 7, 'Emisora #07', '#ff2a55', 1, 347.0, 1, '2026-09-05 16:12:50'),
+	(268, 'bratva', 8, 'Emisora #08', '#ffffff', 0, 348.0, 1, '2026-09-05 16:12:50'),
+	(269, 'bratva', 9, 'Emisora #09', '#ffff00', 5, 349.0, 1, '2026-09-05 16:12:50'),
+	(270, 'bratva', 10, 'Emisora #10', '#06d6a0', 25, 350.0, 1, '2026-09-05 16:12:50'),
+	(271, 'bratva', 11, 'Emisora #11', '#8338ec', 7, 351.0, 1, '2026-09-05 16:12:50'),
+	(272, 'bratva', 12, 'Emisora #12', '#ff477e', 8, 352.0, 1, '2026-09-05 16:12:50'),
+	(273, 'bratva', 13, 'Emisora #13', '#3a86ff', 18, 353.0, 1, '2026-09-05 16:12:50'),
+	(274, 'bratva', 14, 'Emisora #14', '#fb5607', 17, 354.0, 1, '2026-09-05 16:12:50'),
+	(275, 'bratva', 15, 'Emisora #15', '#70e000', 43, 355.0, 1, '2026-09-05 16:12:50'),
+	(276, 'bratva', 16, 'Emisora #16', '#0077b6', 29, 356.0, 1, '2026-09-05 16:12:50'),
+	(277, 'bratva', 17, 'Emisora #17', '#e0aaff', 19, 357.0, 1, '2026-09-05 16:12:50'),
+	(278, 'bratva', 18, 'Emisora #18', '#b5179e', 21, 358.0, 1, '2026-09-05 16:12:50'),
+	(279, 'bratva', 19, 'Emisora #19', '#a0aec0', 40, 359.0, 1, '2026-09-05 16:12:50'),
+	(280, 'bratva', 20, 'Emisora #20', '#4cc9f0', 68, 360.0, 1, '2026-09-05 16:12:50'),
+	(281, 'triada', 1, 'Emisora #01', '#00f2fe', 38, 361.0, 1, '2026-09-05 16:12:50'),
+	(282, 'triada', 2, 'Emisora #02', '#3b82f6', 3, 362.0, 1, '2026-09-05 16:12:50'),
+	(283, 'triada', 3, 'Emisora #03', '#00ff9d', 2, 363.0, 1, '2026-09-05 16:12:50'),
+	(284, 'triada', 4, 'Emisora #04', '#ff007f', 48, 364.0, 1, '2026-09-05 16:12:50'),
+	(285, 'triada', 5, 'Emisora #05', '#ff6b35', 47, 365.0, 1, '2026-09-05 16:12:50'),
+	(286, 'triada', 6, 'Emisora #06', '#9d4edd', 27, 366.0, 1, '2026-09-05 16:12:50'),
+	(287, 'triada', 7, 'Emisora #07', '#ff2a55', 1, 367.0, 1, '2026-09-05 16:12:50'),
+	(288, 'triada', 8, 'Emisora #08', '#ffffff', 0, 368.0, 1, '2026-09-05 16:12:50'),
+	(289, 'triada', 9, 'Emisora #09', '#ffff00', 5, 369.0, 1, '2026-09-05 16:12:50'),
+	(290, 'triada', 10, 'Emisora #10', '#06d6a0', 25, 370.0, 1, '2026-09-05 16:12:50'),
+	(291, 'triada', 11, 'Emisora #11', '#8338ec', 7, 371.0, 1, '2026-09-05 16:12:50'),
+	(292, 'triada', 12, 'Emisora #12', '#ff477e', 8, 372.0, 1, '2026-09-05 16:12:50'),
+	(293, 'triada', 13, 'Emisora #13', '#3a86ff', 18, 373.0, 1, '2026-09-05 16:12:50'),
+	(294, 'triada', 14, 'Emisora #14', '#fb5607', 17, 374.0, 1, '2026-09-05 16:12:50'),
+	(295, 'triada', 15, 'Emisora #15', '#70e000', 43, 375.0, 1, '2026-09-05 16:12:50'),
+	(296, 'triada', 16, 'Emisora #16', '#0077b6', 29, 376.0, 1, '2026-09-05 16:12:50'),
+	(297, 'triada', 17, 'Emisora #17', '#e0aaff', 19, 377.0, 1, '2026-09-05 16:12:50'),
+	(298, 'triada', 18, 'Emisora #18', '#b5179e', 21, 378.0, 1, '2026-09-05 16:12:50'),
+	(299, 'triada', 19, 'Emisora #19', '#a0aec0', 40, 379.0, 1, '2026-09-05 16:12:50'),
+	(300, 'triada', 20, 'Emisora #20', '#4cc9f0', 68, 380.0, 1, '2026-09-05 16:12:50'),
+	(301, 'yakuza', 1, 'Emisora #01', '#00f2fe', 38, 381.0, 1, '2026-09-05 16:12:50'),
+	(302, 'yakuza', 2, 'Emisora #02', '#3b82f6', 3, 382.0, 1, '2026-09-05 16:12:50'),
+	(303, 'yakuza', 3, 'Emisora #03', '#00ff9d', 2, 383.0, 1, '2026-09-05 16:12:50'),
+	(304, 'yakuza', 4, 'Emisora #04', '#ff007f', 48, 384.0, 1, '2026-09-05 16:12:50'),
+	(305, 'yakuza', 5, 'Emisora #05', '#ff6b35', 47, 385.0, 1, '2026-09-05 16:12:50'),
+	(306, 'yakuza', 6, 'Emisora #06', '#9d4edd', 27, 386.0, 1, '2026-09-05 16:12:50'),
+	(307, 'yakuza', 7, 'Emisora #07', '#ff2a55', 1, 387.0, 1, '2026-09-05 16:12:50'),
+	(308, 'yakuza', 8, 'Emisora #08', '#ffffff', 0, 388.0, 1, '2026-09-05 16:12:50'),
+	(309, 'yakuza', 9, 'Emisora #09', '#ffff00', 5, 389.0, 1, '2026-09-05 16:12:50'),
+	(310, 'yakuza', 10, 'Emisora #10', '#06d6a0', 25, 390.0, 1, '2026-09-05 16:12:50'),
+	(311, 'yakuza', 11, 'Emisora #11', '#8338ec', 7, 391.0, 1, '2026-09-05 16:12:50'),
+	(312, 'yakuza', 12, 'Emisora #12', '#ff477e', 8, 392.0, 1, '2026-09-05 16:12:50'),
+	(313, 'yakuza', 13, 'Emisora #13', '#3a86ff', 18, 393.0, 1, '2026-09-05 16:12:50'),
+	(314, 'yakuza', 14, 'Emisora #14', '#fb5607', 17, 394.0, 1, '2026-09-05 16:12:50'),
+	(315, 'yakuza', 15, 'Emisora #15', '#70e000', 43, 395.0, 1, '2026-09-05 16:12:50'),
+	(316, 'yakuza', 16, 'Emisora #16', '#0077b6', 29, 396.0, 1, '2026-09-05 16:12:50'),
+	(317, 'yakuza', 17, 'Emisora #17', '#e0aaff', 19, 397.0, 1, '2026-09-05 16:12:50'),
+	(318, 'yakuza', 18, 'Emisora #18', '#b5179e', 21, 398.0, 1, '2026-09-05 16:12:50'),
+	(319, 'yakuza', 19, 'Emisora #19', '#a0aec0', 40, 399.0, 1, '2026-09-05 16:12:50'),
+	(320, 'yakuza', 20, 'Emisora #20', '#4cc9f0', 68, 400.0, 1, '2026-09-05 16:12:50'),
+	(321, 'marabunta', 1, 'Emisora #01', '#00f2fe', 38, 401.0, 1, '2026-09-05 16:12:50'),
+	(322, 'marabunta', 2, 'Emisora #02', '#3b82f6', 3, 402.0, 1, '2026-09-05 16:12:50'),
+	(323, 'marabunta', 3, 'Emisora #03', '#00ff9d', 2, 403.0, 1, '2026-09-05 16:12:50'),
+	(324, 'marabunta', 4, 'Emisora #04', '#ff007f', 48, 404.0, 1, '2026-09-05 16:12:50'),
+	(325, 'marabunta', 5, 'Emisora #05', '#ff6b35', 47, 405.0, 1, '2026-09-05 16:12:50'),
+	(326, 'marabunta', 6, 'Emisora #06', '#9d4edd', 27, 406.0, 1, '2026-09-05 16:12:50'),
+	(327, 'marabunta', 7, 'Emisora #07', '#ff2a55', 1, 407.0, 1, '2026-09-05 16:12:50'),
+	(328, 'marabunta', 8, 'Emisora #08', '#ffffff', 0, 408.0, 1, '2026-09-05 16:12:50'),
+	(329, 'marabunta', 9, 'Emisora #09', '#ffff00', 5, 409.0, 1, '2026-09-05 16:12:50'),
+	(330, 'marabunta', 10, 'Emisora #10', '#06d6a0', 25, 410.0, 1, '2026-09-05 16:12:50'),
+	(331, 'marabunta', 11, 'Emisora #11', '#8338ec', 7, 411.0, 1, '2026-09-05 16:12:50'),
+	(332, 'marabunta', 12, 'Emisora #12', '#ff477e', 8, 412.0, 1, '2026-09-05 16:12:50'),
+	(333, 'marabunta', 13, 'Emisora #13', '#3a86ff', 18, 413.0, 1, '2026-09-05 16:12:50'),
+	(334, 'marabunta', 14, 'Emisora #14', '#fb5607', 17, 414.0, 1, '2026-09-05 16:12:50'),
+	(335, 'marabunta', 15, 'Emisora #15', '#70e000', 43, 415.0, 1, '2026-09-05 16:12:50'),
+	(336, 'marabunta', 16, 'Emisora #16', '#0077b6', 29, 416.0, 1, '2026-09-05 16:12:50'),
+	(337, 'marabunta', 17, 'Emisora #17', '#e0aaff', 19, 417.0, 1, '2026-09-05 16:12:50'),
+	(338, 'marabunta', 18, 'Emisora #18', '#b5179e', 21, 418.0, 1, '2026-09-05 16:12:50'),
+	(339, 'marabunta', 19, 'Emisora #19', '#a0aec0', 40, 419.0, 1, '2026-09-05 16:12:50'),
+	(340, 'marabunta', 20, 'Emisora #20', '#4cc9f0', 68, 420.0, 1, '2026-09-05 16:12:50');
 
 -- Volcando estructura para tabla aurarp.aura_gang_turfs
 CREATE TABLE IF NOT EXISTS `aura_gang_turfs` (
@@ -370,6 +476,8 @@ CREATE TABLE IF NOT EXISTS `aura_plants` (
   `growth` float NOT NULL DEFAULT 0 COMMENT 'Porcentaje de crecimiento 0.0 a 100.0',
   `thirst` float NOT NULL DEFAULT 100 COMMENT 'Nivel de hidratación 0.0 a 100.0',
   `nutrition` float NOT NULL DEFAULT 100 COMMENT 'Nivel de abono NPK 0.0 a 100.0',
+  `neglected_time` int(11) NOT NULL DEFAULT 0,
+  `mature_time` int(11) NOT NULL DEFAULT 0,
   `coords_x` double NOT NULL,
   `coords_y` double NOT NULL,
   `coords_z` double NOT NULL,
@@ -379,7 +487,7 @@ CREATE TABLE IF NOT EXISTS `aura_plants` (
   PRIMARY KEY (`id`),
   KEY `idx_plants_gang` (`gang_id`),
   KEY `idx_plants_stage` (`stage`,`growth`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Volcando datos para la tabla aurarp.aura_plants: ~0 rows (aproximadamente)
 
@@ -513,13 +621,16 @@ CREATE TABLE IF NOT EXISTS `aura_societies` (
   PRIMARY KEY (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Volcando datos para la tabla aurarp.aura_societies: ~25 rows (aproximadamente)
+-- Volcando datos para la tabla aurarp.aura_societies: ~35 rows (aproximadamente)
 INSERT INTO `aura_societies` (`name`, `label`, `balance`, `last_updated`) VALUES
 	('aceliquor', 'Ace Liquor (Sandy Shores)', 15000, '2026-09-01 21:15:39'),
 	('ambulance', 'Emergency Medical Services', 50000, '2026-09-01 09:25:49'),
+	('antiquebar', 'Antique Bar & Pub', 15000, '2026-09-05 15:53:51'),
 	('bahama', 'Bahama Mamas West', 15000, '2026-09-01 09:25:49'),
 	('ballas', 'East Los Santos Ballas', 25000, '2026-09-04 08:17:10'),
 	('banhamliquor', 'Rob\'s Liquor (Banham Canyon)', 15000, '2026-09-01 21:15:39'),
+	('barthedrink', 'Bar The Drink', 15000, '2026-09-05 15:53:51'),
+	('bratva', 'Bratva (Mafia Rusa)', 50000, '2026-09-05 16:12:50'),
 	('burgershot', 'Burgershot Vespucci', 15000, '2026-09-01 09:25:49'),
 	('cardealer', 'Premium Deluxe Motorsport', 100000, '2026-09-01 09:25:49'),
 	('cartel', 'Cártel de Sinaloa / Medellín', 50000, '2026-09-04 08:17:10'),
@@ -527,18 +638,25 @@ INSERT INTO `aura_societies` (`name`, `label`, `balance`, `last_updated`) VALUES
 	('families', 'Chamberlain Gangster Families', 25000, '2026-09-04 08:17:10'),
 	('harmonyliquor', 'Rob\'s Liquor (Harmony Route 68)', 15000, '2026-09-01 21:15:39'),
 	('henhouse', 'The Hen House Bar', 15000, '2026-09-01 22:18:44'),
+	('himenbar', 'Himen Bar & Club', 15000, '2026-09-05 15:53:51'),
+	('lostmc', 'The Lost MC Club', 50000, '2026-09-05 16:12:50'),
 	('mafia', 'Familia Salieri & Cártel Clandestino', 50000, '2026-09-04 08:17:10'),
+	('marabunta', 'Marabunta Grande', 50000, '2026-09-05 16:12:50'),
 	('mechanic', 'Los Santos Customs', 25000, '2026-09-01 09:25:49'),
 	('morningwoodliquor', 'Rob\'s Liquor (Morningwood)', 15000, '2026-09-01 21:15:39'),
 	('paletoliquor', 'Paleto Bay Liquor Store', 15000, '2026-09-01 22:18:44'),
 	('pearls', 'Pearls Seafood Restaurant', 12000, '2026-09-01 09:25:49'),
 	('police', 'Los Santos Police Department', 50000, '2026-09-01 09:25:49'),
+	('route68bar', 'Route 68 Clubhouse & Bar', 15000, '2026-09-05 15:53:51'),
 	('salieri', 'Familia Salieri & Cártel Clandestino', 15000, '2026-09-04 10:36:58'),
+	('sandyhookah', 'Sandy Hookah Lounge', 15000, '2026-09-05 15:53:51'),
 	('taxi', 'Downtown Cab Co.', 10000, '2026-09-01 09:25:49'),
 	('tequilala', 'Tequi-la-la Bar & Club', 30038, '2026-09-01 11:07:09'),
+	('triada', 'Tríada Asiática', 50000, '2026-09-05 16:12:50'),
 	('vagos', 'Los Santos Vagos', 25000, '2026-09-04 08:17:10'),
 	('vanilla', 'Vanilla Unicorn Club', 15000, '2026-09-01 09:25:49'),
 	('vazou', 'Cártel Marc Vazou', 15000, '2026-09-04 10:36:58'),
+	('yakuza', 'Sindicato Yakuza', 50000, '2026-09-05 16:12:50'),
 	('yellowjack', 'Yellow Jack Inn', 10000, '2026-09-01 09:25:49');
 
 -- Volcando estructura para tabla aurarp.aura_transactions
@@ -641,7 +759,7 @@ CREATE TABLE IF NOT EXISTS `characters` (
 
 -- Volcando datos para la tabla aurarp.characters: ~3 rows (aproximadamente)
 INSERT INTO `characters` (`id`, `citizenid`, `slot`, `firstname`, `lastname`, `nationality`, `dob`, `gender`, `metadata`, `created_at`, `last_played`, `accounts`, `inventory`, `job`, `job_grade`, `job_duty`, `badge`, `jail_time`, `iban`, `pin`, `phone_number`, `phone_settings`) VALUES
-	(11, 'HLWWIZKU', 1, 'test', 'uno', 'Angola', '1990-12-11', 0, '{"health":200,"bank":5000,"last_location":{"z":-38.169921875,"heading":82.20472717285156,"x":1040.967041015625,"y":-3205.120849609375},"cash":1000,"armor":0,"appearance":{"eyeColor":0,"props":[{"texture":6,"drawable":10,"prop_id":0},{"texture":7,"drawable":15,"prop_id":1},{"texture":-1,"drawable":-1,"prop_id":2},{"texture":-1,"drawable":-1,"prop_id":6},{"texture":-1,"drawable":-1,"prop_id":7}],"headOverlays":{"eyebrows":{"opacity":0,"secondColor":0,"style":0,"color":0},"blemishes":{"opacity":0,"secondColor":0,"style":0,"color":0},"ageing":{"opacity":0,"secondColor":0,"style":0,"color":0},"makeUp":{"opacity":0,"secondColor":0,"style":0,"color":0},"moleAndFreckles":{"opacity":0,"secondColor":0,"style":0,"color":0},"complexion":{"opacity":0,"secondColor":0,"style":0,"color":0},"blush":{"opacity":0,"secondColor":0,"style":0,"color":0},"bodyBlemishes":{"opacity":0,"secondColor":0,"style":0,"color":0},"chestHair":{"opacity":0,"secondColor":0,"style":0,"color":0},"sunDamage":{"opacity":0,"secondColor":0,"style":0,"color":0},"lipstick":{"opacity":0,"secondColor":0,"style":0,"color":0},"beard":{"opacity":0,"secondColor":0,"style":0,"color":0}},"model":"mp_m_freemode_01","hair":{"texture":0,"highlight":0,"style":0,"color":0},"components":[{"texture":0,"drawable":0,"component_id":0},{"texture":0,"drawable":0,"component_id":1},{"texture":0,"drawable":0,"component_id":2},{"texture":0,"drawable":200,"component_id":3},{"texture":1,"drawable":52,"component_id":4},{"texture":0,"drawable":0,"component_id":5},{"texture":0,"drawable":24,"component_id":6},{"texture":0,"drawable":1,"component_id":7},{"texture":0,"drawable":253,"component_id":8},{"texture":0,"drawable":101,"component_id":9},{"texture":0,"drawable":0,"component_id":10},{"texture":0,"drawable":629,"component_id":11}],"headBlend":{"thirdMix":0,"shapeMix":0,"skinMix":0,"shapeFirst":0,"skinThird":0,"skinFirst":0,"shapeSecond":0,"shapeThird":0,"skinSecond":0},"tattoos":[],"faceFeatures":{"chinBoneLowering":0,"jawBoneWidth":0,"noseBoneTwist":0,"cheeksWidth":0,"chinBoneSize":0,"eyesOpening":0,"nosePeakLowering":0,"noseWidth":0,"neckThickness":0,"eyeBrownHigh":0,"jawBoneBackSize":0,"lipsThickness":0,"nosePeakHigh":0,"eyeBrownForward":0,"noseBoneHigh":0,"cheeksBoneWidth":0,"chinHole":0,"cheeksBoneHigh":0,"chinBoneLenght":0,"nosePeakSize":0}}}', '2026-08-29 13:56:37', '2026-09-05 10:32:04', '{"bank":25680,"black_money":0,"cash":500}', '[{"count":14,"name":"weed","slot":1},{"count":30,"name":"coca_leaf","slot":2},{"count":7,"name":"maceta_vacia","slot":3},{"count":31,"name":"empty_baggies","slot":4},{"count":27,"name":"meth","slot":5},{"count":2,"name":"sulfuric_acid","slot":6},{"count":4,"name":"baking_soda","slot":7},{"count":7,"name":"weed_seed","slot":8},{"count":6,"name":"water","slot":9},{"count":7,"name":"fertilizante","slot":10},{"count":7,"name":"saco_tierra","slot":11},{"count":1,"name":"tijeras_podar","slot":12},{"count":2,"name":"cogollo_weed","slot":13},{"count":25,"name":"cocaine","slot":15},{"count":1,"metadata":{"durability":100,"components":[]},"name":"WEAPON_FLASHLIGHT","slot":45},{"count":1,"metadata":{"iban":"AURA56149361","owner":11,"description":"IBAN: AURA56149361\\nTitular ID: 11"},"name":"credit_card","slot":32},{"count":4,"name":"lockpick","slot":33},{"count":1,"name":"bodycam","slot":49},{"count":1,"metadata":{"badge":"101","description":"Placa Nº: 101\\nOficial: test uno\\nRango: Comisario\\nDepartamento: LSPD","officer_name":"test uno","citizenid":"HLWWIZKU","grade_label":"Comisario"},"name":"police_badge","slot":50},{"count":2758,"name":"black_money","slot":38},{"count":500,"name":"money","slot":42},{"count":1,"name":"phone","slot":43},{"count":1,"metadata":{"durability":100,"components":[]},"name":"WEAPON_NIGHTSTICK","slot":44},{"count":2,"name":"adv_lockpick","slot":34}]', 'vazou', 4, 0, '101', 0, 'AURA56149361', '6444', '555-8966', '{"ringtone":"ringtone.mp3","security":{"pin_code":"","face_id":true},"message_tone":"sms.mp3","volume_msg":80,"notifications":{"messages":true,"bank":true,"calls":true},"volume_ring":80,"frame_color":"#555566","device_name":"Otto","wallpaper_url":"https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=2564&auto=format&fit=crop"}'),
+	(11, 'HLWWIZKU', 1, 'test', 'uno', 'Angola', '1990-12-11', 0, '{"appearance":{"components":[{"drawable":0,"texture":0,"component_id":0},{"drawable":0,"texture":0,"component_id":1},{"drawable":0,"texture":0,"component_id":2},{"drawable":200,"texture":0,"component_id":3},{"drawable":52,"texture":1,"component_id":4},{"drawable":0,"texture":0,"component_id":5},{"drawable":24,"texture":0,"component_id":6},{"drawable":1,"texture":0,"component_id":7},{"drawable":253,"texture":0,"component_id":8},{"drawable":101,"texture":0,"component_id":9},{"drawable":0,"texture":0,"component_id":10},{"drawable":629,"texture":0,"component_id":11}],"props":[{"drawable":10,"texture":6,"prop_id":0},{"drawable":15,"texture":7,"prop_id":1},{"drawable":-1,"texture":-1,"prop_id":2},{"drawable":-1,"texture":-1,"prop_id":6},{"drawable":-1,"texture":-1,"prop_id":7}],"model":"mp_m_freemode_01","faceFeatures":{"nosePeakLowering":0,"chinBoneLowering":0,"eyeBrownHigh":0,"neckThickness":0,"chinBoneLenght":0,"jawBoneWidth":0,"jawBoneBackSize":0,"lipsThickness":0,"noseBoneHigh":0,"eyeBrownForward":0,"noseBoneTwist":0,"chinBoneSize":0,"cheeksWidth":0,"nosePeakHigh":0,"chinHole":0,"noseWidth":0,"nosePeakSize":0,"cheeksBoneWidth":0,"cheeksBoneHigh":0,"eyesOpening":0},"hair":{"color":0,"texture":0,"style":0,"highlight":0},"tattoos":[],"headBlend":{"thirdMix":0,"shapeThird":0,"shapeFirst":0,"shapeMix":0,"skinMix":0,"shapeSecond":0,"skinThird":0,"skinSecond":0,"skinFirst":0},"headOverlays":{"moleAndFreckles":{"secondColor":0,"style":0,"opacity":0,"color":0},"bodyBlemishes":{"secondColor":0,"style":0,"opacity":0,"color":0},"ageing":{"secondColor":0,"style":0,"opacity":0,"color":0},"beard":{"secondColor":0,"style":0,"opacity":0,"color":0},"blush":{"secondColor":0,"style":0,"opacity":0,"color":0},"complexion":{"secondColor":0,"style":0,"opacity":0,"color":0},"eyebrows":{"secondColor":0,"style":0,"opacity":0,"color":0},"blemishes":{"secondColor":0,"style":0,"opacity":0,"color":0},"lipstick":{"secondColor":0,"style":0,"opacity":0,"color":0},"chestHair":{"secondColor":0,"style":0,"opacity":0,"color":0},"makeUp":{"secondColor":0,"style":0,"opacity":0,"color":0},"sunDamage":{"secondColor":0,"style":0,"opacity":0,"color":0}},"eyeColor":0},"cash":1000,"last_location":{"y":-1543.2659912109376,"x":496.73406982421877,"heading":93.54330444335938,"z":29.24609375},"bank":5000,"health":200,"armor":0}', '2026-08-29 13:56:37', '2026-09-05 15:55:44', '{"bank":25680,"black_money":0,"cash":500}', '[{"name":"weed","count":14,"slot":1},{"name":"coca_leaf","count":30,"slot":2},{"name":"maceta_vacia","count":5,"slot":3},{"name":"meth","count":27,"slot":5},{"name":"sulfuric_acid","count":2,"slot":6},{"name":"baking_soda","count":4,"slot":7},{"name":"weed_seed","count":5,"slot":8},{"name":"empty_baggies","count":31,"slot":9},{"name":"fertilizante","count":3,"slot":10},{"name":"saco_tierra","count":5,"slot":11},{"name":"tijeras_podar","count":1,"slot":12},{"name":"cogollo_weed","count":52,"slot":13},{"name":"cocaine","count":25,"slot":15},{"name":"WEAPON_FLASHLIGHT","metadata":{"durability":100,"components":[]},"count":1,"slot":45},{"name":"credit_card","metadata":{"iban":"AURA56149361","description":"IBAN: AURA56149361\\nTitular ID: 11","owner":11},"count":1,"slot":32},{"name":"lockpick","count":4,"slot":33},{"name":"bodycam","count":1,"slot":49},{"name":"police_badge","metadata":{"officer_name":"test uno","grade_label":"Comisario","badge":"101","description":"Placa Nº: 101\\nOficial: test uno\\nRango: Comisario\\nDepartamento: LSPD","citizenid":"HLWWIZKU"},"count":1,"slot":50},{"name":"black_money","count":2758,"slot":38},{"name":"money","count":500,"slot":42},{"name":"phone","count":1,"slot":43},{"name":"WEAPON_NIGHTSTICK","metadata":{"durability":100,"components":[]},"count":1,"slot":44},{"name":"adv_lockpick","count":2,"slot":34}]', 'vazou', 4, 0, '101', 0, 'AURA56149361', '6444', '555-8966', '{"ringtone":"ringtone.mp3","security":{"pin_code":"","face_id":true},"message_tone":"sms.mp3","volume_msg":80,"notifications":{"messages":true,"bank":true,"calls":true},"volume_ring":80,"frame_color":"#555566","device_name":"Otto","wallpaper_url":"https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=2564&auto=format&fit=crop"}'),
 	(12, 'HLWWIZKU', 2, 'Gang', 'Test', 'Afganistán', '1990-02-05', 0, '{"appearance": {"hair": {"color": 0, "style": 14, "texture": 0, "highlight": 0}, "components": [{"texture": 0, "drawable": 0, "component_id": 0}, {"texture": 0, "drawable": 0, "component_id": 1}, {"texture": 0, "drawable": 0, "component_id": 2}, {"texture": 0, "drawable": 0, "component_id": 3}, {"texture": 0, "drawable": 0, "component_id": 4}, {"texture": 0, "drawable": 0, "component_id": 5}, {"texture": 0, "drawable": 8, "component_id": 6}, {"texture": 0, "drawable": 0, "component_id": 7}, {"texture": 0, "drawable": 0, "component_id": 8}, {"texture": 0, "drawable": 0, "component_id": 9}, {"texture": 0, "drawable": 0, "component_id": 10}, {"texture": 0, "drawable": 57, "component_id": 11}], "props": [{"drawable": -1, "texture": -1, "prop_id": 0}, {"drawable": -1, "texture": -1, "prop_id": 1}, {"drawable": -1, "texture": -1, "prop_id": 2}, {"drawable": -1, "texture": -1, "prop_id": 6}, {"drawable": -1, "texture": -1, "prop_id": 7}], "headOverlays": {"bodyBlemishes": {"color": 0, "style": 0, "secondColor": 0, "opacity": 0}, "makeUp": {"color": 0, "style": 0, "secondColor": 0, "opacity": 0}, "complexion": {"color": 0, "style": 0, "secondColor": 0, "opacity": 0}, "ageing": {"color": 0, "style": 0, "secondColor": 0, "opacity": 0}, "moleAndFreckles": {"color": 0, "style": 0, "secondColor": 0, "opacity": 0}, "sunDamage": {"color": 0, "style": 0, "secondColor": 0, "opacity": 0}, "beard": {"color": 0, "style": 16, "secondColor": 0, "opacity": 1}, "blemishes": {"color": 0, "style": 0, "secondColor": 0, "opacity": 0}, "blush": {"color": 0, "style": 0, "secondColor": 0, "opacity": 0}, "eyebrows": {"color": 0, "style": 0, "secondColor": 0, "opacity": 0}, "lipstick": {"color": 0, "style": 0, "secondColor": 0, "opacity": 0}, "chestHair": {"color": 0, "style": 0, "secondColor": 0, "opacity": 0}}, "tattoos": [], "headBlend": {"shapeMix": 0, "skinMix": 0, "shapeThird": 0, "shapeFirst": 0, "skinThird": 0, "thirdMix": 0, "skinFirst": 0, "shapeSecond": 0, "skinSecond": 0}, "model": "mp_m_freemode_01", "faceFeatures": {"noseWidth": 0, "jawBoneWidth": 0, "cheeksBoneHigh": 0, "nosePeakSize": 0, "chinHole": 0, "chinBoneSize": 0, "jawBoneBackSize": 0, "lipsThickness": 0, "nosePeakLowering": 0, "neckThickness": 0, "chinBoneLowering": 0, "cheeksBoneWidth": 0, "nosePeakHigh": 0, "eyeBrownForward": 0, "chinBoneLenght": 0, "eyeBrownHigh": 0, "noseBoneHigh": 0, "eyesOpening": 0, "cheeksWidth": 0, "noseBoneTwist": 0}, "eyeColor": 0}, "cash": 0, "health": 200, "armor": 0, "last_location": {"y": -1701.6527099609376, "x": -430.9186706542969, "heading": 215.43309020996095, "z": 19.018310546875}, "black_money": 0, "bank": 5000, "hud_positions": {"hud": {"x": 17.5, "y": 3.5}, "hotbar": {"x": 50.0, "y": 3.5}}}', '2026-09-04 08:29:03', '2026-09-04 16:52:15', '{"black_money":0,"cash":0,"bank":5000}', '[{"name":"adv_lockpick","count":10,"slot":1},{"name":"lockpick","count":2,"slot":2},{"name":"car_parts","count":5,"slot":3},{"name":"car_wheel","count":4,"slot":4},{"name":"black_money","count":18285,"slot":5},{"name":"car_door","count":4,"slot":6},{"name":"car_hood","count":1,"slot":7},{"name":"car_engine","count":1,"slot":8},{"name":"scrap_metal","count":7,"slot":9},{"name":"car_exhaust","count":1,"slot":10}]', 'cartel', 4, 0, NULL, 0, NULL, NULL, '555-8236', NULL),
 	(13, 'FULGFGXT', 1, 'Carlos', 'Romero', 'China', '2000-02-01', 0, '{"health": 200, "black_money": 0, "appearance": {"faceFeatures": {"nosePeakSize": 0, "noseBoneHigh": 0, "neckThickness": 0, "jawBoneWidth": 0, "nosePeakLowering": 0, "nosePeakHigh": 0, "chinBoneLowering": 0, "cheeksWidth": 0, "chinBoneLenght": 0, "jawBoneBackSize": 0, "chinHole": 0, "cheeksBoneHigh": 0, "eyeBrownHigh": 0, "noseBoneTwist": 0, "chinBoneSize": 0, "noseWidth": 0, "lipsThickness": 0, "eyesOpening": 0, "eyeBrownForward": 0, "cheeksBoneWidth": 0}, "props": [{"prop_id": 0, "drawable": -1, "texture": -1}, {"prop_id": 1, "drawable": -1, "texture": -1}, {"prop_id": 2, "drawable": -1, "texture": -1}, {"prop_id": 6, "drawable": -1, "texture": -1}, {"prop_id": 7, "drawable": -1, "texture": -1}], "headBlend": {"skinSecond": 0, "skinThird": 0, "skinFirst": 0, "thirdMix": 0, "shapeFirst": 0, "shapeSecond": 0, "skinMix": 0, "shapeMix": 0, "shapeThird": 0}, "hair": {"highlight": 0, "style": 57, "texture": 0, "color": 0}, "model": "mp_m_freemode_01", "headOverlays": {"moleAndFreckles": {"secondColor": 0, "style": 0, "opacity": 0, "color": 0}, "complexion": {"secondColor": 0, "style": 0, "opacity": 0, "color": 0}, "eyebrows": {"secondColor": 0, "style": 0, "opacity": 0, "color": 0}, "ageing": {"secondColor": 0, "style": 0, "opacity": 0, "color": 0}, "makeUp": {"secondColor": 0, "style": 0, "opacity": 0, "color": 0}, "beard": {"secondColor": 0, "style": 0, "opacity": 0, "color": 0}, "chestHair": {"secondColor": 0, "style": 0, "opacity": 0, "color": 0}, "lipstick": {"secondColor": 0, "style": 0, "opacity": 0, "color": 0}, "blemishes": {"secondColor": 0, "style": 0, "opacity": 0, "color": 0}, "bodyBlemishes": {"secondColor": 0, "style": 0, "opacity": 0, "color": 0}, "blush": {"secondColor": 0, "style": 0, "opacity": 0, "color": 0}, "sunDamage": {"secondColor": 0, "style": 0, "opacity": 0, "color": 0}}, "components": [{"drawable": 0, "component_id": 0, "texture": 0}, {"drawable": 0, "component_id": 1, "texture": 0}, {"drawable": 0, "component_id": 2, "texture": 0}, {"drawable": 0, "component_id": 3, "texture": 0}, {"drawable": 0, "component_id": 4, "texture": 0}, {"drawable": 0, "component_id": 5, "texture": 0}, {"drawable": 0, "component_id": 6, "texture": 0}, {"drawable": 0, "component_id": 7, "texture": 0}, {"drawable": 0, "component_id": 8, "texture": 0}, {"drawable": 0, "component_id": 9, "texture": 0}, {"drawable": 0, "component_id": 10, "texture": 0}, {"drawable": 0, "component_id": 11, "texture": 0}], "eyeColor": 0, "tattoos": []}, "last_location": {"x": -863.6439819335938, "heading": 141.73228454589845, "z": 13.5084228515625, "y": -2616.514404296875}, "bank": 5000, "armor": 0, "cash": 0, "hud_positions": {"hud": {"x": 17.5, "y": 3.5}, "hotbar": {"x": 50.0, "y": 3.5}}}', '2026-09-04 10:15:11', '2026-09-04 16:52:15', '{"bank":5000,"black_money":0,"cash":0}', NULL, 'unemployed', 0, 0, NULL, 0, NULL, NULL, '555-2548', NULL);
 
@@ -719,7 +837,7 @@ CREATE TABLE IF NOT EXISTS `players` (
 
 -- Volcando datos para la tabla aurarp.players: ~2 rows (aproximadamente)
 INSERT INTO `players` (`id`, `license`, `citizenid`, `metadata`, `created_at`, `last_updated`, `last_login`) VALUES
-	(1, 'license:fb83002da5edb49dd7bdb39c170a8c8af7cf5298', 'HLWWIZKU', '{"permissions":"user","status":{"hunger":100,"thirst":100},"position":{"x":0.0,"z":0.0,"y":0.0},"money":{"cash":500,"bank":1500}}', '2026-08-28 18:31:20', '2026-09-05 10:17:18', '2026-09-05 10:17:18'),
+	(1, 'license:fb83002da5edb49dd7bdb39c170a8c8af7cf5298', 'HLWWIZKU', '{"permissions":"user","status":{"hunger":100,"thirst":100},"position":{"x":0.0,"z":0.0,"y":0.0},"money":{"cash":500,"bank":1500}}', '2026-08-28 18:31:20', '2026-09-05 15:41:45', '2026-09-05 15:41:45'),
 	(2, 'license:158f6c2adc48a219db13bcf84229d592bd19da6a', 'FULGFGXT', '{"status":{"thirst":100,"hunger":100},"permissions":"user","last_location":{"heading":330.0,"x":-1037.8,"y":-2737.9,"z":20.17},"money":{"cash":500,"bank":1500}}', '2026-09-04 10:12:54', '2026-09-04 10:12:54', '2026-09-04 10:12:54');
 
 -- Volcando estructura para tabla aurarp.playerskins
@@ -752,42 +870,6 @@ CREATE TABLE IF NOT EXISTS `vehicles` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Volcando datos para la tabla aurarp.vehicles: ~0 rows (aproximadamente)
-
--- Volcando estructura para tabla aurarp.aura_greenhouses
-CREATE TABLE IF NOT EXISTS `aura_greenhouses` (
-  `id` INT(11) NOT NULL AUTO_INCREMENT,
-  `gang_id` VARCHAR(50) NOT NULL,
-  `exterior_x` DOUBLE NOT NULL,
-  `exterior_y` DOUBLE NOT NULL,
-  `exterior_z` DOUBLE NOT NULL,
-  `exterior_h` FLOAT NOT NULL DEFAULT 0.0,
-  `created_by` VARCHAR(100) DEFAULT 'Admin',
-  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
-  `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP(),
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `idx_greenhouse_gang` (`gang_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- Volcando estructura para tabla aurarp.aura_plants
-CREATE TABLE IF NOT EXISTS `aura_plants` (
-  `id` INT(11) NOT NULL AUTO_INCREMENT,
-  `gang_id` VARCHAR(50) NOT NULL,
-  `stage` INT(11) NOT NULL DEFAULT 1 COMMENT 'Fase visual 1 a 4',
-  `growth` FLOAT NOT NULL DEFAULT 0.0 COMMENT 'Porcentaje de crecimiento 0.0 a 100.0',
-  `thirst` FLOAT NOT NULL DEFAULT 0.0 COMMENT 'Nivel de hidratación 0.0 a 100.0',
-  `nutrition` FLOAT NOT NULL DEFAULT 0.0 COMMENT 'Nivel de abono NPK 0.0 a 100.0',
-  `neglected_time` INT(11) NOT NULL DEFAULT 0 COMMENT 'Segundos acumulados con 0% agua y nutrientes',
-  `mature_time` INT(11) NOT NULL DEFAULT 0 COMMENT 'Segundos acumulados al 100% de floración',
-  `coords_x` DOUBLE NOT NULL,
-  `coords_y` DOUBLE NOT NULL,
-  `coords_z` DOUBLE NOT NULL,
-  `heading` FLOAT NOT NULL DEFAULT 0.0,
-  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
-  `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP(),
-  PRIMARY KEY (`id`),
-  KEY `idx_plants_gang` (`gang_id`),
-  KEY `idx_plants_stage` (`stage`, `growth`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

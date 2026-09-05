@@ -16,5 +16,8 @@ server_scripts {
 
 client_scripts {
     'client/main.lua',
-    'client/world.lua'
+    'client/world.lua',
+    'client/radio_checks.lua',
+    'client/voice_override.lua'
 }
+

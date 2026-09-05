@@ -16,6 +16,8 @@ end
 -- 1. CONSULTA DE DATOS GENERALES DEL HUB
 -- ============================================================================
 
+local OpenBusinessesState = {}
+
 lib.callback.register('aura_hub:server:getHubData', function(source)
     local src = source
     local activeChar = exports.aura_multichar:GetActiveCharacter(src)
@@ -64,10 +66,11 @@ lib.callback.register('aura_hub:server:getHubData', function(source)
         local pSrc = tonumber(pid)
         if pSrc then
             local pState = Player(pSrc).state
-            if pState.job == 'police' and pState.job_duty then policeCount = policeCount + 1 end
-            if pState.job == 'ambulance' and pState.job_duty then emsCount = emsCount + 1 end
-            if pState.job == 'mechanic' and pState.job_duty then mechanicCount = mechanicCount + 1 end
-            if pState.job == 'taxi' and pState.job_duty then taxiCount = taxiCount + 1 end
+            local isDuty = (pState.job_duty == true or pState.job_duty == 1)
+            if (pState.job == 'police' or pState.job == 'sheriff') and isDuty then policeCount = policeCount + 1 end
+            if (pState.job == 'ambulance' or pState.job == 'ems') and isDuty then emsCount = emsCount + 1 end
+            if pState.job == 'mechanic' and isDuty then mechanicCount = mechanicCount + 1 end
+            if pState.job == 'taxi' and isDuty then taxiCount = taxiCount + 1 end
         end
     end
 
@@ -86,6 +89,11 @@ lib.callback.register('aura_hub:server:getHubData', function(source)
         end
     end
 
+    local hasTablet = false
+    if exports.ox_inventory then
+        hasTablet = (exports.ox_inventory:GetItemCount(src, 'tablet') or 0) > 0
+    end
+
     return {
         serverId = src,
         charId = charId,
@@ -98,6 +106,7 @@ lib.callback.register('aura_hub:server:getHubData', function(source)
         businessOpen = businessOpen,
         isBoss = isBoss,
         isGang = isGang,
+        hasTablet = hasTablet,
         society = societyData,
         onlinePlayers = onlineCount,
         maxPlayers = maxPlayers,
@@ -421,20 +430,27 @@ end)
 -- 6. MDT POLICIAL LSPD (ENDPOINTS, BÚSQUEDAS, SANCIONES Y CÁRCEL EN AURA HUB)
 -- ============================================================================
 
+local function HasPlayerTablet(src)
+    if not src or src <= 0 then return false end
+    if not exports.ox_inventory then return false end
+    return (exports.ox_inventory:GetItemCount(src, 'tablet') or 0) > 0
+end
+
 local function IsPoliceOfficer(src)
     local pState = Player(src).state
-    return pState.job == 'police'
+    return pState.job == 'police' or pState.job == 'sheriff'
 end
 
 local function IsPoliceOnDuty(src)
     local pState = Player(src).state
-    return pState.job == 'police' and (pState.job_duty == true or pState.job_duty == 1)
+    return (pState.job == 'police' or pState.job == 'sheriff') and (pState.job_duty == true or pState.job_duty == 1)
 end
 
 --- Resumen general del MDT: agentes en servicio, balances societarios y estadísticas
 lib.callback.register('aura_hub:server:getPoliceMdtOverview', function(source)
     local src = source
     if not IsPoliceOfficer(src) then return false, "UNAUTHORIZED" end
+    if not HasPlayerTablet(src) then return false, "NO_TABLET" end
 
     local socBalance = exports.aura_jobs:GetSocietyBalance('police') or 0
     local officers = {}
@@ -477,6 +493,7 @@ end)
 lib.callback.register('aura_hub:server:policeSearchCitizen', function(source, query)
     local src = source
     if not IsPoliceOnDuty(src) then return false, "UNAUTHORIZED" end
+    if not HasPlayerTablet(src) then return false, "NO_TABLET" end
 
     query = string.gsub(tostring(query or ""), "^%s*(.-)%s*$", "%1")
     if string.len(query) < 2 then return false, "Término de búsqueda demasiado corto." end
@@ -537,6 +554,7 @@ end)
 lib.callback.register('aura_hub:server:policeSearchVehicle', function(source, plate)
     local src = source
     if not IsPoliceOnDuty(src) then return false, "UNAUTHORIZED" end
+    if not HasPlayerTablet(src) then return false, "NO_TABLET" end
 
     plate = string.upper(string.gsub(tostring(plate or ""), "%s+", ""))
     local row = MySQL.single.await([[
@@ -552,9 +570,18 @@ lib.callback.register('aura_hub:server:policeSearchVehicle', function(source, pl
         return false, "Vehículo no registrado en la base de datos de tráfico."
     end
 
+    local ownerName = "Desconocido"
+    if row then
+        if row.firstname and row.firstname ~= "" then
+            ownerName = string.format("%s %s", row.firstname, row.lastname or "")
+        elseif row.owner then
+            ownerName = "Ciudadano (" .. tostring(row.owner) .. ")"
+        end
+    end
+
     return true, {
         plate = plate,
-        owner = row and string.format("%s %s", row.firstname or "Ciudadano", row.lastname or "") or "Desconocido",
+        owner = ownerName,
         ownerCitizenId = row and row.owner or "N/A",
         phone = row and row.phone_number or "N/A",
         isBolo = bolo ~= nil,
@@ -567,6 +594,7 @@ end)
 lib.callback.register('aura_hub:server:policeToggleVehicleBolo', function(source, data)
     local src = source
     if not IsPoliceOnDuty(src) then return false, "UNAUTHORIZED" end
+    if not HasPlayerTablet(src) then return false, "NO_TABLET" end
 
     local plate = string.upper(string.gsub(tostring(data.plate or ""), "%s+", ""))
     local reason = tostring(data.reason or "Vehículo en Búsqueda Policial (BOLO)")
@@ -590,6 +618,7 @@ end)
 lib.callback.register('aura_hub:server:policeIssueFine', function(source, data)
     local copSrc = source
     if not IsPoliceOnDuty(copSrc) then return false, "UNAUTHORIZED" end
+    if not HasPlayerTablet(copSrc) then return false, "NO_TABLET" end
 
     local targetCitizenId = data.citizenid
     local targetServerId = tonumber(data.targetServerId)
@@ -637,6 +666,10 @@ lib.callback.register('aura_hub:server:policeIssueFine', function(source, data)
         { officer = officerName, officerCid = officerCid }
     )
 
+    if not debited then
+        return false, "El infractor no dispone de fondos suficientes en su cuenta bancaria para abonar la multa."
+    end
+
     -- 2. Acreditación del 100% en la cuenta societaria de la policía mediante aura_jobs
     exports.aura_jobs:AddSocietyMoney('police', amount, string.format("Cobro de Multa LSPD a %s %s (%s)", suspect.firstname, suspect.lastname, reason), {
         txId = txId,
@@ -674,6 +707,7 @@ end)
 lib.callback.register('aura_hub:server:policeJailSuspect', function(source, data)
     local copSrc = source
     if not IsPoliceOnDuty(copSrc) then return false, "UNAUTHORIZED" end
+    if not HasPlayerTablet(copSrc) then return false, "NO_TABLET" end
 
     local targetSrc = tonumber(data.targetServerId)
     local targetCitizenId = data.citizenid
@@ -704,6 +738,7 @@ end)
 --- Órdenes de búsqueda y captura (Warrants)
 lib.callback.register('aura_hub:server:policeGetWarrants', function(source)
     if not IsPoliceOnDuty(source) then return false, "UNAUTHORIZED" end
+    if not HasPlayerTablet(source) then return false, "NO_TABLET" end
     local rows = MySQL.query.await('SELECT id, citizenid, suspect_name, reason, officer_name, severity, status, created_at FROM aura_police_warrants ORDER BY id DESC LIMIT 20')
     return true, rows or {}
 end)
@@ -711,6 +746,7 @@ end)
 lib.callback.register('aura_hub:server:policeCreateWarrant', function(source, data)
     local src = source
     if not IsPoliceOnDuty(src) then return false, "UNAUTHORIZED" end
+    if not HasPlayerTablet(src) then return false, "NO_TABLET" end
 
     local suspectCitizenId = data.citizenid
     local suspectName = data.suspectName or "Sospechoso"
@@ -728,14 +764,18 @@ lib.callback.register('aura_hub:server:policeCreateWarrant', function(source, da
 end)
 
 lib.callback.register('aura_hub:server:policeDeleteWarrant', function(source, warrantId)
-    if not IsPoliceOnDuty(source) then return false, "UNAUTHORIZED" end
+    local src = source
+    if not IsPoliceOnDuty(src) then return false, "UNAUTHORIZED" end
+    if not HasPlayerTablet(src) then return false, "NO_TABLET" end
     MySQL.update('UPDATE aura_police_warrants SET status = ? WHERE id = ?', { 'resolved', tonumber(warrantId) })
     return true, "Orden de búsqueda resuelta / archivada."
 end)
 
 --- Reclusos actualmente en prisión
 lib.callback.register('aura_hub:server:policeGetActiveInmates', function(source)
-    if not IsPoliceOnDuty(source) then return false, "UNAUTHORIZED" end
+    local src = source
+    if not IsPoliceOnDuty(src) then return false, "UNAUTHORIZED" end
+    if not HasPlayerTablet(src) then return false, "NO_TABLET" end
     local rows = MySQL.query.await('SELECT id, citizenid, jail_time, reason, officer_name, created_at FROM aura_police_jail WHERE status = ? ORDER BY id DESC', { 'active' })
     return true, rows or {}
 end)
@@ -748,6 +788,7 @@ end)
 lib.callback.register('aura_hub:server:policeGetStaff', function(source)
     local src = source
     if not IsPoliceOnDuty(src) then return false end
+    if not HasPlayerTablet(src) then return false, "NO_TABLET" end
     local pState = Player(src).state
     local callerGrade = pState.job_grade or 0
     local isHighCommand = callerGrade >= 3 -- Teniente (3), Detective (4), Comisario (5)
@@ -801,6 +842,7 @@ end)
 lib.callback.register('aura_hub:server:policeHireOfficer', function(source, targetSrc)
     local src = source
     if not IsPoliceOnDuty(src) then return false, "UNAUTHORIZED" end
+    if not HasPlayerTablet(src) then return false, "NO_TABLET" end
 
     local pState = Player(src).state
     local callerGrade = pState.job_grade or 0
@@ -845,6 +887,7 @@ end)
 lib.callback.register('aura_hub:server:policeSetOfficerGrade', function(source, data)
     local src = source
     if not IsPoliceOnDuty(src) then return false, "UNAUTHORIZED" end
+    if not HasPlayerTablet(src) then return false, "NO_TABLET" end
 
     local pState = Player(src).state
     local callerGrade = pState.job_grade or 0
@@ -877,16 +920,18 @@ lib.callback.register('aura_hub:server:policeSetOfficerGrade', function(source, 
     local jobConfig = exports.aura_jobs:GetJobConfig('police')
     local gradeName = (jobConfig and jobConfig.grades[newGrade] and jobConfig.grades[newGrade].name) or ("Grado " .. newGrade)
 
+    local success, err = exports.aura_jobs:SetJob(targetOnlineSrc or targetCharId, 'police', newGrade)
+    if not success then
+        return false, "Error al actualizar el rango policial: " .. tostring(err)
+    end
+
     if targetOnlineSrc then
-        exports.aura_jobs:SetJob(targetOnlineSrc, 'police', newGrade)
         TriggerClientEvent('ox_lib:notify', targetOnlineSrc, {
             title = 'Actualización de Rango LSPD',
             description = string.format("Tu rango policial ha sido actualizado a: %s (Grado %d).", gradeName, newGrade),
             type = 'inform',
             duration = 8000
         })
-    else
-        MySQL.update('UPDATE characters SET job_grade = ? WHERE id = ? AND job = ?', { newGrade, targetCharId, 'police' })
     end
 
     return true, string.format("Rango actualizado con éxito a %s (Grado %d).", gradeName, newGrade)
@@ -896,6 +941,7 @@ end)
 lib.callback.register('aura_hub:server:policeFireOfficer', function(source, targetCharId)
     local src = source
     if not IsPoliceOnDuty(src) then return false, "UNAUTHORIZED" end
+    if not HasPlayerTablet(src) then return false, "NO_TABLET" end
 
     local pState = Player(src).state
     local callerGrade = pState.job_grade or 0
@@ -925,16 +971,18 @@ lib.callback.register('aura_hub:server:policeFireOfficer', function(source, targ
         end
     end
 
+    local success, err = exports.aura_jobs:SetJob(targetOnlineSrc or targetCharId, 'unemployed', 0)
+    if not success then
+        return false, "Error al procesar el cese del oficial: " .. tostring(err)
+    end
+
     if targetOnlineSrc then
-        exports.aura_jobs:SetJob(targetOnlineSrc, 'unemployed', 0)
         TriggerClientEvent('ox_lib:notify', targetOnlineSrc, {
             title = 'Cese de Funciones LSPD',
             description = 'Has sido cesado y expulsado del Departamento de Policía.',
             type = 'error',
             duration = 10000
         })
-    else
-        MySQL.update('UPDATE characters SET job = ?, job_grade = 0, job_duty = 0 WHERE id = ?', { 'unemployed', targetCharId })
     end
 
     return true, string.format("El oficial %s %s ha sido expulsado del cuerpo policial.", row.firstname, row.lastname)

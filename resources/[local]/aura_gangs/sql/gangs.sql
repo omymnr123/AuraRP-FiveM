@@ -47,5 +47,11 @@ VALUES
   ('vazou', 'Cártel Marc Vazou', 50000),
   ('ballas', 'East Los Santos Ballas', 25000),
   ('families', 'Chamberlain Gangster Families', 25000),
-  ('vagos', 'Los Santos Vagos', 25000)
+  ('vagos', 'Los Santos Vagos', 25000),
+  ('lostmc', 'The Lost MC Club', 50000),
+  ('bratva', 'Bratva (Mafia Rusa)', 50000),
+  ('triada', 'Tríada Asiática', 50000),
+  ('yakuza', 'Sindicato Yakuza', 50000),
+  ('marabunta', 'Marabunta Grande', 50000)
 ON DUPLICATE KEY UPDATE `label` = VALUES(`label`);
+

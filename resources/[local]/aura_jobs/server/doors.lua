@@ -123,6 +123,14 @@ RegisterNetEvent('aura_jobs:server:requestDoors', function()
     TriggerClientEvent('aura_jobs:client:syncDoors', src, DynamicDoors)
 end)
 
+local function HasDoorPermission(playerJob, doorJob)
+    if not playerJob or not doorJob then return false end
+    if playerJob == doorJob then return true end
+    if Config.GangBusinessMap and Config.GangBusinessMap[playerJob] == doorJob then return true end
+    if Config.BusinessVendors and Config.BusinessVendors[doorJob] and Config.BusinessVendors[doorJob].gang == playerJob then return true end
+    return false
+end
+
 -- Bloquear / Desbloquear puerta (Jugadores y Jefes)
 RegisterNetEvent('aura_jobs:server:toggleDoorlock', function(doorId)
     local src = source
@@ -134,8 +142,8 @@ RegisterNetEvent('aura_jobs:server:toggleDoorlock', function(doorId)
     local doorConfig = DynamicDoors[doorId] or (Config.Doors and Config.Doors[doorId])
     if not doorConfig then return end
     
-    -- Verificar si el trabajo del jugador coincide con la cerradura
-    if pJob ~= doorConfig.job then
+    -- Verificar si el trabajo o banda del jugador coincide con la cerradura
+    if not HasDoorPermission(pJob, doorConfig.job) then
         TriggerClientEvent('ox_lib:notify', src, { type = 'error', description = 'No tienes las llaves de esta puerta' })
         return
     end

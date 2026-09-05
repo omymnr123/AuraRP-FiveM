@@ -34,13 +34,25 @@ local function RegisterVendorStashes()
         local maxWeight = vendorConfig.maxWeight or 300000 -- 300.0 kg (en gramos)
         local slots = vendorConfig.slots or 50
 
+        local allowedGroups = { [vendorConfig.job] = 0 }
+        if vendorConfig.gang then
+            allowedGroups[vendorConfig.gang] = 0
+        end
+        if Config.GangBusinessMap then
+            for gangName, mappedFront in pairs(Config.GangBusinessMap) do
+                if mappedFront == vendorConfig.job then
+                    allowedGroups[gangName] = 0
+                end
+            end
+        end
+
         exports.ox_inventory:RegisterStash(
             stashId,
             stashLabel,
             slots,
             maxWeight,
             nil,     -- compartido
-            { [vendorConfig.job] = 0 } -- acceso restringido al trabajo
+            allowedGroups -- acceso restringido al trabajo y a la banda vinculada
         )
 
         if Config.Debug then

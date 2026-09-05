@@ -208,6 +208,13 @@ lib.callback.register('aura_police:server:joinRadioChannel', function(source, ch
 
     local offInfo = GetOfficerInfo(src)
 
+    -- Validar tenencia de hardware de radio (Estándar o Satelital)
+    local standardCount = exports.ox_inventory:Search(src, 'count', 'radio') or 0
+    local satelliteCount = exports.ox_inventory:Search(src, 'count', 'radio_satelite') or 0
+    if (standardCount + satelliteCount) <= 0 then
+        return { success = false, message = "No dispones de un dispositivo de radio o radio satelital en tu inventario." }
+    end
+
     -- Si es Canal de Mando, verificar rango (Sargento hacia arriba: grado >= 2)
     if ch.isMando and offInfo.grade < 2 then
         return { success = false, message = "Acceso denegado: El Canal de Mando está reservado para Mandos y Supervisores." }
