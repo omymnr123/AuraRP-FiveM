@@ -150,6 +150,21 @@
           }
         }
 
+        function enhanceProgressBar() {
+          // Detect all elements with progress-bar animation or label
+          var allBars = document.querySelectorAll('div[style*="progress-bar"], div[style*="animation: progress-bar"]');
+          for (var b = 0; b < allBars.length; b++) {
+            var bar = allBars[b];
+            bar.classList.add('aura-progress-fill-bar');
+            var container = bar.parentElement;
+            if (container) {
+              container.classList.add('aura-progress-bar-container');
+              var wrapper = container.parentElement;
+              if (wrapper) wrapper.classList.add('aura-progress-outer-wrapper');
+            }
+          }
+        }
+
         function debouncedProcess() {
           // Debounce: wait 30ms after last mutation to process
           // This lets React + FontAwesome finish rendering the SVG icons
@@ -157,6 +172,7 @@
           _auraDebounceTimer = setTimeout(function() {
             formatAuraKeycaps();
             enhanceToastCards();
+            enhanceProgressBar();
           }, 30);
         }
 

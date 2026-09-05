@@ -175,9 +175,19 @@ local function startProgress(data, nuiMessage)
     local disable = data.disable
     local startTime = GetGameTimer()
 
-    SendNUIMessage(nuiMessage)
+    if GetResourceState('aura_progress') == 'started' then
+        exports.aura_progress:Show(data.label or 'PROCESANDO...', data.duration, data.canCancel == true)
+    else
+        SendNUIMessage(nuiMessage)
+    end
 
     while progress do
+        -- Límite de tiempo alcanzado (Finalización con éxito)
+        if (GetGameTimer() - startTime) >= data.duration then
+            progress = nil
+            break
+        end
+
         if disable then
             if disable.mouse then
                 DisableControlAction(0, controls.INPUT_LOOK_LR, true)
@@ -210,8 +220,17 @@ local function startProgress(data, nuiMessage)
             end
         end
 
+        if progress.canCancel then
+            if IsControlJustPressed(0, 200) or IsControlJustPressed(0, 322) or IsControlJustPressed(0, 177) or
+               IsDisabledControlJustPressed(0, 200) or IsDisabledControlJustPressed(0, 322) or IsDisabledControlJustPressed(0, 177) then
+                progress = false
+                break
+            end
+        end
+
         if interruptProgress(progress) then
             progress = false
+            break
         end
 
         Wait(0)
@@ -224,17 +243,24 @@ local function startProgress(data, nuiMessage)
     if anim then
         if anim.dict then
             StopAnimTask(cache.ped, anim.dict, anim.clip, 1.0)
-            Wait(0) -- This is needed here otherwise the StopAnimTask is cancelled
+            Wait(50)
+            ClearPedTasks(cache.ped)
         else
             ClearPedTasks(cache.ped)
         end
     end
 
-    local duration = progress ~= false and GetGameTimer() - startTime + 100 -- give slight leeway
-
-    if progress == false or duration <= data.duration then
-        SendNUIMessage({ action = 'progressCancel' })
+    if progress == false then
+        if GetResourceState('aura_progress') == 'started' then
+            exports.aura_progress:Hide()
+        else
+            SendNUIMessage({ action = 'progressCancel' })
+        end
         return false
+    end
+
+    if GetResourceState('aura_progress') == 'started' then
+        exports.aura_progress:Hide()
     end
 
     return true
@@ -274,6 +300,10 @@ function lib.progressCircle(data)
 end
 
 function lib.cancelProgress()
+    if GetResourceState('aura_progress') == 'started' and exports.aura_progress:IsActive() then
+        exports.aura_progress:Cancel()
+    end
+
     if not progress then
         error('No progress bar is active')
     end

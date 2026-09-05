@@ -49,7 +49,7 @@ local function SetupExteriorZones()
     end
 end
 
---- Registrar la zona de salida del interior del MLO
+--- Registrar la zona de salida del interior del MLO (Fail-safe: siempre accesible)
 local function SetupInteriorExitZone()
     if InteriorExitZone then
         exports.ox_target:removeZone(InteriorExitZone)
@@ -59,17 +59,17 @@ local function SetupInteriorExitZone()
     local interior = Config.Greenhouse.Interior
     InteriorExitZone = exports.ox_target:addSphereZone({
         coords = interior.exitDoor,
-        radius = interior.exitRadius or 2.0,
+        radius = interior.exitRadius or 2.2,
         debug = Config.Debug or false,
         options = {
             {
                 name = 'greenhouse_interior_exit',
                 icon = 'fas fa-door-closed',
                 label = 'Salir al Exterior',
-                distance = 2.0,
+                distance = 2.5,
                 canInteract = function()
-                    local pState = LocalPlayer.state
-                    return pState.greenhouse_bucket and pState.greenhouse_bucket > 0
+                    -- Siempre permitir interactuar si está físicamente cerca de la puerta interior
+                    return true
                 end,
                 onSelect = function()
                     ExitGreenhouse()
@@ -136,7 +136,7 @@ function ExitGreenhouse()
 end
 
 -- ============================================================================
--- EVENTOS DE SINCRONIZACIÓN Y CICLO DE VIDA
+-- EVENTOS DE SINCRONIZACIÓN Y RECONEXIÓN AUTOMÁTICA
 -- ============================================================================
 
 RegisterNetEvent('aura_gangs:client:syncGreenhouses', function(greenhouses)
@@ -144,9 +144,40 @@ RegisterNetEvent('aura_gangs:client:syncGreenhouses', function(greenhouses)
     SetupExteriorZones()
 end)
 
+RegisterNetEvent('aura_gangs:client:interiorRestored', function(gangId, bucketId)
+    local gangConfig = Config.Gangs[gangId] or { label = gangId }
+    lib.notify({
+        title = 'DIMENSIÓN RESTAURADA',
+        description = string.format('Reconectado en el Invernadero de "%s" (Bucket %d). Plantas y mesas activas.', gangConfig.label, bucketId),
+        type = 'success',
+        duration = 8000
+    })
+end)
+
+local function CheckLocalInteriorReconnection()
+    Wait(1500)
+    local ped = PlayerPedId()
+    local coords = GetEntityCoords(ped)
+    local interiorCenter = Config.Greenhouse.Interior.plantingCenter or vec3(1051.49, -3196.53, -39.14)
+    local dist = #(coords - interiorCenter)
+
+    if dist <= 45.0 or (coords.z < -30.0 and coords.x > 1020.0 and coords.x < 1080.0) then
+        TriggerServerEvent('aura_gangs:server:checkPlayerInteriorState')
+    end
+end
+
+RegisterNetEvent('aura_multichar:client:characterLoaded', function()
+    CheckLocalInteriorReconnection()
+end)
+
+AddEventHandler('playerSpawned', function()
+    CheckLocalInteriorReconnection()
+end)
+
 CreateThread(function()
     SetupInteriorExitZone()
     TriggerServerEvent('aura_gangs:server:requestGreenhouses')
+    CheckLocalInteriorReconnection()
 end)
 
 AddEventHandler('onResourceStop', function(res)

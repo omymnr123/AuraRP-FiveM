@@ -26,6 +26,7 @@ files {
     'web/js/ecubypass.js',
     'web/js/reactor.js',
     'web/js/cipher.js',
+    'web/js/weedpackaging.js',
     'web/js/app.js'
 }
 
@@ -33,5 +34,6 @@ exports {
     'Lockpick',
     'ECUBypass',
     'ChemicalReactor',
-    'CipherMatrix'
+    'CipherMatrix',
+    'WeedPackaging'
 }

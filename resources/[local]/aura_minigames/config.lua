@@ -36,5 +36,15 @@ Config.Defaults = {
         sequenceLength = 3,   -- Longitud del código objetivo a descifrar
         timeLimit = 30,       -- Segundos disponibles
         difficulty = 'medium'
+    },
+
+    -- 5. Dosificación y Sellado Hermético al Vacío (Weed Packaging)
+    WeedPackaging = {
+        targetWeight = 28.00,       -- Peso objetivo en gramos (28.00 g por bolsa)
+        weightTolerance = 0.70,     -- Margen de tolerancia admisible (±0.70 g)
+        requiredSeals = 3,          -- Sellados térmicos requeridos
+        sealSpeed = 1.0,            -- Velocidad de oscilación del cabezal térmico
+        timeLimit = 35,             -- Tiempo límite en segundos
+        difficulty = 'medium'
     }
 }

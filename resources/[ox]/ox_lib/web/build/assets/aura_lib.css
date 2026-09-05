@@ -877,3 +877,96 @@ input[class*="mantine-Input-input"]:focus {
   border-color: var(--aura-cyan) !important;
   box-shadow: 0 0 12px rgba(0, 242, 254, 0.4) !important;
 }
+
+/* ==========================================================================
+   AURA RP - UNIVERSAL PROGRESS BAR (SOLO LA BARRA - ESTILO MINIMALISTA AURARP)
+   Aesthetic: Obsidian Glass + Turquoise (#40E0D0) to Neon Pink (#FF007F)
+   ========================================================================== */
+
+/* Outer wrapper positioning (bottom-center) */
+.aura-progress-outer-wrapper,
+#root > div:has(.aura-progress-bar-container),
+#root > div:has(div[style*="animation: progress-bar"]),
+#root > div:has(div[style*="progress-bar"]) {
+  position: fixed !important;
+  bottom: 80px !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  pointer-events: none !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  z-index: 999999 !important;
+}
+
+/* Container de la barra - Minimalista, sin marcos gruesos */
+.aura-progress-bar-container,
+div:has(> .aura-progress-fill-bar),
+div:has(> div[style*="progress-bar"]),
+div:has(> div[style*="animation: progress-bar"]) {
+  width: 380px !important;
+  height: 32px !important;
+  background: #0a0f1d !important;
+  background-color: #0a0f1d !important;
+  border: 1.5px solid rgba(64, 224, 208, 0.45) !important;
+  border-radius: 8px !important;
+  overflow: hidden !important;
+  position: relative !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.85), 0 0 12px rgba(64, 224, 208, 0.25) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+}
+
+/* Relleno de la barra (Gradiente Turquesa a Rosa Neón) */
+.aura-progress-fill-bar,
+div[style*="progress-bar"],
+div[style*="animation: progress-bar"] {
+  height: 100% !important;
+  background: linear-gradient(90deg, #40E0D0 0%, #FF007F 100%) !important;
+  background-color: transparent !important;
+  box-shadow: 0 0 16px rgba(64, 224, 208, 0.7), 0 0 24px rgba(255, 0, 127, 0.5) !important;
+  border-radius: 6px !important;
+  position: absolute !important;
+  left: 0 !important;
+  top: 0 !important;
+  bottom: 0 !important;
+  z-index: 1 !important;
+}
+
+/* Capa de texto centrada */
+.aura-progress-bar-container > div:not(.aura-progress-fill-bar):not([style*="progress-bar"]),
+.aura-progress-fill-bar > div,
+div[style*="progress-bar"] > div {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  z-index: 10 !important;
+  pointer-events: none !important;
+}
+
+/* Tipografía de la etiqueta */
+.aura-progress-bar-container p,
+.aura-progress-bar-container span,
+.aura-progress-bar-container div,
+div[style*="progress-bar"] p,
+div[style*="progress-bar"] span,
+div[style*="progress-bar"] div {
+  font-family: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.6px !important;
+  text-transform: uppercase !important;
+  color: #FFFFFF !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95), 0 0 8px rgba(0, 0, 0, 0.9) !important;
+}

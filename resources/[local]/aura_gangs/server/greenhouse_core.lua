@@ -192,6 +192,55 @@ end, false)
 -- 2. TELETRANSPORTE E INSTANCIACIÓN (ROUTING BUCKETS)
 -- ============================================================================
 
+--- Comprobar si un jugador está dentro del MLO interior y restaurar su dimensión instanciada
+--- @param src number
+function CheckAndRestorePlayerInterior(src)
+    if not src then return end
+
+    local ped = GetPlayerPed(src)
+    if not ped or ped == 0 then return end
+
+    local coords = GetEntityCoords(ped)
+    local interiorCenter = Config.Greenhouse.Interior.plantingCenter or vec3(1051.49, -3196.53, -39.14)
+    local dist = #(coords - interiorCenter)
+
+    -- Si el jugador está dentro de la zona del interior del invernadero
+    if dist <= (Config.Greenhouse.Interior.plantingRadius or 45.0) or (coords.z < -30.0 and coords.x > 1020.0 and coords.x < 1080.0 and coords.y < -3160.0 and coords.y > -3220.0) then
+        local pState = Player(src).state
+        local gangId = pState.job
+
+        -- Si la banda del jugador es válida en Config.Gangs
+        if gangId and Config.Gangs[gangId] then
+            local bucketId = GetGangBucket(gangId)
+            SetPlayerRoutingBucket(src, bucketId)
+            pState:set('greenhouse_bucket', bucketId, true)
+            pState:set('in_greenhouse_gang', gangId, true)
+
+            -- Sincronizar plantas de su banda
+            TriggerEvent('aura_gangs:server:syncPlantsToPlayer', src, gangId)
+            TriggerClientEvent('aura_gangs:client:interiorRestored', src, gangId, bucketId)
+
+            print(string.format('^2[AURA GANGS]^7 Jugador %s (%d) reconectado dentro del Invernadero de "%s". Restaurado a Bucket %d y sincronizado.^7', GetPlayerName(src) or tostring(src), src, gangId, bucketId))
+        else
+            -- Si es administrador
+            local isAdmin = IsPlayerAceAllowed(tostring(src), 'group.admin') or IsPlayerAceAllowed(tostring(src), 'command')
+            if isAdmin then
+                pState:set('greenhouse_bucket', 0, true)
+                pState:set('in_greenhouse_gang', 'admin', true)
+                TriggerClientEvent('aura_gangs:client:interiorRestored', src, 'admin', 0)
+            else
+                -- Si no pertenece a ninguna banda, salir de forma segura al exterior
+                local defaultExit = vec4(1066.37, -3183.47, -39.16, 0.0)
+                SetPlayerRoutingBucket(src, 0)
+                pState:set('greenhouse_bucket', 0, true)
+                pState:set('in_greenhouse_gang', nil, true)
+                SetEntityCoords(ped, defaultExit.x, defaultExit.y, defaultExit.z, false, false, false, false)
+            end
+        end
+    end
+end
+exports('CheckAndRestorePlayerInterior', CheckAndRestorePlayerInterior)
+
 --- Callback para solicitar entrada al Invernadero Clandestino
 lib.callback.register('aura_gangs:server:enterGreenhouse', function(source, gangId)
     local src = source
@@ -231,14 +280,22 @@ lib.callback.register('aura_gangs:server:exitGreenhouse', function(source)
     if not src then return false end
 
     local pState = Player(src).state
-    local gangId = pState.in_greenhouse_gang
+    local gangId = pState.in_greenhouse_gang or pState.job
     local exitCoords = nil
 
     if gangId and Greenhouses[gangId] then
         exitCoords = Greenhouses[gangId].coords
     else
-        -- Coordenadas por defecto en caso de anomalía
-        exitCoords = vec4(1066.37, -3183.47, -39.16, 0.0)
+        -- Buscar el primer invernadero disponible o coordenadas exteriores por defecto
+        for _, gh in pairs(Greenhouses) do
+            if gh and gh.coords then
+                exitCoords = gh.coords
+                break
+            end
+        end
+        if not exitCoords then
+            exitCoords = vec4(1066.37, -3183.47, -39.16, 0.0)
+        end
     end
 
     -- Restaurar a la dimensión pública 0
@@ -247,6 +304,37 @@ lib.callback.register('aura_gangs:server:exitGreenhouse', function(source)
     pState:set('in_greenhouse_gang', nil, true)
 
     return true, exitCoords
+end)
+
+--- Eventos de carga y conexión de personajes
+RegisterNetEvent('aura_gangs:server:checkPlayerInteriorState', function()
+    local src = source
+    CheckAndRestorePlayerInterior(src)
+end)
+
+AddEventHandler('aura_multichar:server:characterLoaded', function(charId, explicitSrc)
+    local src = explicitSrc or source
+    SetTimeout(1000, function()
+        CheckAndRestorePlayerInterior(src)
+    end)
+end)
+
+AddEventHandler('aura_economy:server:characterLoaded', function(arg1, arg2, arg3)
+    local src = (type(arg1) == 'number') and arg1 or source
+    SetTimeout(1000, function()
+        CheckAndRestorePlayerInterior(src)
+    end)
+end)
+
+-- Comprobación periódica / al arrancar el script para restaurar jugadores ya conectados
+CreateThread(function()
+    Wait(1500)
+    for _, pid in ipairs(GetPlayers()) do
+        local pSrc = tonumber(pid)
+        if pSrc then
+            CheckAndRestorePlayerInterior(pSrc)
+        end
+    end
 end)
 
 -- Función exportada para obtener invernaderos activos

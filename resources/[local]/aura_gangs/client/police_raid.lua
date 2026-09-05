@@ -119,8 +119,13 @@ end
 --- Registrar target global en props de marihuana para destrucción policial
 CreateThread(function()
     local weedModels = {
-        `bkr_prop_weed_bucket_open_01a`,
+        `prop_plant_pot_01a`,
+        `prop_plant_pot_02a`,
+        `prop_plant_pot_03a`,
+        `prop_plant_pot_04a`,
+        `prop_plant_pot_05a`,
         `bkr_prop_weed_01_small_01a`,
+        `bkr_prop_weed_01_plant_01a`,
         `bkr_prop_weed_med_01a`,
         `bkr_prop_weed_lrg_01a`
     }

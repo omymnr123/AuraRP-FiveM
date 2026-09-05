@@ -79,6 +79,14 @@ local function CipherMatrix(options)
 end
 exports('CipherMatrix', CipherMatrix)
 
+--- Minijuego de dosificación, calibración de peso y sellado hermético al vacío de marihuana
+--- @param options table | nil { targetWeight = 28.00, weightTolerance = 0.70, requiredSeals = 3, timeLimit = 35 }
+--- @return boolean
+local function WeedPackaging(options)
+    return StartMinigame('WeedPackaging', options)
+end
+exports('WeedPackaging', WeedPackaging)
+
 -- ============================================================================
 -- NUI CALLBACKS
 -- ============================================================================
@@ -145,10 +153,19 @@ RegisterCommand('testminigame', function(source, args)
             lib.notify({ title = 'Minijuego', description = 'Fallo de descifrado en la memoria. (FALSE)', type = 'error' })
         end
 
+    elseif gameName == 'weed' or gameName == 'packaging' or gameName == 'empaquetar' then
+        lib.notify({ title = 'Minijuego AuraRP', description = 'Iniciando báscula y selladora hermética de cogollos...', type = 'inform' })
+        local res = WeedPackaging({ targetWeight = 28.00, weightTolerance = 0.70, requiredSeals = 3 })
+        if res then
+            lib.notify({ title = 'Minijuego', description = '¡Bolsa de marihuana sellada al vacío con éxito! (TRUE)', type = 'success' })
+        else
+            lib.notify({ title = 'Minijuego', description = 'Fallo en el pesaje o sellado hermético. (FALSE)', type = 'error' })
+        end
+
     else
         lib.notify({
             title = 'Test Minijuegos',
-            description = 'Uso: /testminigame [lockpick | ecu | reactor | cipher]',
+            description = 'Uso: /testminigame [lockpick | ecu | reactor | cipher | weed]',
             type = 'error'
         })
     end

@@ -75,6 +75,48 @@ local function AttachPlantTarget(entity, plantData)
     })
 end
 
+local CandidatePlantModels = {
+    [1] = {
+        `prop_plant_pot_01a`,
+        `prop_plant_pot_02a`,
+        `prop_plant_pot_03a`,
+        `prop_plant_pot_04a`,
+        `prop_plant_pot_05a`,
+        `bkr_prop_weed_01_small_01a`
+    },
+    [2] = {
+        `bkr_prop_weed_01_small_01a`,
+        `bkr_prop_weed_01_plant_01a`,
+        `bkr_prop_weed_med_01a`
+    },
+    [3] = {
+        `bkr_prop_weed_med_01a`,
+        `bkr_prop_weed_01_plant_01c`,
+        `bkr_prop_weed_lrg_01a`
+    },
+    [4] = {
+        `bkr_prop_weed_lrg_01a`,
+        `bkr_prop_weed_01_plant_02a`,
+        `bkr_prop_weed_med_01a`
+    }
+}
+
+local function ResolvePlantModel(preferredModel, stage)
+    local stageNum = tonumber(stage) or 1
+    if preferredModel and IsModelValid(preferredModel) and IsModelInCdimage(preferredModel) then
+        return preferredModel
+    end
+
+    local pool = CandidatePlantModels[stageNum] or CandidatePlantModels[1]
+    for _, mod in ipairs(pool) do
+        if IsModelValid(mod) and IsModelInCdimage(mod) then
+            return mod
+        end
+    end
+
+    return `bkr_prop_weed_01_small_01a`
+end
+
 --- Sincronizar y generar props visuales según la fase biológica
 RegisterNetEvent('aura_gangs:client:syncPlants', function(plantsList)
     local pState = LocalPlayer.state
@@ -90,7 +132,7 @@ RegisterNetEvent('aura_gangs:client:syncPlants', function(plantsList)
         incomingIds[pId] = true
 
         local stageConfig = Config.Greenhouse.Stages[plant.stage] or Config.Greenhouse.Stages[1]
-        local targetModel = stageConfig.model
+        local targetModel = ResolvePlantModel(stageConfig.model, plant.stage)
 
         -- Si la planta ya existe y ha cambiado de fase, reemplazar prop
         if SpawnedPlants[pId] then
@@ -111,9 +153,6 @@ RegisterNetEvent('aura_gangs:client:syncPlants', function(plantsList)
 
         -- Crear entidad física si no existe
         if not SpawnedPlants[pId] then
-            if not IsModelInCdimage(targetModel) then
-                targetModel = `bkr_prop_weed_bucket_open_01a`
-            end
             lib.requestModel(targetModel)
             local coords = plant.coords
             local obj = CreateObject(targetModel, coords.x, coords.y, coords.z, false, false, false)
@@ -292,8 +331,8 @@ function HarvestPlant(plantId)
     end
 
     if lib.progressBar({
-        duration = Config.Greenhouse.Harvest.harvestDuration or 6000,
-        label = 'Cortando y embolsando cogollos de marihuana...',
+        duration = Config.Greenhouse.Harvest.harvestDuration or 5500,
+        label = 'Recolectando y cortando cogollos de marihuana...',
         useWhileDead = false,
         canCancel = true,
         disable = { car = true, move = true, combat = true },
@@ -313,7 +352,173 @@ function HarvestPlant(plantId)
 end
 
 -- ============================================================================
--- 3. NUI GLASSMORPHISM (DIAGNÓSTICO BIOLÓGICO DE LA PLANTA)
+-- 3. MESA DE TRABAJO: SENTARSE A EMPAQUETAR (MINIJUEGO AURA_MINIGAMES)
+-- ============================================================================
+
+local isPackagingActive = false
+
+function SitAndPackageWeed(targetEntity, targetCoords)
+    if isPackagingActive then return end
+
+    local pCoords = GetEntityCoords(PlayerPedId())
+    local center = Config.Greenhouse.Interior.plantingCenter or vec3(1051.49, -3196.53, -39.14)
+    local pState = LocalPlayer.state
+
+    if #(pCoords - center) > 50.0 and (not pState.greenhouse_bucket or pState.greenhouse_bucket == 0) then
+        lib.notify({ title = 'Laboratorio Clandestino', description = 'Debes estar dentro del invernadero para empaquetar.', type = 'error' })
+        return
+    end
+
+    local pkgConfig = Config.Greenhouse.Packaging or {}
+    local reqBuds = pkgConfig.requiredBudsItem or 'cogollo_weed'
+    local reqBudsCount = pkgConfig.requiredBudsCount or 5
+    local reqBaggie = pkgConfig.requiredBaggieItem or 'empty_baggies'
+    local reqBaggieCount = pkgConfig.requiredBaggieCount or 1
+
+    local currentBuds = exports.ox_inventory:Search('count', reqBuds) or 0
+    local currentBaggies = exports.ox_inventory:Search('count', reqBaggie) or 0
+
+    if currentBuds < reqBudsCount or currentBaggies < reqBaggieCount then
+        local statusBuds = (currentBuds >= reqBudsCount) and "✅" or "❌"
+        local statusBaggies = (currentBaggies >= reqBaggieCount) and "✅" or "❌"
+        lib.alertDialog({
+            header = '🌿 MESA DE EMPAQUETADO Y DOSIFICACIÓN',
+            content = string.format("### 📦 MATERIAS PRIMAS REQUERIDAS:\n- %s **%dx Cogollos de Marihuana** (`%s`) — _En posesión: %d_\n- %s **%dx Bolsitas Herméticas** (`%s`) — _En posesión: %d_\n\n> ⚠️ **FALTAN INSUMOS:**\n> Cosecha más cogollos frescos con tus tijeras de podar y asegúrate de tener bolsitas herméticas para envasar al vacío.", statusBuds, reqBudsCount, reqBuds, currentBuds, statusBaggies, reqBaggieCount, reqBaggie, currentBaggies),
+            centered = true,
+            cancel = false,
+            labels = { confirm = 'ENTENDIDO' }
+        })
+        return
+    end
+
+    isPackagingActive = true
+    local ped = PlayerPedId()
+
+    -- 1. Determinar coordenadas y orientación precisa de asiento
+    local sitX, sitY, sitZ = nil, nil, nil
+    local sitHeading = nil
+
+    if targetEntity and DoesEntityExist(targetEntity) then
+        local eCoords = GetEntityCoords(targetEntity)
+        local eHeading = GetEntityHeading(targetEntity)
+        sitX, sitY = eCoords.x, eCoords.y
+        -- En GTA V, la orientación para sentarse de cara a la mesa es invertida 180° respecto al respaldo de la silla
+        sitHeading = (eHeading + 180.0) % 360.0
+        -- Ajustar altura de asiento (si la coordenada es a nivel de suelo, elevar al asiento; si es del prop, calibrar)
+        sitZ = (eCoords.z < -39.0) and (eCoords.z + 0.45) or (eCoords.z - 0.15)
+    elseif targetCoords then
+        sitX, sitY = targetCoords.x, targetCoords.y
+        sitHeading = (GetEntityHeading(ped) + 180.0) % 360.0
+        sitZ = (targetCoords.z < -39.0) and (targetCoords.z + 0.45) or targetCoords.z
+    else
+        local myPos = GetEntityCoords(ped)
+        sitX, sitY = myPos.x, myPos.y
+        sitHeading = GetEntityHeading(ped)
+        sitZ = myPos.z
+    end
+
+    -- 2. Posicionar y sentar físicamente al personaje en la silla de forma persistente
+    TaskTurnPedToFaceCoord(ped, sitX, sitY, sitZ, 200)
+    Wait(150)
+    TaskStartScenarioAtPosition(ped, 'PROP_HUMAN_SEAT_CHAIR_MP_PLAYER', sitX, sitY, sitZ, sitHeading, -1, false, true)
+    Wait(500)
+
+    -- Retirar ingredientes antes de abrir el minijuego
+    local canStart, startMsg = lib.callback.await('aura_gangs:server:startWeedPackaging', false)
+    if not canStart then
+        ClearPedTasks(ped)
+        isPackagingActive = false
+        lib.notify({ title = 'Mesa de Empaquetado', description = startMsg, type = 'error' })
+        return
+    end
+
+    -- Ejecución del Minijuego AuraRP WeedPackaging
+    local success = false
+    if GetResourceState('aura_minigames') == 'started' then
+        success = exports.aura_minigames:WeedPackaging({
+            targetWeight = 28.00,
+            weightTolerance = 0.70,
+            requiredSeals = 3,
+            timeLimit = 35
+        })
+    else
+        local s1 = lib.skillCheck({'medium', 'medium'}, {'w', 'a', 's', 'd'})
+        local s2 = s1 and lib.skillCheck({'hard'}, {'w', 'a', 's', 'd'})
+        success = (s2 == true)
+    end
+
+    -- Levantar al personaje suavemente de la silla
+    ClearPedTasks(ped)
+    isPackagingActive = false
+
+    if success then
+        local ok, finishMsg = lib.callback.await('aura_gangs:server:finishWeedPackaging', false)
+        if ok then
+            PlaySoundFrontend(-1, "COLLECTED", "HUD_AWARDS", true)
+            lib.notify({
+                title = 'EMPAQUETADO EXITOSO',
+                description = finishMsg,
+                type = 'success',
+                duration = 7000
+            })
+        else
+            lib.notify({ title = 'Mesa de Empaquetado', description = finishMsg, type = 'error' })
+        end
+    else
+        local _, cancelMsg = lib.callback.await('aura_gangs:server:cancelWeedPackaging', false)
+        lib.notify({
+            title = 'EMPAQUETADO CANCELADO',
+            description = cancelMsg,
+            type = 'inform'
+        })
+    end
+end
+
+-- ============================================================================
+-- 4. REGISTRO DE TARGETS PARA SILLAS Y MESAS DE EMPAQUETADO
+-- ============================================================================
+
+CreateThread(function()
+    local pkgConfig = Config.Greenhouse.Packaging or {}
+    local center = Config.Greenhouse.Interior.plantingCenter or vec3(1051.49, -3196.53, -39.14)
+
+    local function IsInGreenhouseInterior()
+        local pCoords = GetEntityCoords(PlayerPedId())
+        local pState = LocalPlayer.state
+        return (#(pCoords - center) < 55.0) or (pState.greenhouse_bucket and pState.greenhouse_bucket > 0)
+    end
+
+    local function IsPlantEntity(entity)
+        if not entity or not DoesEntityExist(entity) then return false end
+        for _, plantData in pairs(SpawnedPlants) do
+            if plantData.entity == entity then
+                return true
+            end
+        end
+        return false
+    end
+
+    -- Registro exclusivo y único por modelos de sillas, bancos y mesas de empaquetado
+    if pkgConfig.targetModels and #pkgConfig.targetModels > 0 then
+        exports.ox_target:addModel(pkgConfig.targetModels, {
+            {
+                name = 'greenhouse_sit_and_package',
+                icon = 'fas fa-box-open',
+                label = 'Sentarse a Empaquetar',
+                distance = 2.5,
+                canInteract = function(entity)
+                    return IsInGreenhouseInterior() and not IsPlantEntity(entity)
+                end,
+                onSelect = function(data)
+                    SitAndPackageWeed(data and data.entity, data and data.coords)
+                end
+            }
+        })
+    end
+end)
+
+-- ============================================================================
+-- 5. NUI GLASSMORPHISM (DIAGNÓSTICO BIOLÓGICO DE LA PLANTA)
 -- ============================================================================
 
 function OpenPlantNUI(plantIdentifier)

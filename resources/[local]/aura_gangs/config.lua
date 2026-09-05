@@ -319,8 +319,8 @@ Config.Greenhouse = {
     -- 4 Fases visuales de crecimiento (Hashes nativos oficiales GTA V)
     Stages = {
         [1] = {
-            model = `bkr_prop_weed_bucket_open_01a`,
-            label = 'Fase 1: Maceta con Tierra (Semilla Sembrada)',
+            model = `prop_plant_pot_01a`,
+            label = 'Fase 1: Maceta con Sustrato (Semilla Sembrada)',
             minGrowth = 0.0,
             maxGrowth = 25.0
         },
@@ -350,23 +350,100 @@ Config.Greenhouse = {
         nutrition = 0.0    -- 0% de fertilizante (requiere abonado NPK para activar la nutrición)
     },
 
-    -- Motor de Crecimiento y Degradación de Recursos
+    -- Motor de Crecimiento, Muerte por Descuido y Sobremaduración (2h de ciclo biológico)
     GrowthEngine = {
-        tickInterval = 30,         -- Comprobación cada 30 segundos en servidor
-        thirstDecay = 1.2,         -- Pérdida de sed por tick (aprox 25-30 min de autonomía)
-        nutritionDecay = 0.9,      -- Pérdida de fertilizante por tick
-        baseGrowthRate = 2.2,      -- % de crecimiento por tick si tiene agua (>0) y abono (>0)
-        optimalBonusMultiplier = 1.3 -- Multiplicador si agua > 50% y abono > 50%
+        tickInterval = 30,           -- Comprobación cada 30 segundos en servidor
+        thirstDecay = 1.25,          -- -1.25% cada 30s (Exactamente -50% de agua cada 20 minutos)
+        nutritionDecay = 1.25,       -- -1.25% cada 30s (Exactamente -50% de abono cada 20 minutos)
+        baseGrowthRate = 0.35,       -- % de crecimiento por tick si tiene agua (>0) y abono (>0) (~2.3h)
+        optimalBonusMultiplier = 1.2, -- Multiplicador si agua > 50% y abono > 50% -> 0.42% por tick (Exactamente 2.0h)
+        maxNeglectedDuration = 600,  -- 10 minutos (600 segundos) al 0% de agua y nutrientes -> Muerte y eliminación de la planta
+        maxMatureDuration = 900      -- 15 minutos (900 segundos) al 100% de crecimiento sin cosechar -> La planta se pudre y muere
     },
 
-    -- Recompensas de Cosecha Simplificada (Directo a Bolsitas Herméticas)
+    -- Recompensas de Cosecha (Escaladas dinámicamente de 10 a 25 según el cuidado de la planta)
     Harvest = {
         requiredTool = 'tijeras_podar',
-        requiredBaggie = 'empty_baggies',
-        baggiesConsumed = 1,
-        rewardItem = 'weed',
-        rewardAmount = { min = 8, max = 15 },
-        harvestDuration = 6000
+        rewardItem = 'cogollo_weed',
+        minYield = 10,               -- Rendimiento mínimo (planta poco cuidada / seca)
+        maxYield = 25,               -- Rendimiento máximo (planta con cuidado óptimo al 100%)
+        harvestDuration = 5500
+    },
+
+    -- Mesa de Trabajo: Empaquetado, Pesaje de Precisión y Sellado Hermético
+    Packaging = {
+        requiredBudsItem = 'cogollo_weed',
+        requiredBudsCount = 5,       -- Mínimo 5 cogollos de marihuana
+        requiredBaggieItem = 'empty_baggies',
+        requiredBaggieCount = 1,     -- 1 bolsita hermética
+        outputItem = 'weed',         -- Entrega 1 bolsa de marihuana envasada
+        outputCount = 1,
+
+        -- Props de sillas, bancos y mesas de empaquetado interactuables
+        targetModels = {
+            `bkr_prop_weed_chair_01a`,
+            `bkr_prop_weed_table_01a`,
+            `bkr_prop_weed_scale_01a`,
+            `bkr_prop_weed_scales_01a`,
+            `bkr_prop_weed_drying_01a`,
+            `bkr_prop_weed_drying_02a`,
+            `bkr_prop_weed_tub_01a`,
+            `bkr_prop_weed_bud_01a`,
+            `bkr_prop_weed_bud_02a`,
+            `bkr_prop_clubhouse_chair_01`,
+            `bkr_prop_clubhouse_chair_02`,
+            `bkr_prop_clubhouse_chair_03`,
+            `prop_chair_01a`,
+            `prop_chair_01b`,
+            `prop_chair_02`,
+            `prop_chair_03`,
+            `prop_chair_04a`,
+            `prop_chair_04b`,
+            `prop_chair_05`,
+            `prop_chair_06`,
+            `prop_chair_08`,
+            `prop_chair_10`,
+            `prop_off_chair_01`,
+            `prop_off_chair_03`,
+            `prop_off_chair_04`,
+            `prop_off_chair_04b`,
+            `prop_off_chair_05`,
+            `v_corp_offchair`,
+            `v_corp_sidechair`,
+            `v_club_officechair`,
+            `v_ilev_chair02_p`,
+            `v_ilev_hd_chair`,
+            `v_ret_chair_white`,
+            `v_ret_chair`,
+            `v_ret_gc_chair01`,
+            `v_ret_gc_chair02`,
+            `prop_table_01`,
+            `prop_table_02`,
+            `prop_table_03`,
+            `prop_table_03b_chr`,
+            `prop_rub_chair_01`,
+            `prop_rub_chair_02`,
+            `apa_mp_h_din_chair_04`,
+            `apa_mp_h_din_chair_08`,
+            `apa_mp_h_din_chair_09`,
+            `apa_mp_h_din_chair_12`,
+            `ba_prop_battle_club_chair_01`,
+            `ba_prop_battle_club_chair_02`,
+            `gr_prop_gr_chair_office_01b`,
+            `hei_prop_heist_off_chair`,
+            `xm_prop_lab_chair_01`
+        },
+
+        -- Estaciones de empaquetado físicas dedicadas en el interior sd2 (Weed Farm)
+        dedicatedStations = {
+            { coords = vec3(1044.20, -3194.80, -39.15), heading = 90.0, radius = 2.0 },
+            { coords = vec3(1040.50, -3194.80, -39.15), heading = 90.0, radius = 2.0 },
+            { coords = vec3(1037.20, -3195.10, -39.15), heading = 180.0, radius = 2.0 },
+            { coords = vec3(1048.80, -3194.80, -39.15), heading = 0.0, radius = 2.0 },
+            { coords = vec3(1061.20, -3193.80, -39.15), heading = 270.0, radius = 2.0 },
+            { coords = vec3(1043.15, -3195.80, -39.15), heading = 180.0, radius = 1.8 },
+            { coords = vec3(1045.25, -3193.80, -39.15), heading = 0.0, radius = 1.8 }
+        }
     },
 
     -- Allanamientos e Irrupciones Policiales (Police Raid)

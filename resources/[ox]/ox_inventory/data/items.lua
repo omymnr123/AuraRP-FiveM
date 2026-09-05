@@ -934,6 +934,17 @@ return {
 		}
 	},
 
+	['cogollo_weed'] = {
+		label = 'Cogollo de Marihuana',
+		weight = 20,
+		stack = true,
+		close = true,
+		description = 'Cogollo curado y aromático recién recolectado. Requiere 5 unidades y 1 bolsita hermética en una mesa de empaquetado.',
+		client = {
+			image = 'cogollo_weed.png'
+		}
+	},
+
 	['weed'] = {
 		label = 'Marihuana Envasada',
 		weight = 100,
