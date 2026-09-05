@@ -157,7 +157,9 @@ else
     RegisterCommand('emotemenu', function() OpenEmoteMenu() end, false)
 end
 RegisterCommand('emotes', function() EmotesOnCommand() end, false)
-RegisterCommand('emotecancel', function() EmoteCancel() end, false)
+RegisterCommand('emotecancel', function() EmoteCancel(true) end, false)
+RegisterCommand('c', function() EmoteCancel(true) end, false)
+RegisterCommand('cancel', function() EmoteCancel(true) end, false)
 
 local disableHandsupControls = {
 
@@ -279,6 +281,12 @@ if Config.HandsupEnabled then
             return
         end
 
+        -- Si el jugador está ejecutando una animación y presiona X, primero cancela la animación
+        if IsInAnimation and not inHandsup then
+            EmoteCancel(true)
+            return
+        end
+
         inHandsup = not inHandsup
         if inHandsup then
             DestroyAllProps()
@@ -291,6 +299,9 @@ if Config.HandsupEnabled then
             HandsUpLoop()
         else
             ClearPedSecondaryTask(PlayerPedId())
+            if not IsPedInjured(PlayerPedId()) then
+                ClearPedTasks(PlayerPedId())
+            end
             if Config.PersistentEmoteAfterHandsup and IsInAnimation then
                 local emote = RP.Emotes[CurrentAnimationName]
                 if not emote then
@@ -342,7 +353,7 @@ end)
 function EmoteCancel(force)
     EmoteCancelPlaying = true
     -- Don't cancel if we are in an exit emote
-    if InExitEmote then
+    if InExitEmote and force ~= true then
         return
     end
 
@@ -362,14 +373,14 @@ function EmoteCancel(force)
     PtfxPrompt = false
 	Pointing = false
 
-    if IsInAnimation then
+    if IsInAnimation or force == true then
         if LocalPlayer.state.ptfx then
             PtfxStop()
         end
         DetachEntity(ply, true, false)
         CancelSharedEmote(ply)
 
-        if ChosenAnimOptions and ChosenAnimOptions.ExitEmote then
+        if ChosenAnimOptions and ChosenAnimOptions.ExitEmote and force ~= true then
             -- If the emote exit type is not specified, it defaults to Emotes
             local options = ChosenAnimOptions
             local ExitEmoteType = options.ExitEmoteType or "Emotes"
@@ -399,6 +410,7 @@ function EmoteCancel(force)
         else
             IsInAnimation = false
             ClearPedTasks(ply)
+            ClearPedSecondaryTask(ply)
             EmoteCancelPlaying = false
         end
         DestroyAllProps()

@@ -21,7 +21,7 @@ Config = {
     AllowedInCars = true,
     -- You can disable the menu here / change the keybind. It is currently set to F4
     -- The keybind you set here will be server sided for new players. existing players can set their own in the ESC menu keybind settings
-    MenuKeybindEnabled = true,
+    MenuKeybindEnabled = false,
     MenuKeybind = 'f3', -- Get the button string here https://docs.fivem.net/docs/game-references/input-mapper-parameter-ids/keyboard/
     -- You can disable the Favorite emote keybinding here.
     FavKeybindEnabled = true,
@@ -46,13 +46,13 @@ Config = {
     -- Saves expression style to client and applies them on joining
     PersistentExpression = true,
     -- You can disable the Walking Styles menu here.
-    WalkingStylesEnabled = false,
+    WalkingStylesEnabled = true,
     -- Saves walk styles to client and applies them on joining
-    PersistentWalk = false,
+    PersistentWalk = true,
     -- You can disable the Shared Emotes here.
     SharedEmotesEnabled = true,
     -- If you have the SQL imported enable this to turn on keybinding.
-    SqlKeybinding = false,
+    SqlKeybinding = true,
     -- If you don't like gta notifications, you can disable them here to have messages in the chat.
     NotificationsAsChatMessage = false,
     -- Used for few framework dependent things. Accepted values: "qb-core", false
@@ -63,17 +63,17 @@ Config = {
     AnimalEmotesEnabled = true,
     -- Used to enable or disable the search feature in the menu.
     Search = true,
-    -- You can disable the handsup here / change the keybind. It is currently set to Y
-    HandsupEnabled = false,
-    HandsupKeybind = 'Y', -- Get the button string here https://docs.fivem.net/docs/game-references/input-mapper-parameter-ids/keyboard/
-    HandsupKeybindEnabled = false,
-    HandsupKeybindInCarEnabled = false,
+    -- You can disable the handsup here / change the keybind. It is currently set to X
+    HandsupEnabled = true,
+    HandsupKeybind = 'X', -- Get the button string here https://docs.fivem.net/docs/game-references/input-mapper-parameter-ids/keyboard/
+    HandsupKeybindEnabled = true,
+    HandsupKeybindInCarEnabled = true,
     PersistentEmoteAfterHandsup = true, -- If true, you will play the emote you were playing previously after you stop handsup.
-    -- You can disable the fingrer pointing here / change the keybind. It is currently set to B
-    PointingEnabled = false,
+    -- You can disable the finger pointing here / change the keybind. It is currently set to B
+    PointingEnabled = true,
     PointingKeybindEnabled = true,
     PointingKeybind = 'B', -- Get the button string here https://docs.fivem.net/docs/game-references/input-mapper-parameter-ids/keyboard/
-    PointingKeybindInCarEnabled = false,
+    PointingKeybindInCarEnabled = true,
     PersistentEmoteAfterPointing = true, -- If true, you will play the emote you were playing previously after you stop pointing.
     -- If crouching should be enabled.
     CrouchEnabled = true,
@@ -94,8 +94,8 @@ Config = {
     AllowVisionsToggling = true,
     -- If set to true, the /newscam command will be enabled.
     NewscamEnabled = true,
-    -- Check for updates
-    CheckForUpdates = true,
+    -- Check for updates (Desactivado para evitar errores de conexión con GitHub en la consola)
+    CheckForUpdates = false,
 }
 
 Config.KeybindKeys = {

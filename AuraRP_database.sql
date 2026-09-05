@@ -869,7 +869,23 @@ CREATE TABLE IF NOT EXISTS `vehicles` (
   UNIQUE KEY `plate` (`plate`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Volcando datos para la tabla aurarp.vehicles: ~0 rows (aproximadamente)
+-- Volcando estructura para tabla aurarp.dpkeybinds
+CREATE TABLE IF NOT EXISTS `dpkeybinds` (
+  `id` varchar(50) NOT NULL,
+  `keybind1` varchar(50) DEFAULT 'num4',
+  `emote1` varchar(255) DEFAULT '',
+  `keybind2` varchar(50) DEFAULT 'num5',
+  `emote2` varchar(255) DEFAULT '',
+  `keybind3` varchar(50) DEFAULT 'num6',
+  `emote3` varchar(255) DEFAULT '',
+  `keybind4` varchar(50) DEFAULT 'num7',
+  `emote4` varchar(255) DEFAULT '',
+  `keybind5` varchar(50) DEFAULT 'num8',
+  `emote5` varchar(255) DEFAULT '',
+  `keybind6` varchar(50) DEFAULT 'num9',
+  `emote6` varchar(255) DEFAULT '',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

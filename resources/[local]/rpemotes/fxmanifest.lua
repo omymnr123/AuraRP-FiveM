@@ -18,8 +18,8 @@ dependencies {
 
 --#region oxmysql
 
--- dependency 'oxmysql'
--- server_script '@oxmysql/lib/MySQL.lua'
+dependency 'oxmysql'
+server_script '@oxmysql/lib/MySQL.lua'
 
 --#endregion oxmysql
 
