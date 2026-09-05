@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AuraRP - Diagnóstico de Cultivo Clandestino</title>
+    <!-- Google Fonts & FontAwesome Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="app" class="hidden">
+        <div class="glass-card">
+            <!-- Header Glow -->
+            <div class="card-header">
+                <div class="header-branding">
+                    <div class="icon-orb">
+                        <i class="fa-solid fa-cannabis"></i>
+                    </div>
+                    <div class="title-meta">
+                        <span class="sub-label">AURA ECOSYSTEM // BIO-SCANNER</span>
+                        <h2 class="main-title">Cultivo Amnesia Haze</h2>
+                    </div>
+                </div>
+                <button id="btn-close" class="close-btn" title="Cerrar diagnóstico">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Plant ID & Status Badge -->
+            <div class="status-ribbon">
+                <div class="ribbon-tag" id="plant-id-tag">MACETA #0</div>
+                <div class="ribbon-badge" id="plant-stage-badge">FASE 1: BROTE</div>
+            </div>
+
+            <!-- Main Metric: Growth Progress -->
+            <div class="metric-container primary-metric">
+                <div class="metric-header">
+                    <div class="metric-label">
+                        <i class="fa-solid fa-chart-line"></i>
+                        <span>Progreso Biológico de Floración</span>
+                    </div>
+                    <span class="metric-val" id="growth-value">0.0%</span>
+                </div>
+                <div class="progress-track">
+                    <div class="progress-fill growth-fill" id="growth-fill" style="width: 0%;"></div>
+                </div>
+            </div>
+
+            <!-- Secondary Metrics: Thirst & Nutrients -->
+            <div class="metrics-grid">
+                <!-- Hydration / Thirst -->
+                <div class="metric-container">
+                    <div class="metric-header">
+                        <div class="metric-label">
+                            <i class="fa-solid fa-droplet text-cyan"></i>
+                            <span>Hidratación (Agua)</span>
+                        </div>
+                        <span class="metric-val text-cyan" id="thirst-value">100%</span>
+                    </div>
+                    <div class="progress-track">
+                        <div class="progress-fill thirst-fill" id="thirst-fill" style="width: 100%;"></div>
+                    </div>
+                </div>
+
+                <!-- Nutrition NPK -->
+                <div class="metric-container">
+                    <div class="metric-header">
+                        <div class="metric-label">
+                            <i class="fa-solid fa-flask-vial text-pink"></i>
+                            <span>Nutrientes NPK</span>
+                        </div>
+                        <span class="metric-val text-pink" id="nutrition-value">100%</span>
+                    </div>
+                    <div class="progress-track">
+                        <div class="progress-fill nutrition-fill" id="nutrition-fill" style="width: 100%;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Diagnostic Advisory Alert -->
+            <div class="status-alert" id="status-alert-box">
+                <div class="alert-icon" id="alert-icon-wrap">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+                <div class="alert-content">
+                    <span class="alert-title" id="alert-title">Sustrato Equilibrado</span>
+                    <p class="alert-desc" id="alert-desc">Las condiciones de humedad y abono son óptimas para un desarrollo acelerado.</p>
+                </div>
+            </div>
+
+            <!-- Footer Meta -->
+            <div class="card-footer">
+                <span class="footer-tip"><i class="fa-solid fa-keyboard"></i> Presiona <kbd>ESC</kbd> para salir</span>
+                <span class="footer-sign">AURA GANGS v2.0</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>

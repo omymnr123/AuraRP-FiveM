@@ -16,7 +16,11 @@ client_scripts {
     'client/theft.lua',
     'client/chopshop.lua',
     'client/illegal.lua',
-    'client/graffiti.lua'
+    'client/graffiti.lua',
+    'client/radio_blips.lua',
+    'client/greenhouse_core.lua',
+    'client/plants.lua',
+    'client/police_raid.lua'
 }
 
 server_scripts {
@@ -25,7 +29,19 @@ server_scripts {
     'server/chopshop.lua',
     'server/illegal.lua',
     'server/graffiti.lua',
-    'server/darkweb.lua'
+    'server/darkweb.lua',
+    'server/radio.lua',
+    'server/greenhouse_core.lua',
+    'server/plants.lua',
+    'server/police_raid.lua'
+}
+
+ui_page 'web/index.html'
+
+files {
+    'web/index.html',
+    'web/css/style.css',
+    'web/js/app.js'
 }
 
 dependencies {
@@ -38,3 +54,4 @@ dependencies {
     'aura_economy',
     'aura_minigames'
 }
+

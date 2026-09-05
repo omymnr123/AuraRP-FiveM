@@ -88,37 +88,47 @@ CreateThread(function()
             `blip_color` int(11) NOT NULL DEFAULT 38,
             `frequency` int(11) NOT NULL,
             `is_mando` tinyint(1) NOT NULL DEFAULT 0,
+            `is_encrypted` tinyint(1) NOT NULL DEFAULT 1,
             `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
             PRIMARY KEY (`channel_id`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
     ]])
 
+    -- Verificar columna is_encrypted si la tabla ya existía
+    local checkEncryptedCol = MySQL.scalar.await([[
+        SELECT COUNT(*) FROM information_schema.COLUMNS 
+        WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'aura_police_radio_channels' AND COLUMN_NAME = 'is_encrypted'
+    ]])
+    if checkEncryptedCol == 0 then
+        MySQL.query("ALTER TABLE `aura_police_radio_channels` ADD COLUMN `is_encrypted` tinyint(1) NOT NULL DEFAULT 1 AFTER `is_mando`")
+    end
+
     -- Poblar canales por defecto si la tabla está vacía
     local countChannels = MySQL.scalar.await('SELECT COUNT(*) FROM `aura_police_radio_channels`')
     if not countChannels or countChannels == 0 then
         MySQL.query([[
-            INSERT INTO `aura_police_radio_channels` (`channel_id`, `label`, `color`, `blip_color`, `frequency`, `is_mando`) VALUES
-            ('mando', 'Canal de Mando', '#ffb700', 46, 100, 1),
-            ('patrol_1', 'Patrulla #01', '#00f2fe', 38, 101, 0),
-            ('patrol_2', 'Patrulla #02', '#3b82f6', 3, 102, 0),
-            ('patrol_3', 'Patrulla #03', '#00ff9d', 2, 103, 0),
-            ('patrol_4', 'Patrulla #04', '#ff007f', 48, 104, 0),
-            ('patrol_5', 'Patrulla #05', '#ff6b35', 47, 105, 0),
-            ('patrol_6', 'Patrulla #06', '#9d4edd', 27, 106, 0),
-            ('patrol_7', 'Patrulla #07', '#ff2a55', 1, 107, 0),
-            ('patrol_8', 'Patrulla #08', '#ffffff', 0, 108, 0),
-            ('patrol_9', 'Patrulla #09', '#ffff00', 5, 109, 0),
-            ('patrol_10', 'Patrulla #10', '#06d6a0', 25, 110, 0),
-            ('patrol_11', 'Patrulla #11', '#8338ec', 7, 111, 0),
-            ('patrol_12', 'Patrulla #12', '#ff477e', 8, 112, 0),
-            ('patrol_13', 'Patrulla #13', '#3a86ff', 18, 113, 0),
-            ('patrol_14', 'Patrulla #14', '#fb5607', 17, 114, 0),
-            ('patrol_15', 'Patrulla #15', '#70e000', 43, 115, 0),
-            ('patrol_16', 'Patrulla #16', '#0077b6', 29, 116, 0),
-            ('patrol_17', 'Patrulla #17', '#e0aaff', 19, 117, 0),
-            ('patrol_18', 'Patrulla #18', '#b5179e', 21, 118, 0),
-            ('patrol_19', 'Patrulla #19', '#a0aec0', 40, 119, 0),
-            ('patrol_20', 'Patrulla #20', '#4cc9f0', 68, 120, 0);
+            INSERT INTO `aura_police_radio_channels` (`channel_id`, `label`, `color`, `blip_color`, `frequency`, `is_mando`, `is_encrypted`) VALUES
+            ('mando', 'Canal de Mando', '#ffb700', 46, 100, 1, 1),
+            ('patrol_1', 'Patrulla #01', '#00f2fe', 38, 101, 0, 1),
+            ('patrol_2', 'Patrulla #02', '#3b82f6', 3, 102, 0, 1),
+            ('patrol_3', 'Patrulla #03', '#00ff9d', 2, 103, 0, 1),
+            ('patrol_4', 'Patrulla #04', '#ff007f', 48, 104, 0, 1),
+            ('patrol_5', 'Patrulla #05', '#ff6b35', 47, 105, 0, 1),
+            ('patrol_6', 'Patrulla #06', '#9d4edd', 27, 106, 0, 1),
+            ('patrol_7', 'Patrulla #07', '#ff2a55', 1, 107, 0, 1),
+            ('patrol_8', 'Patrulla #08', '#ffffff', 0, 108, 0, 1),
+            ('patrol_9', 'Patrulla #09', '#ffff00', 5, 109, 0, 1),
+            ('patrol_10', 'Patrulla #10', '#06d6a0', 25, 110, 0, 1),
+            ('patrol_11', 'Patrulla #11', '#8338ec', 7, 111, 0, 1),
+            ('patrol_12', 'Patrulla #12', '#ff477e', 8, 112, 0, 1),
+            ('patrol_13', 'Patrulla #13', '#3a86ff', 18, 113, 0, 1),
+            ('patrol_14', 'Patrulla #14', '#fb5607', 17, 114, 0, 1),
+            ('patrol_15', 'Patrulla #15', '#70e000', 43, 115, 0, 1),
+            ('patrol_16', 'Patrulla #16', '#0077b6', 29, 116, 0, 1),
+            ('patrol_17', 'Patrulla #17', '#e0aaff', 19, 117, 0, 1),
+            ('patrol_18', 'Patrulla #18', '#b5179e', 21, 118, 0, 1),
+            ('patrol_19', 'Patrulla #19', '#a0aec0', 40, 119, 0, 1),
+            ('patrol_20', 'Patrulla #20', '#4cc9f0', 68, 120, 0, 1);
         ]])
     end
 

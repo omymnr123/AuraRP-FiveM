@@ -554,6 +554,31 @@ RegisterNUICallback('darkWebWithdraw', function(data, cb)
     end, data.amount)
 end)
 
+-- Callbacks para Radio Clandestina (Dark Web Gang Radio)
+RegisterNUICallback('gangGetRadioOverview', function(_, cb)
+    lib.callback('aura_gangs:server:getRadioOverview', false, function(res)
+        cb(res or { success = false, message = "Error al conectar con la red de radio." })
+    end)
+end)
+
+RegisterNUICallback('gangJoinRadio', function(data, cb)
+    lib.callback('aura_gangs:server:joinRadioChannel', false, function(res)
+        cb(res or { success = false, message = "Error al unirse a la emisora." })
+    end, data.channelIndex)
+end)
+
+RegisterNUICallback('gangLeaveRadio', function(_, cb)
+    lib.callback('aura_gangs:server:leaveRadioChannel', false, function(res)
+        cb(res or { success = false, message = "Error al desconectar de la emisora." })
+    end)
+end)
+
+RegisterNUICallback('gangSetRadioColor', function(data, cb)
+    lib.callback('aura_gangs:server:setRadioColor', false, function(res)
+        cb(res or { success = false, message = "Error al actualizar color de la emisora." })
+    end, data.channelIndex, data.hexColor, data.blipColor)
+end)
+
 -- Limpieza de memoria gráfica al detener el recurso
 AddEventHandler('onResourceStop', function(res)
     if res == GetCurrentResourceName() then

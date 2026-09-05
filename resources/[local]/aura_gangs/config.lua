@@ -284,3 +284,98 @@ Config.Graffiti = {
         ['vagos']    = { label = 'VAGOS', color = { r = 247, g = 183, b = 49 } }
     }
 }
+
+-- ============================================================================
+-- 7. INVERNADERO INSTANCIADO Y CULTIVO DE WEED (PROJECT GREENHOUSE)
+-- ============================================================================
+Config.Greenhouse = {
+    -- Interior instanciado ("sd2" Weed Lab MLO / GTA V Biker DLC Weed Farm)
+    Interior = {
+        name = "Invernadero Clandestino sd2",
+        -- Coordenadas de aparición dentro del MLO al entrar
+        spawnCoords = vec4(1066.37, -3183.47, -39.16, 270.0),
+        -- Puerta interior para volver al exterior
+        exitDoor = vec3(1066.37, -3183.47, -39.16),
+        exitRadius = 2.0,
+        -- Radio interior permitido para plantar
+        plantingCenter = vec3(1051.49, -3196.53, -39.14),
+        plantingRadius = 35.0
+    },
+
+    -- Asignación de Routing Buckets privados por organización criminal
+    GangBuckets = {
+        ['salieri']  = 101,
+        ['vazou']    = 102,
+        ['cartel']   = 103,
+        ['ballas']   = 104,
+        ['families'] = 105,
+        ['vagos']    = 106
+    },
+
+    -- Límites de cultivo por invernadero
+    MaxPlantsPerGreenhouse = 25,
+    MinPlantDistance = 1.0, -- Distancia mínima en metros entre macetas
+
+    -- 4 Fases visuales de crecimiento (Hashes nativos oficiales GTA V)
+    Stages = {
+        [1] = {
+            model = `bkr_prop_weed_bucket_open_01a`,
+            label = 'Fase 1: Maceta con Tierra (Semilla Sembrada)',
+            minGrowth = 0.0,
+            maxGrowth = 25.0
+        },
+        [2] = {
+            model = `bkr_prop_weed_01_small_01a`,
+            label = 'Fase 2: Brote y Plántula Temprana',
+            minGrowth = 25.0,
+            maxGrowth = 55.0
+        },
+        [3] = {
+            model = `bkr_prop_weed_med_01a`,
+            label = 'Fase 3: Crecimiento Vegetativo y Ramificación',
+            minGrowth = 55.0,
+            maxGrowth = 90.0
+        },
+        [4] = {
+            model = `bkr_prop_weed_lrg_01a`,
+            label = 'Fase 4: Floración Madura (Lista para Cosechar)',
+            minGrowth = 90.0,
+            maxGrowth = 100.0
+        }
+    },
+
+    -- Valores biológicos iniciales al asentar una maceta nueva (tierra seca y sin abonar)
+    InitialStats = {
+        thirst = 0.0,      -- 0% de hidratación (sustrato seco que requiere riego inmediato)
+        nutrition = 0.0    -- 0% de fertilizante (requiere abonado NPK para activar la nutrición)
+    },
+
+    -- Motor de Crecimiento y Degradación de Recursos
+    GrowthEngine = {
+        tickInterval = 30,         -- Comprobación cada 30 segundos en servidor
+        thirstDecay = 1.2,         -- Pérdida de sed por tick (aprox 25-30 min de autonomía)
+        nutritionDecay = 0.9,      -- Pérdida de fertilizante por tick
+        baseGrowthRate = 2.2,      -- % de crecimiento por tick si tiene agua (>0) y abono (>0)
+        optimalBonusMultiplier = 1.3 -- Multiplicador si agua > 50% y abono > 50%
+    },
+
+    -- Recompensas de Cosecha Simplificada (Directo a Bolsitas Herméticas)
+    Harvest = {
+        requiredTool = 'tijeras_podar',
+        requiredBaggie = 'empty_baggies',
+        baggiesConsumed = 1,
+        rewardItem = 'weed',
+        rewardAmount = { min = 8, max = 15 },
+        harvestDuration = 6000
+    },
+
+    -- Allanamientos e Irrupciones Policiales (Police Raid)
+    PoliceRaid = {
+        requiredItem = 'ariete_policial',
+        policeJob = 'police',
+        minigame = { 'medium', 'hard', 'medium' },
+        breachDuration = 7500,
+        destroyDuration = 8000
+    }
+}
+

@@ -52,6 +52,44 @@ end
 -- 1. CARGA INICIAL Y SINCRONIZACIÓN DE CANALES
 -- ============================================================================
 
+local function RegisterEncryptedRadioChecks()
+    if not exports['pma-voice'] then return end
+
+    -- 1. Canal de Mando (100.0 MHz): Exclusivo para mandos policiales de servicio
+    pcall(function()
+        exports['pma-voice']:addChannelCheck(100, function(source)
+            return IsOfficerMando(source)
+        end)
+    end)
+
+    -- 2. Canales de Patrullas (101 a 120): Exclusivos para miembros de policía de servicio
+    for freq = 101, 120 do
+        local f = freq
+        pcall(function()
+            exports['pma-voice']:addChannelCheck(f, function(source)
+                return IsCopOnDuty(source)
+            end)
+        end)
+    end
+
+    -- 3. Frecuencias dinámicas registradas en la base de datos
+    for _, ch in pairs(PoliceChannels) do
+        local f = tonumber(ch.frequency)
+        if f and f > 0 then
+            local isMando = ch.isMando
+            pcall(function()
+                exports['pma-voice']:addChannelCheck(f, function(source)
+                    if isMando then
+                        return IsOfficerMando(source)
+                    else
+                        return IsCopOnDuty(source)
+                    end
+                end)
+            end)
+        end
+    end
+end
+
 local function LoadPoliceChannels()
     local rows = MySQL.query.await('SELECT * FROM `aura_police_radio_channels` ORDER BY `frequency` ASC')
     PoliceChannels = {}
@@ -64,10 +102,12 @@ local function LoadPoliceChannels()
                 blipColor = tonumber(r.blip_color) or 38,
                 frequency = tonumber(r.frequency) or 100,
                 isMando = (r.is_mando == 1 or r.is_mando == true),
+                isEncrypted = (r.is_encrypted == 1 or r.is_encrypted == true or r.is_encrypted == nil),
                 members = {}
             }
         end
     end
+    RegisterEncryptedRadioChecks()
 end
 
 CreateThread(function()
@@ -351,6 +391,11 @@ RegisterNetEvent('aura_police:server:onDutyChange', function(isDuty)
         if pState then
             pState:set('police_radio_channel', nil, true)
             pState:set('police_radio_freq', 0, true)
+        end
+        if exports['pma-voice'] then
+            pcall(function()
+                exports['pma-voice']:setPlayerRadio(src, 0)
+            end)
         end
         TriggerClientEvent('aura_police:client:syncRadioChannel', src, 0, "Desconectado", "#00f2fe", false)
         SyncRadioMembersToAllPolice()

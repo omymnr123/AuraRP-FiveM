@@ -795,6 +795,7 @@
                 <div class="modal-tabs-nav dark-tabs">
                     <button class="modal-tab-btn active" data-modaltab="dark-roster"><i class="fa-solid fa-users-viewfinder"></i> Roster Clandestino</button>
                     <button class="modal-tab-btn" data-modaltab="dark-offshore"><i class="fa-solid fa-vault"></i> Cuentas Offshore</button>
+                    <button class="modal-tab-btn" data-modaltab="dark-radio" id="btnDarkTabRadio"><i class="fa-solid fa-walkie-talkie"></i> Radio</button>
                 </div>
 
                 <div class="modal-body">
@@ -849,6 +850,42 @@
                                     <button class="btn-neon-action cyan" id="btnDarkWithdraw" style="display: none;"><i class="fa-solid fa-arrow-up"></i> Retirar Fondos (Jefe)</button>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 3: RADIO CLANDESTINA (EMISORAS #01 AL #20) -->
+                    <div id="modaltab-dark-radio" class="modal-tab-content">
+                        <!-- Banner de Estado de Radio de Banda -->
+                        <div class="radio-status-banner dark-radio-banner">
+                            <div class="radio-active-info">
+                                <div class="radio-beacon-wrapper dark-beacon" id="darkRadioBeaconWrapper">
+                                    <i class="fa-solid fa-tower-broadcast"></i>
+                                    <span class="radio-pulse-beacon" id="darkRadioActiveDot"></span>
+                                </div>
+                                <div class="radio-active-texts">
+                                    <span class="sub" id="darkRadioActiveFreqDesc">FRECUENCIA CLANDESTINA ENCRIPTADA</span>
+                                    <h4 id="darkRadioActiveChannelTitle">DESCONECTADO DE LA RED</h4>
+                                </div>
+                            </div>
+                            <div class="radio-banner-actions">
+                                <div class="radio-keybinds-pill">
+                                    <span><i class="fa-solid fa-microphone-lines"></i> PTT: Tecla Radio</span>
+                                </div>
+                                <button class="btn-neon-action pink" id="btnDarkDisconnectRadio" style="display: none;" onclick="leaveGangRadio()">
+                                    <i class="fa-solid fa-power-off"></i> Desconectar
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Sección de Emisoras -->
+                        <div class="patrols-section-header">
+                            <h4><i class="fa-solid fa-satellite-dish"></i> RED DE COMUNICACIONES ENCRIPTADAS (EMISORAS #01 AL #20)</h4>
+                            <span class="header-badge-tag dark-badge"><i class="fa-solid fa-lock"></i> FRECUENCIAS EXCLUSIVAS DE BANDA</span>
+                        </div>
+
+                        <!-- Grid de Emisoras (#01 al #20) -->
+                        <div class="radio-patrols-grid dark-radio-grid" id="darkRadioEmisorasContainer">
+                            <!-- Renderizado dinámico vía app.js -->
                         </div>
                     </div>
                 </div>

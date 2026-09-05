@@ -187,17 +187,38 @@ window.addEventListener('message', (event) => {
             updateRing('thirst', data.thirst);
             break;
 
-        case 'updateVoice':
+        case 'updateVoice': {
+            const iconEl = rings.voice.item ? rings.voice.item.querySelector('.hud-icon i') : null;
             if (data.isTalking) {
                 rings.voice.item.classList.add('talking');
+                if (data.isRadio) {
+                    rings.voice.item.classList.add('radio-talking');
+                    if (iconEl) {
+                        iconEl.className = 'fa-solid fa-walkie-talkie';
+                    }
+                } else {
+                    rings.voice.item.classList.remove('radio-talking');
+                    if (iconEl) {
+                        iconEl.className = 'fa-solid fa-microphone';
+                    }
+                }
                 setVisibility(rings.voice.item, true);
             } else {
                 rings.voice.item.classList.remove('talking');
+                rings.voice.item.classList.remove('radio-talking');
+                if (iconEl) {
+                    iconEl.className = 'fa-solid fa-microphone';
+                }
                 setVisibility(rings.voice.item, false);
             }
             break;
+        }
             
-        case 'showVoiceTemporary':
+        case 'showVoiceTemporary': {
+            const iconEl = rings.voice.item ? rings.voice.item.querySelector('.hud-icon i') : null;
+            if (iconEl && !rings.voice.item.classList.contains('radio-talking')) {
+                iconEl.className = 'fa-solid fa-microphone';
+            }
             // Mostrar temporalmente al cambiar el rango de voz
             setVisibility(rings.voice.item, true);
             // Actualizar porcentaje simulando el rango (opcional)
@@ -213,6 +234,7 @@ window.addEventListener('message', (event) => {
                 }
             }, 2000);
             break;
+        }
             
         case 'editMode':
             document.getElementById('edit-overlay').classList.remove('hidden');

@@ -65,11 +65,46 @@ RegisterCommand('+radiotalk_all', function()
 
     if not isMandoBroadcasting then
         isMandoBroadcasting = true
+        LocalPlayer.state:set('mandoRadioActive', true, true)
+        TriggerEvent('pma-voice:radioActive', true)
+        TriggerEvent('aura_police:client:radioStateChanged', true)
+
         PlaySoundFrontend(-1, "NAV_UP_DOWN", "HUD_FRONTEND_DEFAULT_SOUNDSET", 1)
         TriggerServerEvent('aura_police:server:broadcastMandoTalk', true)
         
-        -- Iniciar animación táctica de radio si está disponible
-        TaskPlayAnim(PlayerPedId(), "random@arrests", "generic_radio_enter", 8.0, 2.0, -1, 50, 2.0, false, false, false)
+        -- Añadir a todos los agentes en servicio como objetivos de voz directos (Mumble VoiceTarget 1)
+        local mySrc = GetPlayerServerId(PlayerId())
+        for src, _ in pairs(ActiveOfficerBlips) do
+            if src ~= mySrc then
+                MumbleAddVoiceTargetPlayerByServerId(1, src)
+            end
+        end
+
+        -- Iniciar animación táctica de radio y activación de PTT continuo
+        CreateThread(function()
+            local dict = "random@arrests"
+            local anim = "generic_radio_enter"
+            RequestAnimDict(dict)
+            local timeout = 0
+            while not HasAnimDictLoaded(dict) and timeout < 20 do
+                Wait(10)
+                timeout = timeout + 1
+            end
+
+            while isMandoBroadcasting do
+                local ped = PlayerPedId()
+                if HasAnimDictLoaded(dict) and not IsEntityPlayingAnim(ped, dict, anim, 3) then
+                    TaskPlayAnim(ped, dict, anim, 8.0, 2.0, -1, 50, 2.0, false, false, false)
+                end
+                SetControlNormal(0, 249, 1.0)
+                SetControlNormal(1, 249, 1.0)
+                SetControlNormal(2, 249, 1.0)
+                Wait(0)
+            end
+            if HasAnimDictLoaded(dict) then
+                RemoveAnimDict(dict)
+            end
+        end)
         
         lib.notify({
             title = 'Malla General Activa',
@@ -83,8 +118,12 @@ end, false)
 RegisterCommand('-radiotalk_all', function()
     if isMandoBroadcasting then
         isMandoBroadcasting = false
+        LocalPlayer.state:set('mandoRadioActive', false, true)
+        TriggerEvent('pma-voice:radioActive', false)
+        TriggerEvent('aura_police:client:radioStateChanged', false)
+        MumbleClearVoiceTargetPlayers(1)
         TriggerServerEvent('aura_police:server:broadcastMandoTalk', false)
-        StopAnimTask(PlayerPedId(), "random@arrests", "generic_radio_enter", 1.5)
+        StopAnimTask(PlayerPedId(), "random@arrests", "generic_radio_enter", -4.0)
     end
 end, false)
 

@@ -708,6 +708,8 @@ document.querySelectorAll('.modal-tab-btn').forEach(btn => {
 
         if (btn.dataset.modaltab === 'biz-hr') {
             loadEmployees();
+        } else if (btn.dataset.modaltab === 'dark-radio') {
+            loadDarkWebRadio();
         }
     });
 });
@@ -1623,16 +1625,23 @@ window.openRadioColorPicker = (channelId, event) => {
         grid.appendChild(btn);
     });
 
-    // Posicionar dropdown cerca del botón o en el centro si no cabe
+    // Posicionar dropdown cerca del botón o centrado respetando límites de pantalla
     if (event && event.target) {
         const rect = event.target.closest('button')?.getBoundingClientRect() || event.target.getBoundingClientRect();
+        const dropdownWidth = 440;
+        const dropdownHeight = 310;
         let top = rect.bottom + 8;
-        let left = rect.left - 40;
+        let left = rect.left - 200;
 
-        // Limitar dentro de la ventana
-        if (left + 260 > window.innerWidth) left = window.innerWidth - 280;
-        if (left < 10) left = 10;
-        if (top + 280 > window.innerHeight) top = rect.top - 290;
+        // Limitar dentro de la ventana del navegador
+        if (left + dropdownWidth > window.innerWidth - 15) {
+            left = window.innerWidth - dropdownWidth - 15;
+        }
+        if (left < 15) left = 15;
+        if (top + dropdownHeight > window.innerHeight - 15) {
+            top = rect.top - dropdownHeight - 8;
+        }
+        if (top < 15) top = 15;
 
         dropdown.style.top = `${top}px`;
         dropdown.style.left = `${left}px`;
@@ -1665,13 +1674,14 @@ window.closeRadioColorPicker = () => {
     const dropdown = document.getElementById('radioColorPickerDropdown');
     if (dropdown) dropdown.classList.add('hidden');
     activePickerChannelId = null;
+    activeGangPickerChannelId = null;
 };
 
 // Cerrar selector al hacer clic fuera
 document.addEventListener('click', (e) => {
     const dropdown = document.getElementById('radioColorPickerDropdown');
     if (dropdown && !dropdown.classList.contains('hidden')) {
-        if (!dropdown.contains(e.target) && !e.target.closest('.btn-channel-color') && !e.target.closest('.btn-patrol-color')) {
+        if (!dropdown.contains(e.target) && !e.target.closest('.btn-channel-color') && !e.target.closest('.btn-patrol-color') && !e.target.closest('.btn-patrol-color-mini')) {
             closeRadioColorPicker();
         }
     }
@@ -1869,4 +1879,205 @@ document.getElementById('btnDarkWithdraw')?.addEventListener('click', async () =
         showToast(res ? res.message : "Error al procesar la retirada", true);
     }
 });
+
+// ============================================================================
+// DARK WEB RADIO CONTROLLER (EMISORAS #01 AL #20 & FRECUENCIAS ENCRIPTADAS)
+// ============================================================================
+
+let activeGangRadioOverview = null;
+let activeGangPickerChannelId = null;
+
+async function loadDarkWebRadio() {
+    const res = await postFetch('gangGetRadioOverview');
+    if (!res || !res.success) {
+        showToast("Error al conectar con la red de radio clandestina.", true);
+        return;
+    }
+
+    const rawData = res.data || res;
+    activeGangRadioOverview = rawData;
+
+    let channels = rawData.channels || [];
+    if (!Array.isArray(channels)) {
+        channels = Object.values(channels);
+    }
+    const activeChannelIndex = (rawData.activeChannelIndex !== undefined && rawData.activeChannelIndex !== null)
+        ? Number(rawData.activeChannelIndex)
+        : ((rawData.activeChannelId !== undefined && rawData.activeChannelId !== null) ? Number(rawData.activeChannelId) : null);
+
+    // 1. Banner de Estado Activo
+    const bannerTitle = document.getElementById('darkRadioActiveChannelTitle');
+    const bannerDesc = document.getElementById('darkRadioActiveFreqDesc');
+    const bannerDot = document.getElementById('darkRadioActiveDot');
+    const beaconWrapper = document.getElementById('darkRadioBeaconWrapper');
+    const btnDisconnect = document.getElementById('btnDarkDisconnectRadio');
+
+    const currentChannel = (activeChannelIndex !== null)
+        ? channels.find(c => {
+            const idx = c.channelIndex ?? c.channel_index;
+            return idx !== undefined && idx !== null && Number(idx) === activeChannelIndex;
+        })
+        : null;
+
+    if (currentChannel) {
+        if (bannerTitle) bannerTitle.textContent = `${currentChannel.label.toUpperCase()} (${parseFloat(currentChannel.frequency).toFixed(1)} MHz)`;
+        if (bannerDesc) bannerDesc.textContent = `Conectado y transmitiendo en vivo. Frecuencia clandestina ${parseFloat(currentChannel.frequency).toFixed(1)} MHz.`;
+        if (bannerDot) bannerDot.style.background = currentChannel.color_hex || currentChannel.color || '#FF007F';
+        if (beaconWrapper) beaconWrapper.classList.add('active');
+        if (btnDisconnect) btnDisconnect.style.display = 'inline-flex';
+    } else {
+        if (bannerTitle) bannerTitle.textContent = 'DESCONECTADO DE LA RED';
+        if (bannerDesc) bannerDesc.textContent = 'Haz clic en cualquier emisora clandestina para sintonizar en vivo.';
+        if (bannerDot) bannerDot.style.background = '#64748b';
+        if (beaconWrapper) beaconWrapper.classList.remove('active');
+        if (btnDisconnect) btnDisconnect.style.display = 'none';
+    }
+
+    // 2. Grid de Emisoras (#01 al #20)
+    const container = document.getElementById('darkRadioEmisorasContainer');
+    if (container) {
+        container.innerHTML = '';
+
+        channels.forEach(p => {
+            const chIdx = Number(p.channelIndex ?? p.channel_index ?? 0);
+            const isConnected = (activeChannelIndex !== null && chIdx === activeChannelIndex);
+            const pMembers = p.members || [];
+            const hexColor = p.color_hex || p.color || '#FF007F';
+
+            let membersChips = '';
+            if (pMembers.length === 0) {
+                membersChips = '<span class="patrol-empty-text"><i class="fa-regular fa-circle-check"></i> Disponible</span>';
+            } else {
+                membersChips = '<div class="patrol-chips-wrap">' + pMembers.map(mem => `<span class="patrol-chip" title="${mem.gradeLabel ? mem.gradeLabel + ' - ' : ''}${mem.name}"><i class="fa-solid fa-user-ninja" style="font-size: 7.5px; opacity: 0.7;"></i> ${mem.name}</span>`).join('') + '</div>';
+            }
+
+            const card = document.createElement('div');
+            card.className = `patrol-card ${isConnected ? 'active' : ''}`;
+            card.style.setProperty('--patrol-color', hexColor);
+
+            card.innerHTML = `
+                <div class="patrol-card-header">
+                    <div class="patrol-info">
+                        <span class="patrol-dot" style="background:${hexColor}; box-shadow: 0 0 6px ${hexColor};"></span>
+                        <strong class="patrol-title">${p.label}</strong>
+                        <span class="patrol-freq-badge">${parseFloat(p.frequency).toFixed(1)} MHz</span>
+                    </div>
+                    <div class="patrol-btn-group">
+                        <button class="btn-patrol-color-mini" onclick="openGangRadioColorPicker(${chIdx}, event)" title="Personalizar color de emisora y blip">
+                            <i class="fa-solid fa-palette"></i>
+                        </button>
+                        ${isConnected ? `
+                            <button class="btn-patrol-join disconnect" onclick="leaveGangRadio()">
+                                <i class="fa-solid fa-link-slash"></i> Salir
+                            </button>
+                        ` : `
+                            <button class="btn-patrol-join" onclick="joinGangRadio(${chIdx})">
+                                <i class="fa-solid fa-plug"></i> Entrar
+                            </button>
+                        `}
+                    </div>
+                </div>
+                <div class="patrol-members-row">
+                    ${membersChips}
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    }
+}
+
+window.joinGangRadio = async (channelIndex) => {
+    playTone('click');
+    const res = await postFetch('gangJoinRadio', { channelIndex });
+    if (res && res.success) {
+        showToast(res.message || "Conectado a la emisora clandestina.");
+        loadDarkWebRadio();
+    } else {
+        showToast((res && res.message) ? res.message : "Error al conectar a la emisora.", true);
+    }
+};
+
+window.leaveGangRadio = async () => {
+    playTone('click');
+    const res = await postFetch('gangLeaveRadio');
+    if (res && res.success) {
+        showToast(res.message || "Desconectado de la emisora clandestina.");
+        loadDarkWebRadio();
+    } else {
+        showToast((res && res.message) ? res.message : "Error al desconectar de la emisora.", true);
+    }
+};
+
+window.openGangRadioColorPicker = (channelIndex, event) => {
+    if (event) {
+        event.stopPropagation();
+        event.preventDefault();
+    }
+    playTone('click');
+    activeGangPickerChannelId = channelIndex;
+
+    const dropdown = document.getElementById('radioColorPickerDropdown');
+    const grid = document.getElementById('pickerSwatchesGrid');
+    if (!dropdown || !grid) return;
+
+    grid.innerHTML = '';
+    RADIO_COLOR_PALETTE.forEach(c => {
+        const btn = document.createElement('button');
+        btn.className = 'swatch-btn';
+        btn.style.setProperty('--swatch-color', c.hex);
+        btn.title = `${c.name} (${c.hex})`;
+        btn.innerHTML = `
+            <span class="swatch-circle" style="background: ${c.hex}; box-shadow: 0 0 8px ${c.hex};"></span>
+            <span class="swatch-name">${c.name}</span>
+        `;
+        btn.onclick = (e) => {
+            e.stopPropagation();
+            setGangRadioColor(c.hex, c.blip);
+        };
+        grid.appendChild(btn);
+    });
+
+    if (event && event.target) {
+        const rect = event.target.closest('button')?.getBoundingClientRect() || event.target.getBoundingClientRect();
+        const dropdownWidth = 440;
+        const dropdownHeight = 310;
+        let top = rect.bottom + 8;
+        let left = rect.left - 200;
+
+        if (left + dropdownWidth > window.innerWidth - 15) {
+            left = window.innerWidth - dropdownWidth - 15;
+        }
+        if (left < 15) left = 15;
+        if (top + dropdownHeight > window.innerHeight - 15) {
+            top = rect.top - dropdownHeight - 8;
+        }
+        if (top < 15) top = 15;
+
+        dropdown.style.top = `${top}px`;
+        dropdown.style.left = `${left}px`;
+    }
+
+    dropdown.classList.remove('hidden');
+};
+
+window.setGangRadioColor = async (hexColor, blipColor) => {
+    if (!activeGangPickerChannelId) return;
+    playTone('click');
+    const channelIndex = activeGangPickerChannelId;
+    closeRadioColorPicker();
+
+    const res = await postFetch('gangSetRadioColor', {
+        channelIndex: channelIndex,
+        hexColor: hexColor,
+        blipColor: blipColor
+    });
+
+    if (res && res.success) {
+        showToast(res.message || "Color de emisora y blip táctico actualizado.");
+        loadDarkWebRadio();
+    } else {
+        showToast((res && res.message) ? res.message : "Error al actualizar color de emisora.", true);
+    }
+};
+
 

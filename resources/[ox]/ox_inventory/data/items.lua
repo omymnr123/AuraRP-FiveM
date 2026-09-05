@@ -851,5 +851,109 @@ return {
 		client = {
 			image = 'scrap_metal.png'
 		}
+	},
+
+	-- ============================================================================
+	-- AURA RP - SISTEMA DE CULTIVO DE MARIHUANA E INVERNADEROS (PROJECT GREENHOUSE)
+	-- ============================================================================
+	['maceta_vacia'] = {
+		label = 'Maceta de Cultivo',
+		weight = 800,
+		stack = true,
+		close = true,
+		description = 'Maceta resistente de polímero perforado. Base imprescindible para asentar el sustrato y plantar semillas.',
+		client = {
+			image = 'maceta_vacia.png',
+			export = 'aura_gangs.usePlantPot'
+		}
+	},
+
+	['saco_tierra'] = {
+		label = 'Saco de Sustrato',
+		weight = 2500,
+		stack = true,
+		close = true,
+		description = 'Tierra negra enriquecida con perlita y humus de lombriz para un drenaje y desarrollo radicular óptimo.',
+		client = {
+			image = 'saco_tierra.png'
+		}
+	},
+
+	['fertilizante'] = {
+		label = 'Fertilizante NPK',
+		weight = 1000,
+		stack = true,
+		close = true,
+		description = 'Abono líquido con alto contenido en nitrógeno, fósforo y potasio para acelerar la floración.',
+		client = {
+			image = 'fertilizante.png'
+		}
+	},
+
+	['botella_agua'] = {
+		label = 'Agua de Riego',
+		weight = 1000,
+		stack = true,
+		close = true,
+		description = 'Botella de agua purificada con pH balanceado (6.2) ideal para la hidratación de cultivos.',
+		client = {
+			image = 'water.png'
+		}
+	},
+
+	['weed_seed'] = {
+		label = 'Semilla Feminizada',
+		weight = 10,
+		stack = true,
+		close = true,
+		description = 'Semilla seleccionada de Amnesia Haze de alta pureza genética y rápido ciclo de floración.',
+		client = {
+			image = 'weed_seed.png'
+		}
+	},
+
+	['tijeras_podar'] = {
+		label = 'Tijeras de Podar',
+		weight = 450,
+		stack = true,
+		close = true,
+		description = 'Tijeras de acero inoxidable y punta curva diseñadas para manicurar y cosechar cogollos sin dañar la resina.',
+		client = {
+			image = 'tijeras_podar.png'
+		}
+	},
+
+	['empty_baggies'] = {
+		label = 'Bolsitas Herméticas',
+		weight = 15,
+		stack = true,
+		close = true,
+		description = 'Bolsitas de polietileno con cierre zip hermético para envasar gramos de sustancias.',
+		client = {
+			image = 'empty_baggies.png'
+		}
+	},
+
+	['weed'] = {
+		label = 'Marihuana Envasada',
+		weight = 100,
+		stack = true,
+		close = true,
+		description = 'Bolsita hermética con cogollos curados de cannabis listos para su distribución o consumo.',
+		client = {
+			image = 'weed.png'
+		}
+	},
+
+	['ariete_policial'] = {
+		label = 'Ariete Táctico LSPD',
+		weight = 12000,
+		stack = false,
+		close = true,
+		description = 'Herramienta táctica de impacto forjado para allanamientos e irrupciones policiales en recintos fortificados.',
+		client = {
+			image = 'ariete_policial.png'
+		}
 	}
 }
+

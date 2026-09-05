@@ -99,19 +99,50 @@ AddEventHandler('aura_hud:updateStatus', function(health, armor, hunger, thirst,
     })
 end)
 
+local wasTalking = false
+local wasRadio = false
+local isRadioActive = false
+
+local function SendVoiceUpdate()
+    if not HUD_VISIBLE then return end
+    local pState = LocalPlayer.state
+    local isRadio = isRadioActive or (pState and (pState.radioActive == true or pState.mandoRadioActive == true)) or false
+    local isTalking = NetworkIsPlayerTalking(PlayerId()) or isRadio
+
+    if isTalking ~= wasTalking or isRadio ~= wasRadio then
+        wasTalking = isTalking
+        wasRadio = isRadio
+        SendNUIMessage({
+            action = 'updateVoice',
+            isTalking = isTalking,
+            isRadio = isRadio
+        })
+    end
+end
+
+-- Escuchar eventos de pma-voice para radio
+AddEventHandler('pma-voice:radioActive', function(radioTalking)
+    isRadioActive = (radioTalking == true)
+    SendVoiceUpdate()
+end)
+
+-- Escuchar cambios de estado para Malla General o radio policial / bandas
+RegisterNetEvent('aura_police:client:radioStateChanged', function(radioTalking)
+    isRadioActive = (radioTalking == true)
+    SendVoiceUpdate()
+end)
+
+RegisterNetEvent('aura_gangs:client:radioStateChanged', function(radioTalking)
+    isRadioActive = (radioTalking == true)
+    SendVoiceUpdate()
+end)
+
 -- Loop optimizado nativo para Voice
 CreateThread(function()
     while true do
-        Wait(200) -- Revisar cada 200ms si el jugador está hablando o cambió su estado
+        Wait(150) -- Revisar cada 150ms si el jugador está hablando o cambió su estado
         if HUD_VISIBLE then
-            local isTalking = NetworkIsPlayerTalking(PlayerId())
-            if isTalking ~= wasTalking then
-                wasTalking = isTalking
-                SendNUIMessage({
-                    action = 'updateVoice',
-                    isTalking = isTalking
-                })
-            end
+            SendVoiceUpdate()
         end
     end
 end)

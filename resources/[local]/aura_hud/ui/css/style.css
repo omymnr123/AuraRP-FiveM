@@ -322,6 +322,11 @@ body {
     text-shadow: 0 0 10px rgba(0, 255, 255, 0.6);
 }
 
+#item-voice.radio-talking .hud-icon {
+    color: #FF007F;
+    text-shadow: 0 0 12px rgba(255, 0, 127, 0.85), 0 0 4px #00FFFF;
+}
+
 /* Marco del Minimapa (Fijo y perfectamente alineado al mapa nativo) */
 #minimap-border {
     position: absolute;
