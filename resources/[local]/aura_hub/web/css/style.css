@@ -1264,17 +1264,31 @@ html, body {
     border-radius: 0 !important;
 }
 
+.neon-glow-strip-aura {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #00f2fe 0%, #a855f7 50%, #ff007f 100%);
+    box-shadow: 0 0 15px rgba(0, 242, 254, 0.7), 0 0 25px rgba(255, 0, 127, 0.7);
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    z-index: 10;
+}
+
 .mdt-card {
-    width: 94vw !important;
-    max-width: 1240px !important;
+    position: relative !important;
+    width: 95vw !important;
+    max-width: 1280px !important;
     height: 88vh !important;
     max-height: 88vh !important;
     display: flex !important;
     flex-direction: column !important;
-    background: rgba(8, 16, 32, 0.96) !important;
+    background: linear-gradient(145deg, rgba(8, 14, 28, 0.97) 0%, rgba(16, 10, 26, 0.98) 100%) !important;
     border: 1px solid rgba(0, 242, 254, 0.35) !important;
     border-radius: var(--radius-xl) !important;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7), 0 0 35px rgba(0, 242, 254, 0.18) !important;
+    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.85), 0 0 35px rgba(0, 242, 254, 0.15), 0 0 45px rgba(255, 0, 127, 0.12) !important;
+    overflow: hidden;
 }
 
 .mdt-header {
@@ -1286,14 +1300,14 @@ html, body {
     width: 44px;
     height: 44px;
     border-radius: 12px;
-    background: linear-gradient(135deg, rgba(0, 242, 254, 0.3) 0%, rgba(30, 58, 138, 0.5) 100%);
+    background: linear-gradient(135deg, rgba(0, 242, 254, 0.25) 0%, rgba(255, 0, 127, 0.25) 100%);
     border: 1px solid rgba(0, 242, 254, 0.5);
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 20px;
     color: #00f2fe;
-    box-shadow: 0 0 15px rgba(0, 242, 254, 0.3);
+    box-shadow: 0 0 16px rgba(0, 242, 254, 0.35), 0 0 12px rgba(255, 0, 127, 0.25);
 }
 
 .mdt-title-line {
@@ -1302,11 +1316,21 @@ html, body {
     gap: 12px;
 }
 
+.mdt-title-line h3 {
+    font-size: 18px;
+    font-weight: 900;
+    background: linear-gradient(90deg, #00f2fe 0%, #ffffff 45%, #ff66c4 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: 0.5px;
+    margin: 0;
+}
+
 .mdt-status-live {
     font-size: 10px;
     font-weight: 800;
     color: #00f2fe;
-    background: rgba(0, 242, 254, 0.1);
+    background: rgba(0, 242, 254, 0.08);
     border: 1px solid rgba(0, 242, 254, 0.3);
     padding: 3px 8px;
     border-radius: 20px;
@@ -1314,6 +1338,7 @@ html, body {
     align-items: center;
     gap: 6px;
     letter-spacing: 0.5px;
+    box-shadow: 0 0 10px rgba(0, 242, 254, 0.2);
 }
 
 .mdt-header-right {
@@ -1323,13 +1348,14 @@ html, body {
 }
 
 .mdt-soc-pill {
-    background: rgba(0, 0, 0, 0.45);
+    background: rgba(0, 0, 0, 0.5);
     border: 1px solid rgba(0, 242, 254, 0.3);
     border-radius: var(--radius-md);
-    padding: 6px 12px;
+    padding: 6px 14px;
     display: flex;
     flex-direction: column;
     align-items: flex-end;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .mdt-soc-pill .sub {
@@ -1350,7 +1376,7 @@ html, body {
     display: flex;
     gap: 6px;
     padding: 8px 16px;
-    background: rgba(0, 0, 0, 0.28);
+    background: rgba(0, 0, 0, 0.35);
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     overflow-x: auto;
     scrollbar-width: thin;
@@ -1362,7 +1388,7 @@ html, body {
 }
 
 .mdt-nav-tabs::-webkit-scrollbar-thumb {
-    background: rgba(0, 242, 254, 0.4);
+    background: linear-gradient(90deg, #00f2fe, #ff007f);
     border-radius: 4px;
 }
 
@@ -1388,16 +1414,23 @@ html, body {
 }
 
 .mdt-tab-btn:hover {
-    background: rgba(0, 242, 254, 0.12);
-    border-color: rgba(0, 242, 254, 0.35);
+    background: linear-gradient(135deg, rgba(0, 242, 254, 0.15) 0%, rgba(255, 0, 127, 0.12) 100%);
+    border-color: rgba(0, 242, 254, 0.4);
     color: #ffffff;
 }
 
 .mdt-tab-btn.active {
-    background: linear-gradient(135deg, rgba(0, 242, 254, 0.25) 0%, rgba(30, 58, 138, 0.4) 100%);
+    background: linear-gradient(135deg, rgba(0, 242, 254, 0.3) 0%, rgba(255, 0, 127, 0.28) 100%);
     border-color: #00f2fe;
-    color: #00f2fe;
-    box-shadow: 0 0 15px rgba(0, 242, 254, 0.3);
+    color: #ffffff;
+    box-shadow: 0 0 16px rgba(0, 242, 254, 0.35), 0 0 12px rgba(255, 0, 127, 0.25);
+}
+
+#btnMdtTabRadio.active {
+    background: linear-gradient(135deg, rgba(0, 242, 254, 0.35) 0%, rgba(255, 0, 127, 0.35) 100%);
+    border-color: #00f2fe;
+    color: #ffffff;
+    box-shadow: 0 0 18px rgba(0, 242, 254, 0.45), 0 0 16px rgba(255, 0, 127, 0.4);
 }
 
 /* CONTENIDO DE PESTAÑAS MDT */
@@ -2232,106 +2265,51 @@ html, body {
    RADIO-PATRULLAS POLICIALES (MANDO + PATRULLAS #01 AL #20)
    ============================================================================ */
 
-.radio-status-banner {
-    background: rgba(4, 10, 22, 0.75);
-    border: 1px solid rgba(0, 242, 254, 0.3);
-    border-radius: var(--radius-lg);
-    padding: 16px 22px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 20px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08);
-}
-
-.radio-active-info {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-}
-
-.radio-beacon-wrapper {
-    position: relative;
-    width: 46px;
-    height: 46px;
-    border-radius: 12px;
-    background: rgba(0, 242, 254, 0.12);
-    border: 1px solid rgba(0, 242, 254, 0.35);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 20px;
-    color: #00f2fe;
-    box-shadow: 0 0 15px rgba(0, 242, 254, 0.25);
-}
-
-.radio-pulse-beacon {
-    position: absolute;
-    top: 6px;
-    right: 6px;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: #64748b;
-    box-shadow: 0 0 6px #64748b;
-}
-
-.radio-pulse-beacon.active {
-    background: #00ff9d;
-    box-shadow: 0 0 12px #00ff9d;
-    animation: pulseCyanAnim 1.4s infinite ease-in-out;
-}
-
-.radio-active-texts .sub {
-    font-size: 9.5px;
-    font-weight: 800;
-    color: var(--text-muted);
-    letter-spacing: 0.8px;
-    text-transform: uppercase;
-}
-
-.radio-active-texts h3 {
-    font-size: 16px;
-    font-weight: 800;
-    color: #ffffff;
-    margin: 2px 0;
-}
-
-.radio-active-texts p {
-    font-size: 11.5px;
-    color: var(--text-dim);
-}
-
-.radio-status-banner {
-    background: rgba(6, 11, 24, 0.85);
-    border: 1px solid rgba(0, 242, 254, 0.25);
-    border-radius: var(--radius-md);
-    padding: 6px 14px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 6px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-}
-
-.radio-active-info {
-    display: flex;
-    align-items: center;
+#mdttab-radio {
+    display: none;
+    flex: 1;
+    flex-direction: column;
     gap: 10px;
+    height: 100%;
+    min-height: 0;
+}
+
+#mdttab-radio.active {
+    display: flex;
+}
+
+.radio-status-banner {
+    background: linear-gradient(135deg, rgba(6, 12, 26, 0.9) 0%, rgba(20, 10, 30, 0.9) 100%);
+    border: 1px solid rgba(0, 242, 254, 0.35);
+    border-left: 4px solid #00f2fe;
+    border-right: 4px solid #ff007f;
+    border-radius: var(--radius-md);
+    padding: 8px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 15px rgba(0, 242, 254, 0.12);
+    flex-shrink: 0;
+}
+
+.radio-active-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
 
 .radio-beacon-wrapper {
     position: relative;
-    width: 28px;
-    height: 28px;
+    width: 32px;
+    height: 32px;
     border-radius: 8px;
-    background: rgba(0, 242, 254, 0.1);
-    border: 1px solid rgba(0, 242, 254, 0.3);
+    background: linear-gradient(135deg, rgba(0, 242, 254, 0.15) 0%, rgba(255, 0, 127, 0.15) 100%);
+    border: 1px solid rgba(0, 242, 254, 0.4);
     display: flex;
     align-items: center;
     justify-content: center;
     color: #00f2fe;
-    font-size: 13px;
+    font-size: 14px;
 }
 
 .radio-pulse-beacon {
@@ -2346,7 +2324,7 @@ html, body {
 
 .radio-beacon-wrapper.active .radio-pulse-beacon {
     background: #00ff9d;
-    box-shadow: 0 0 8px #00ff9d;
+    box-shadow: 0 0 10px #00ff9d;
     animation: pulseCyanAnim 1.2s infinite;
 }
 
@@ -2358,31 +2336,33 @@ html, body {
 .radio-active-texts .sub {
     font-size: 9px;
     font-weight: 800;
-    letter-spacing: 0.6px;
+    letter-spacing: 0.8px;
     color: var(--text-dim);
+    text-transform: uppercase;
 }
 
 .radio-active-texts h4 {
-    font-size: 12.5px;
+    font-size: 13px;
     font-weight: 900;
     color: #ffffff;
     margin: 0;
+    letter-spacing: 0.3px;
 }
 
 .radio-banner-actions {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
 }
 
 .radio-keybinds-pill {
     display: flex;
     align-items: center;
     gap: 12px;
-    background: rgba(0, 0, 0, 0.4);
+    background: rgba(0, 0, 0, 0.45);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: var(--radius-sm);
-    padding: 4px 10px;
+    padding: 5px 12px;
     font-size: 10.5px;
     color: var(--text-muted);
 }
@@ -2391,7 +2371,7 @@ html, body {
     background: rgba(255, 183, 0, 0.2);
     border: 1px solid #ffb700;
     color: #ffb700;
-    padding: 0 4px;
+    padding: 0 5px;
     border-radius: 3px;
     font-family: var(--font-mono);
     font-weight: 800;
@@ -2400,43 +2380,44 @@ html, body {
 /* TARJETA COMPACTA: CANAL DE MANDO */
 .mando-vip-card {
     position: relative;
-    background: linear-gradient(135deg, rgba(28, 20, 6, 0.8) 0%, rgba(10, 16, 28, 0.85) 100%);
-    border: 1px solid rgba(255, 183, 0, 0.4);
+    background: linear-gradient(135deg, rgba(34, 24, 6, 0.88) 0%, rgba(24, 10, 30, 0.92) 100%);
+    border: 1px solid rgba(255, 183, 0, 0.5);
     border-left: 4px solid #ffb700;
+    border-right: 4px solid rgba(255, 0, 127, 0.5);
     border-radius: var(--radius-md);
-    padding: 8px 14px;
+    padding: 10px 18px;
     display: flex;
     flex-direction: column;
     gap: 0;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5), 0 0 15px rgba(255, 183, 0, 0.12);
-    margin-bottom: 6px;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.6), 0 0 18px rgba(255, 183, 0, 0.18);
+    flex-shrink: 0;
 }
 
 .mando-header-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 12px;
+    gap: 14px;
 }
 
 .mando-title-badge {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
 }
 
 .mando-icon-box {
-    width: 32px;
-    height: 32px;
+    width: 34px;
+    height: 34px;
     border-radius: 8px;
     background: rgba(255, 183, 0, 0.15);
-    border: 1px solid rgba(255, 183, 0, 0.4);
+    border: 1px solid rgba(255, 183, 0, 0.5);
     color: #ffb700;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 15px;
-    box-shadow: 0 0 10px rgba(255, 183, 0, 0.25);
+    font-size: 16px;
+    box-shadow: 0 0 12px rgba(255, 183, 0, 0.3);
     flex-shrink: 0;
 }
 
@@ -2450,19 +2431,20 @@ html, body {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    font-size: 11.5px;
+    font-size: 12px;
     font-weight: 800;
     color: #ffb700;
 }
 
 .mando-sub-label {
     font-size: 9.5px;
-    color: var(--text-dim);
-    background: rgba(255, 183, 0, 0.1);
-    padding: 1px 5px;
+    color: #ff66c4;
+    background: rgba(255, 0, 127, 0.12);
+    border: 1px solid rgba(255, 0, 127, 0.25);
+    padding: 1px 6px;
     border-radius: 3px;
     margin-left: 4px;
-    font-weight: 600;
+    font-weight: 700;
 }
 
 .pulse-dot-gold {
@@ -2484,15 +2466,15 @@ html, body {
 .mando-actions-row {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
     flex-shrink: 0;
 }
 
 .btn-channel-color {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.18);
     border-radius: var(--radius-sm);
-    padding: 4px 10px;
+    padding: 5px 12px;
     color: #ffffff;
     font-size: 11px;
     font-weight: 700;
@@ -2504,44 +2486,44 @@ html, body {
 }
 
 .btn-channel-color:hover {
-    background: rgba(255, 255, 255, 0.12);
-    border-color: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.14);
+    border-color: rgba(255, 255, 255, 0.35);
 }
 
 .color-dot-indicator {
-    width: 10px;
-    height: 10px;
+    width: 11px;
+    height: 11px;
     border-radius: 50%;
     border: 1px solid rgba(255, 255, 255, 0.6);
     box-shadow: 0 0 6px currentColor;
 }
 
 .btn-channel-connect {
-    background: linear-gradient(135deg, rgba(0, 242, 254, 0.2) 0%, rgba(0, 198, 255, 0.3) 100%);
-    border: 1px solid rgba(0, 242, 254, 0.5);
+    background: linear-gradient(135deg, rgba(0, 242, 254, 0.25) 0%, rgba(0, 198, 255, 0.35) 100%);
+    border: 1px solid rgba(0, 242, 254, 0.6);
     border-radius: var(--radius-sm);
-    padding: 5px 14px;
+    padding: 6px 16px;
     color: #00f2fe;
-    font-size: 11px;
+    font-size: 11.5px;
     font-weight: 800;
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 6px;
     transition: var(--transition-fast);
 }
 
 .btn-channel-connect:hover {
-    background: linear-gradient(135deg, rgba(0, 242, 254, 0.35) 0%, rgba(0, 198, 255, 0.45) 100%);
+    background: linear-gradient(135deg, rgba(0, 242, 254, 0.4) 0%, rgba(0, 198, 255, 0.55) 100%);
     border-color: #00f2fe;
-    box-shadow: 0 0 12px rgba(0, 242, 254, 0.4);
+    box-shadow: 0 0 14px rgba(0, 242, 254, 0.5);
 }
 
 .btn-channel-connect.connected {
-    background: linear-gradient(135deg, rgba(255, 42, 85, 0.25) 0%, rgba(255, 8, 68, 0.35) 100%);
+    background: linear-gradient(135deg, rgba(255, 42, 85, 0.3) 0%, rgba(255, 8, 68, 0.4) 100%);
     border-color: #ff0844;
     color: #ff4d6d;
-    box-shadow: 0 0 12px rgba(255, 8, 68, 0.35);
+    box-shadow: 0 0 14px rgba(255, 8, 68, 0.4);
 }
 
 .empty-chips {
@@ -2554,7 +2536,7 @@ html, body {
     background: rgba(0, 0, 0, 0.5);
     border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 12px;
-    padding: 1px 7px;
+    padding: 2px 8px;
     font-size: 10px;
     font-weight: 700;
     color: #ffffff;
@@ -2577,17 +2559,18 @@ html, body {
 
 /* ENCABEZADO DE PATRULLAS */
 .patrols-section-header {
-    margin: 6px 0 6px 0;
+    margin: 2px 0;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-shrink: 0;
 }
 
 .patrols-section-header h4 {
-    font-size: 11.5px;
+    font-size: 11px;
     font-weight: 800;
-    color: var(--text-muted);
-    letter-spacing: 0.6px;
+    color: #cbd5e1;
+    letter-spacing: 0.8px;
     text-transform: uppercase;
     display: flex;
     align-items: center;
@@ -2595,12 +2578,14 @@ html, body {
     margin: 0;
 }
 
-/* GRID DE PATRULLAS (1 AL 20) */
+/* GRID DE PATRULLAS (1 AL 20) - STRETCH COMPLETO */
 .radio-patrols-grid {
+    flex: 1;
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 6px;
-    max-height: 480px;
+    grid-auto-rows: 1fr;
+    gap: 8px;
+    min-height: 0;
     overflow-y: auto;
     padding-right: 4px;
 }
@@ -2613,181 +2598,211 @@ html, body {
 
 .patrol-card {
     position: relative;
-    background: rgba(6, 12, 24, 0.75);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-left: 3.5px solid var(--patrol-color, #00f2fe);
+    background: rgba(6, 12, 24, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-left: 4px solid var(--patrol-color, #00f2fe);
     border-radius: var(--radius-sm);
-    padding: 6px 9px;
+    padding: 8px 10px;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    gap: 4px;
-    min-height: 56px;
+    justify-content: flex-start;
+    gap: 6px;
     transition: var(--transition-fast);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35);
+    overflow: hidden;
 }
 
 .patrol-card:hover {
-    background: rgba(10, 18, 36, 0.9);
-    border-color: rgba(255, 255, 255, 0.2);
+    background: rgba(12, 20, 40, 0.95);
+    border-color: rgba(255, 255, 255, 0.25);
     transform: translateY(-1px);
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.55), 0 0 10px var(--patrol-color, #00f2fe);
 }
 
 .patrol-card.active {
-    background: rgba(0, 242, 254, 0.12);
-    border-color: rgba(0, 242, 254, 0.5);
-    box-shadow: 0 0 14px rgba(0, 242, 254, 0.25);
+    background: rgba(0, 242, 254, 0.15);
+    border-color: rgba(0, 242, 254, 0.6);
+    box-shadow: 0 0 18px rgba(0, 242, 254, 0.35);
 }
 
 .patrol-card-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 4px;
+    gap: 6px;
 }
 
 .patrol-info {
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 6px;
     overflow: hidden;
 }
 
 .patrol-dot {
-    width: 6px;
-    height: 6px;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
     flex-shrink: 0;
 }
 
 .patrol-title {
-    font-size: 11.5px;
+    font-size: 13px;
     font-weight: 800;
     color: #ffffff;
     white-space: nowrap;
 }
 
 .patrol-freq-badge {
-    font-size: 9px;
+    font-size: 10px;
     font-family: var(--font-mono);
-    color: var(--text-dim);
-    background: rgba(255, 255, 255, 0.05);
-    padding: 1px 4px;
-    border-radius: 3px;
+    color: #cbd5e1;
+    background: rgba(255, 255, 255, 0.08);
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
     white-space: nowrap;
 }
 
 .patrol-btn-group {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 5px;
     flex-shrink: 0;
 }
 
 .btn-patrol-color-mini {
-    width: 20px;
-    height: 20px;
-    border-radius: 3px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.15);
     color: var(--text-muted);
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 9.5px;
+    font-size: 11px;
     transition: var(--transition-fast);
 }
 
 .btn-patrol-color-mini:hover {
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.18);
     color: #ffffff;
-    border-color: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.4);
 }
 
 .btn-patrol-join {
-    padding: 2px 7px;
-    border-radius: 3px;
-    font-size: 9.5px;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 10.5px;
     font-weight: 800;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
-    gap: 3px;
-    background: rgba(0, 242, 254, 0.15);
-    border: 1px solid rgba(0, 242, 254, 0.4);
+    gap: 4px;
+    background: rgba(0, 242, 254, 0.18);
+    border: 1px solid rgba(0, 242, 254, 0.45);
     color: #00f2fe;
     transition: var(--transition-fast);
 }
 
 .btn-patrol-join:hover {
-    background: rgba(0, 242, 254, 0.3);
+    background: rgba(0, 242, 254, 0.35);
     border-color: #00f2fe;
-    box-shadow: 0 0 8px rgba(0, 242, 254, 0.4);
+    box-shadow: 0 0 10px rgba(0, 242, 254, 0.5);
 }
 
 .btn-patrol-join.disconnect {
-    background: rgba(255, 42, 85, 0.2);
-    border: 1px solid rgba(255, 42, 85, 0.5);
+    background: rgba(255, 42, 85, 0.25);
+    border: 1px solid rgba(255, 42, 85, 0.6);
     color: #ff4d6d;
 }
 
 .btn-patrol-join.disconnect:hover {
-    background: rgba(255, 42, 85, 0.35);
+    background: rgba(255, 42, 85, 0.4);
     border-color: #ff0844;
-    box-shadow: 0 0 8px rgba(255, 8, 68, 0.4);
+    box-shadow: 0 0 10px rgba(255, 8, 68, 0.5);
 }
 
 .patrol-members-row {
     display: flex;
-    align-items: center;
-    min-height: 16px;
+    align-items: flex-start;
+    flex: 1;
+    min-height: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-top: 1px;
+}
+
+.patrol-members-row::-webkit-scrollbar {
+    height: 3px;
+}
+
+.patrol-members-row::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.patrol-members-row::-webkit-scrollbar-thumb {
+    background: rgba(0, 242, 254, 0.3);
+    border-radius: 2px;
 }
 
 .patrol-chips-wrap {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 3px;
+    display: grid;
+    grid-template-rows: repeat(4, auto);
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(75px, max-content);
+    gap: 3px 6px;
     align-items: center;
 }
 
 .patrol-chip {
-    font-size: 9px;
+    font-size: 9.5px;
     font-weight: 700;
-    color: #cbd5e1;
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 1px 5px;
+    color: #e2e8f0;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    padding: 1.5px 6px;
     border-radius: 3px;
-    max-width: 85px;
+    max-width: 105px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    transition: var(--transition-fast);
+}
+
+.patrol-chip:hover {
+    background: rgba(255, 255, 255, 0.16);
+    border-color: var(--patrol-color, #00f2fe);
+    color: #ffffff;
 }
 
 .patrol-empty-text {
-    font-size: 9.5px;
+    font-size: 10px;
     color: var(--text-dim);
     font-style: italic;
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 3px;
+    gap: 4px;
 }
 
-/* DROPDOWN SELECTOR DE COLOR TÁCTICO FLOTANTE */
+/* DROPDOWN SELECTOR DE COLOR TÁCTICO FLOTANTE (20 COLORES) */
 .radio-color-picker-dropdown {
     position: fixed;
     z-index: 9999999;
-    background: rgba(10, 15, 29, 0.98);
-    border: 1px solid var(--border-turquoise);
+    background: rgba(10, 14, 28, 0.98);
+    border: 1px solid rgba(0, 242, 254, 0.5);
     border-radius: var(--radius-lg);
-    padding: 14px;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), var(--turquoise-glow);
+    padding: 14px 16px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.85), 0 0 25px rgba(0, 242, 254, 0.25), 0 0 25px rgba(255, 0, 127, 0.2);
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    width: 270px;
+    gap: 12px;
+    width: 330px;
     animation: modalFadeIn 0.2s ease-out;
 }
 
@@ -2799,7 +2814,7 @@ html, body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 10.5px;
+    font-size: 11px;
     font-weight: 800;
     color: #00f2fe;
     letter-spacing: 0.6px;
@@ -2827,26 +2842,26 @@ html, body {
 .picker-swatches-grid {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    gap: 8px;
+    gap: 6px;
 }
 
 .swatch-btn {
     background: rgba(255, 255, 255, 0.04);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 6px;
-    padding: 6px 2px;
+    padding: 5px 2px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 4px;
+    gap: 3px;
     cursor: pointer;
     transition: var(--transition-fast);
 }
 
 .swatch-btn:hover {
-    background: rgba(255, 255, 255, 0.12);
-    border-color: rgba(255, 255, 255, 0.3);
-    transform: scale(1.05);
+    background: rgba(255, 255, 255, 0.14);
+    border-color: rgba(255, 255, 255, 0.35);
+    transform: scale(1.08);
 }
 
 .swatch-circle {
@@ -2857,7 +2872,7 @@ html, body {
 }
 
 .swatch-name {
-    font-size: 8px;
+    font-size: 7.5px;
     font-weight: 700;
     color: var(--text-muted);
     text-align: center;

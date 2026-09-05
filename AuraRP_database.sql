@@ -558,19 +558,19 @@ INSERT INTO `aura_police_radio_channels` (`channel_id`, `label`, `color`, `blip_
 	('patrol_6', 'Patrulla #06', '#9d4edd', 27, 106, 0),
 	('patrol_7', 'Patrulla #07', '#ff2a55', 1, 107, 0),
 	('patrol_8', 'Patrulla #08', '#ffffff', 0, 108, 0),
-	('patrol_9', 'Patrulla #09', '#a0aec0', 40, 109, 0),
-	('patrol_10', 'Patrulla #10', '#00f2fe', 38, 110, 0),
-	('patrol_11', 'Patrulla #11', '#3b82f6', 3, 111, 0),
-	('patrol_12', 'Patrulla #12', '#00ff9d', 2, 112, 0),
-	('patrol_13', 'Patrulla #13', '#ff007f', 48, 113, 0),
-	('patrol_14', 'Patrulla #14', '#ff6b35', 47, 114, 0),
-	('patrol_15', 'Patrulla #15', '#9d4edd', 27, 115, 0),
-	('patrol_16', 'Patrulla #16', '#ff2a55', 1, 116, 0),
-	('patrol_17', 'Patrulla #17', '#ffffff', 0, 117, 0),
-	('patrol_18', 'Patrulla #18', '#a0aec0', 40, 118, 0),
-	('patrol_19', 'Patrulla #19', '#00f2fe', 38, 119, 0),
-	('patrol_20', 'Patrulla #20', '#3b82f6', 3, 120, 0)
-ON DUPLICATE KEY UPDATE `label` = VALUES(`label`);
+	('patrol_9', 'Patrulla #09', '#ffff00', 5, 109, 0),
+	('patrol_10', 'Patrulla #10', '#06d6a0', 25, 110, 0),
+	('patrol_11', 'Patrulla #11', '#8338ec', 7, 111, 0),
+	('patrol_12', 'Patrulla #12', '#ff477e', 8, 112, 0),
+	('patrol_13', 'Patrulla #13', '#3a86ff', 18, 113, 0),
+	('patrol_14', 'Patrulla #14', '#fb5607', 17, 114, 0),
+	('patrol_15', 'Patrulla #15', '#70e000', 43, 115, 0),
+	('patrol_16', 'Patrulla #16', '#0077b6', 29, 116, 0),
+	('patrol_17', 'Patrulla #17', '#e0aaff', 19, 117, 0),
+	('patrol_18', 'Patrulla #18', '#b5179e', 21, 118, 0),
+	('patrol_19', 'Patrulla #19', '#a0aec0', 40, 119, 0),
+	('patrol_20', 'Patrulla #20', '#4cc9f0', 68, 120, 0)
+ON DUPLICATE KEY UPDATE `label` = VALUES(`label`), `color` = VALUES(`color`), `blip_color` = VALUES(`blip_color`);
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

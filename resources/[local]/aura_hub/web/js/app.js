@@ -1416,13 +1416,24 @@ const RADIO_COLOR_PALETTE = [
     { hex: '#ffb700', blip: 46, name: 'Oro Mando' },
     { hex: '#00f2fe', blip: 38, name: 'Cian LSPD' },
     { hex: '#3b82f6', blip: 3,  name: 'Azul Patrulla' },
-    { hex: '#00ff9d', blip: 2,  name: 'Verde Táctico' },
+    { hex: '#00ff9d', blip: 2,  name: 'Verde Esmeralda' },
     { hex: '#ff007f', blip: 48, name: 'Rosa Neón' },
-    { hex: '#ff6b35', blip: 47, name: 'Naranja Tráfico' },
+    { hex: '#ff6b35', blip: 47, name: 'Naranja Fuego' },
     { hex: '#9d4edd', blip: 27, name: 'Púrpura K9' },
     { hex: '#ff2a55', blip: 1,  name: 'Rojo Asalto' },
     { hex: '#ffffff', blip: 0,  name: 'Blanco SWAT' },
-    { hex: '#a0aec0', blip: 40, name: 'Gris Nocturno' }
+    { hex: '#ffff00', blip: 5,  name: 'Amarillo Tráfico' },
+    { hex: '#06d6a0', blip: 25, name: 'Verde Menta' },
+    { hex: '#8338ec', blip: 7,  name: 'Violeta Profundo' },
+    { hex: '#ff477e', blip: 8,  name: 'Magenta Táctico' },
+    { hex: '#3a86ff', blip: 18, name: 'Azul Eléctrico' },
+    { hex: '#fb5607', blip: 17, name: 'Coral Neón' },
+    { hex: '#70e000', blip: 43, name: 'Lima Operativo' },
+    { hex: '#0077b6', blip: 29, name: 'Azul Marino' },
+    { hex: '#e0aaff', blip: 19, name: 'Lavanda Aéreo' },
+    { hex: '#b5179e', blip: 21, name: 'Fucsia Especial' },
+    { hex: '#a0aec0', blip: 40, name: 'Gris Nocturno' },
+    { hex: '#4cc9f0', blip: 68, name: 'Celeste Hielo' }
 ];
 
 async function loadMdtRadioChannels() {
@@ -1523,7 +1534,7 @@ async function loadMdtRadioChannels() {
             if (pMembers.length === 0) {
                 membersChips = '<span class="patrol-empty-text"><i class="fa-regular fa-circle-check"></i> Disponible</span>';
             } else {
-                membersChips = '<div class="patrol-chips-wrap">' + pMembers.map(mem => `<span class="patrol-chip" title="${mem.gradeLabel || ''}">${mem.name}</span>`).join('') + '</div>';
+                membersChips = '<div class="patrol-chips-wrap">' + pMembers.map(mem => `<span class="patrol-chip" title="${mem.gradeLabel ? mem.gradeLabel + ' - ' : ''}${mem.name}"><i class="fa-solid fa-user" style="font-size: 7.5px; opacity: 0.7;"></i> ${mem.name}</span>`).join('') + '</div>';
             }
 
             const card = document.createElement('div');
