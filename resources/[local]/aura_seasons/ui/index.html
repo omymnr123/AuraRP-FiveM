@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AuraRP Seasons Panel</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="app" class="hidden">
+        <div class="panel-container">
+            <!-- HEADER -->
+            <div class="panel-header">
+                <div class="header-branding">
+                    <div class="branding-icon">
+                        <i class="fa-solid fa-cloud-bolt-sun"></i>
+                    </div>
+                    <div class="branding-text">
+                        <div class="branding-badge"><i class="fa-solid fa-shield-halved"></i> AURARP ADMIN SUITE</div>
+                        <h2>CONTROL ESTACIONAL & CLIMA</h2>
+                        <p>Motor Meteorológico Dinámico & Supervivencia Térmica (Fase 6)</p>
+                    </div>
+                </div>
+                <button id="btn-close" class="btn-close" title="Cerrar Panel (ESC)">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- TELEMETRY BAR STRIP -->
+            <div class="telemetry-bar">
+                <div class="telemetry-pill">
+                    <span class="pill-label">ESTACIÓN</span>
+                    <span class="pill-val" id="telemetry-season">INVIERNO</span>
+                </div>
+                <div class="telemetry-pill">
+                    <span class="pill-label">CLIMA</span>
+                    <span class="pill-val" id="telemetry-weather">SNOW</span>
+                </div>
+                <div class="telemetry-pill">
+                    <span class="pill-label">TEMP. AMBIENTE</span>
+                    <span class="pill-val" id="telemetry-ambient">2.7ºC</span>
+                </div>
+                <div class="telemetry-pill">
+                    <span class="pill-label">TEMP. CORPORAL</span>
+                    <span class="pill-val" id="telemetry-core">37.0ºC</span>
+                </div>
+                <div class="telemetry-pill">
+                    <span class="pill-label">HORA / CICLO</span>
+                    <span class="pill-val highlight" id="telemetry-time"><i class="fa-solid fa-sun status-yes"></i> 12:00</span>
+                </div>
+                <div class="telemetry-pill">
+                    <span class="pill-label">AISLAMIENTO</span>
+                    <span class="pill-val highlight" id="telemetry-insulation">100%</span>
+                </div>
+                <div class="telemetry-pill">
+                    <span class="pill-label">REFUGIO / AC</span>
+                    <span class="pill-val" id="telemetry-shelter"><i class="fa-solid fa-circle-xmark status-no"></i> NO</span>
+                </div>
+            </div>
+
+            <!-- MAIN NAVIGATION TABS -->
+            <div class="panel-nav">
+                <button class="nav-tab active" data-tab="dashboard">
+                    <i class="fa-solid fa-chart-pie"></i> Telemetría & Ropa
+                </button>
+                <button class="nav-tab" data-tab="seasons">
+                    <i class="fa-solid fa-calendar-days"></i> Estaciones
+                </button>
+                <button class="nav-tab" data-tab="weather">
+                    <i class="fa-solid fa-cloud-sun-rain"></i> Climas
+                </button>
+                <button class="nav-tab" data-tab="time">
+                    <i class="fa-solid fa-clock"></i> Control de Tiempo
+                </button>
+                <button class="nav-tab" data-tab="thermal">
+                    <i class="fa-solid fa-temperature-half"></i> Fisiología & Simulador
+                </button>
+                <button class="nav-tab" data-tab="buffs">
+                    <i class="fa-solid fa-mug-hot"></i> Buffs & Consumibles
+                </button>
+                <button class="nav-tab" data-tab="calendar">
+                    <i class="fa-solid fa-clock-rotate-left"></i> Calendario
+                </button>
+            </div>
+
+            <!-- PANEL BODY CONTENT -->
+            <div class="panel-body">
+                <!-- TAB 1: DASHBOARD & CLOTHING BREAKDOWN -->
+                <div class="tab-content active" id="tab-dashboard">
+                    <div class="dashboard-grid">
+                        <!-- Gauges Card -->
+                        <div class="dash-card">
+                            <div class="card-header">
+                                <i class="fa-solid fa-gauge-high"></i>
+                                <span>Monitoreo Térmico</span>
+                            </div>
+                            <div class="gauges-container">
+                                <div class="gauge-item">
+                                    <div class="gauge-circle ambient-circle">
+                                        <span class="gauge-val" id="dash-ambient-val">2.7º</span>
+                                        <span class="gauge-unit">Celsius</span>
+                                    </div>
+                                    <span class="gauge-title">Ambiente Local</span>
+                                </div>
+                                <div class="gauge-item">
+                                    <div class="gauge-circle core-circle" id="dash-core-border">
+                                        <span class="gauge-val" id="dash-core-val">37.0º</span>
+                                        <span class="gauge-unit">Celsius</span>
+                                    </div>
+                                    <span class="gauge-title">Corporal (Core)</span>
+                                </div>
+                                <div class="gauge-item">
+                                    <div class="gauge-circle insul-circle">
+                                        <span class="gauge-val" id="dash-insul-val">100%</span>
+                                        <span class="gauge-unit">Aislamiento</span>
+                                    </div>
+                                    <span class="gauge-title">Protección Ropa</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Clothing Heuristics Breakdown Card (EUP & Civil) -->
+                        <div class="dash-card">
+                            <div class="card-header">
+                                <i class="fa-solid fa-shirt"></i>
+                                <span>Desglose de Ropa & Uniformes EUP</span>
+                            </div>
+                            <div class="clothing-slots-grid" id="clothing-slots-container">
+                                <div class="clothing-slot">
+                                    <div class="slot-info">
+                                        <span class="slot-name"><i class="fa-solid fa-vest"></i> Prenda Superior (Tops 11)</span>
+                                        <span class="slot-id" id="slot-top-id">Drawable #125</span>
+                                    </div>
+                                    <span class="slot-score" id="slot-top-score">+45 pts</span>
+                                </div>
+                                <div class="clothing-slot">
+                                    <div class="slot-info">
+                                        <span class="slot-name"><i class="fa-solid fa-shield"></i> Chaleco Antibalas EUP (ID 9)</span>
+                                        <span class="slot-id" id="slot-armor-id">Drawable #12</span>
+                                    </div>
+                                    <span class="slot-score" id="slot-armor-score">+12 pts</span>
+                                </div>
+                                <div class="clothing-slot">
+                                    <div class="slot-info">
+                                        <span class="slot-name"><i class="fa-solid fa-hand"></i> Brazos / Mangas (ID 3)</span>
+                                        <span class="slot-id" id="slot-arms-id">Drawable #5</span>
+                                    </div>
+                                    <span class="slot-score" id="slot-arms-score">+12 pts</span>
+                                </div>
+                                <div class="clothing-slot">
+                                    <div class="slot-info">
+                                        <span class="slot-name"><i class="fa-solid fa-socks"></i> Pantalones / Piernas (ID 4)</span>
+                                        <span class="slot-id" id="slot-pants-id">Drawable #36</span>
+                                    </div>
+                                    <span class="slot-score" id="slot-pants-score">+15 pts</span>
+                                </div>
+                                <div class="clothing-slot">
+                                    <div class="slot-info">
+                                        <span class="slot-name"><i class="fa-solid fa-tshirt"></i> Camiseta Interior (ID 8)</span>
+                                        <span class="slot-id" id="slot-under-id">Drawable #58</span>
+                                    </div>
+                                    <span class="slot-score" id="slot-under-score">+5 pts</span>
+                                </div>
+                                <div class="clothing-slot">
+                                    <div class="slot-info">
+                                        <span class="slot-name"><i class="fa-solid fa-shoe-prints"></i> Calzado / Botas (ID 6)</span>
+                                        <span class="slot-id" id="slot-shoes-id">Drawable #52</span>
+                                    </div>
+                                    <span class="slot-score" id="slot-shoes-score">+5 pts</span>
+                                </div>
+                                <div class="clothing-slot">
+                                    <div class="slot-info">
+                                        <span class="slot-name"><i class="fa-solid fa-hat-cowboy"></i> Cabeza & Accesorios (0/1/7)</span>
+                                        <span class="slot-id" id="slot-head-id">Mask #1 | Prop #0</span>
+                                    </div>
+                                    <span class="slot-score" id="slot-head-score">+6 pts</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 2: SEASONS CHANGER -->
+                <div class="tab-content" id="tab-seasons">
+                    <div class="section-title">
+                        <i class="fa-solid fa-earth-americas"></i> Selecciona la Estación Activa del Servidor
+                    </div>
+                    <div class="seasons-cards-grid">
+                        <div class="season-card season-spring" data-season="spring">
+                            <div class="season-icon"><i class="fa-solid fa-seedling"></i></div>
+                            <div class="season-info">
+                                <h3>PRIMAVERA</h3>
+                                <div class="season-temp-range">14ºC a 22ºC</div>
+                                <p>Clima templado, brisa fresca y precipitaciones suaves.</p>
+                            </div>
+                            <button class="btn-action btn-season" data-season="spring">Activar Primavera</button>
+                        </div>
+
+                        <div class="season-card season-summer" data-season="summer">
+                            <div class="season-icon"><i class="fa-solid fa-sun"></i></div>
+                            <div class="season-info">
+                                <h3>VERANO</h3>
+                                <div class="season-temp-range">28ºC a 42ºC</div>
+                                <p>Olas de calor abrasador, sol extremo, riesgo de deshidratación.</p>
+                            </div>
+                            <button class="btn-action btn-season" data-season="summer">Activar Verano</button>
+                        </div>
+
+                        <div class="season-card season-autumn" data-season="autumn">
+                            <div class="season-icon"><i class="fa-solid fa-leaf"></i></div>
+                            <div class="season-info">
+                                <h3>OTOÑO</h3>
+                                <div class="season-temp-range">8ºC a 16ºC</div>
+                                <p>Tormentas eléctricas, niebla densa y vientos frescos.</p>
+                            </div>
+                            <button class="btn-action btn-season" data-season="autumn">Activar Otoño</button>
+                        </div>
+
+                        <div class="season-card season-winter" data-season="winter">
+                            <div class="season-icon"><i class="fa-solid fa-snowflake"></i></div>
+                            <div class="season-info">
+                                <h3>INVIERNO</h3>
+                                <div class="season-temp-range">-10ºC a 5ºC</div>
+                                <p>Frío polar, nieve en el asfalto, ventiscas y peligro de hipotermia.</p>
+                            </div>
+                            <button class="btn-action btn-season" data-season="winter">Activar Invierno</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 3: WEATHER CHANGER -->
+                <div class="tab-content" id="tab-weather">
+                    <div class="section-title">
+                        <i class="fa-solid fa-cloud-bolt"></i> Catálogo Meteorológico de Los Santos
+                    </div>
+                    <div class="weather-reset-banner">
+                        <div class="reset-info">
+                            <h4><i class="fa-solid fa-arrows-rotate"></i> Modo Automático Estacional</h4>
+                            <p>Restaura el ciclo dinámico que cambia el clima cada 15 minutos según la estación.</p>
+                        </div>
+                        <button class="btn-reset-weather" id="btn-weather-reset">Restaurar Clima Dinámico</button>
+                    </div>
+
+                    <div class="weather-buttons-grid">
+                        <button class="btn-weather" data-weather="EXTRASUNNY">
+                            <i class="fa-solid fa-sun"></i>
+                            <span>EXTRASUNNY</span>
+                            <small>Sol Abrasador</small>
+                        </button>
+                        <button class="btn-weather" data-weather="CLEAR">
+                            <i class="fa-solid fa-cloud-sun"></i>
+                            <span>CLEAR</span>
+                            <small>Despejado</small>
+                        </button>
+                        <button class="btn-weather" data-weather="CLOUDS">
+                            <i class="fa-solid fa-cloud"></i>
+                            <span>CLOUDS</span>
+                            <small>Nublado</small>
+                        </button>
+                        <button class="btn-weather" data-weather="OVERCAST">
+                            <i class="fa-solid fa-smog"></i>
+                            <span>OVERCAST</span>
+                            <small>Cubierto</small>
+                        </button>
+                        <button class="btn-weather" data-weather="RAIN">
+                            <i class="fa-solid fa-cloud-showers-heavy"></i>
+                            <span>RAIN</span>
+                            <small>Lluvia Intensa</small>
+                        </button>
+                        <button class="btn-weather" data-weather="THUNDER">
+                            <i class="fa-solid fa-cloud-bolt"></i>
+                            <span>THUNDER</span>
+                            <small>Tormenta</small>
+                        </button>
+                        <button class="btn-weather" data-weather="FOGGY">
+                            <i class="fa-solid fa-water"></i>
+                            <span>FOGGY</span>
+                            <small>Niebla Densa</small>
+                        </button>
+                        <button class="btn-weather" data-weather="SMOG">
+                            <i class="fa-solid fa-fire-smoke"></i>
+                            <span>SMOG</span>
+                            <small>Calima / Smog</small>
+                        </button>
+                        <button class="btn-weather" data-weather="XMAS">
+                            <i class="fa-solid fa-snowman"></i>
+                            <span>XMAS</span>
+                            <small>Nevada Suave</small>
+                        </button>
+                        <button class="btn-weather" data-weather="BLIZZARD">
+                            <i class="fa-solid fa-wind"></i>
+                            <span>BLIZZARD</span>
+                            <small>Ventisca Polar</small>
+                        </button>
+                        <button class="btn-weather" data-weather="SNOWLIGHT">
+                            <i class="fa-solid fa-snowflake"></i>
+                            <span>SNOWLIGHT</span>
+                            <small>Copos Ligeros</small>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- TAB 4: TIME & DAY/NIGHT CONTROL -->
+                <div class="tab-content" id="tab-time">
+                    <div class="section-title">
+                        <i class="fa-solid fa-clock"></i> Control Maestro de Tiempo y Ciclo Día / Noche
+                    </div>
+
+                    <div class="time-panel-grid">
+                        <!-- Card 1: Clock & Quick Presets -->
+                        <div class="dash-card time-main-card">
+                            <div class="card-header">
+                                <i class="fa-solid fa-stopwatch"></i>
+                                <span>Reloj del Servidor</span>
+                            </div>
+
+                            <div class="digital-clock-display">
+                                <div class="digital-clock-time" id="digital-clock-time">12:00</div>
+                                <div class="digital-clock-badge" id="digital-clock-badge">
+                                    <i class="fa-solid fa-sun"></i> DÍA
+                                </div>
+                            </div>
+
+                            <!-- Slider de Hora Directa -->
+                            <div class="custom-slider-card time-slider-wrapper">
+                                <div class="slider-header">
+                                    <span><i class="fa-solid fa-sliders"></i> Ajuste Rápido de Hora (00:00 - 23:59)</span>
+                                    <span class="slider-display highlight" id="time-slider-val">12:00</span>
+                                </div>
+                                <input type="range" id="time-slider" min="0" max="1439" step="15" value="720" class="aura-slider">
+                                <div class="slider-actions">
+                                    <button id="btn-apply-time" class="btn-apply-slider"><i class="fa-solid fa-check"></i> Establecer Hora</button>
+                                </div>
+                            </div>
+
+                            <!-- Presets Rápidos -->
+                            <div class="time-presets-title"><i class="fa-solid fa-wand-magic-sparkles"></i> Presets Horarios Inmediatos</div>
+                            <div class="time-presets-grid">
+                                <button class="btn-time-preset" data-hour="6" data-minute="0">
+                                    <i class="fa-solid fa-cloud-sun"></i>
+                                    <span>Amanecer</span>
+                                    <small>06:00 AM</small>
+                                </button>
+                                <button class="btn-time-preset" data-hour="12" data-minute="0">
+                                    <i class="fa-solid fa-sun"></i>
+                                    <span>Mediodía</span>
+                                    <small>12:00 PM</small>
+                                </button>
+                                <button class="btn-time-preset" data-hour="18" data-minute="30">
+                                    <i class="fa-solid fa-mountain-sun"></i>
+                                    <span>Atardecer</span>
+                                    <small>18:30 PM</small>
+                                </button>
+                                <button class="btn-time-preset" data-hour="0" data-minute="0">
+                                    <i class="fa-solid fa-moon"></i>
+                                    <span>Medianoche</span>
+                                    <small>00:00 AM</small>
+                                </button>
+                                <button class="btn-time-preset" data-hour="3" data-minute="0">
+                                    <i class="fa-solid fa-star-and-crescent"></i>
+                                    <span>Madrugada</span>
+                                    <small>03:00 AM</small>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Card 2: Freeze & Speed Settings -->
+                        <div class="dash-card time-settings-card">
+                            <div class="card-header">
+                                <i class="fa-solid fa-gear"></i>
+                                <span>Configuración & Congelamiento</span>
+                            </div>
+
+                            <!-- Freeze Toggle Card -->
+                            <div class="freeze-card">
+                                <div class="freeze-info">
+                                    <div class="freeze-title"><i class="fa-solid fa-snowflake"></i> Congelar Reloj del Servidor</div>
+                                    <p>Pausa el avance del tiempo para mantener siempre la misma hora fija.</p>
+                                </div>
+                                <button class="btn-freeze-toggle" id="btn-freeze-time">
+                                    <i class="fa-solid fa-pause"></i>
+                                    <span id="freeze-btn-text">Pausar Tiempo</span>
+                                </button>
+                            </div>
+
+                            <!-- Speed Settings Form -->
+                            <div class="speed-settings-box">
+                                <div class="speed-box-title"><i class="fa-solid fa-hourglass-half"></i> Duración del Ciclo Día / Noche</div>
+                                <p class="speed-box-desc">Configura cuántos <strong>minutos reales</strong> dura el periodo de Día y el periodo de Noche.</p>
+                                
+                                <div class="speed-input-group">
+                                    <div class="speed-label-row">
+                                        <label><i class="fa-solid fa-sun"></i> Duración del DÍA (06:00 a 20:00)</label>
+                                        <span class="speed-calc-val" id="day-calc-display">30 min reales</span>
+                                    </div>
+                                    <div class="input-with-presets">
+                                        <div class="input-unit-wrapper">
+                                            <input type="number" id="input-day-minutes" min="1" max="240" step="1" value="30" class="aura-input">
+                                            <span class="input-unit">min</span>
+                                        </div>
+                                        <div class="speed-quick-chips">
+                                            <button class="chip-btn" data-target="day" data-val="15">15 min</button>
+                                            <button class="chip-btn" data-target="day" data-val="30">30 min (Recomendado)</button>
+                                            <button class="chip-btn" data-target="day" data-val="45">45 min</button>
+                                            <button class="chip-btn" data-target="day" data-val="60">60 min</button>
+                                        </div>
+                                    </div>
+                                    <span class="speed-hint">Tiempo total de la vida real que tarda desde el amanecer (06:00) hasta el anochecer (20:00).</span>
+                                </div>
+
+                                <div class="speed-input-group">
+                                    <div class="speed-label-row">
+                                        <label><i class="fa-solid fa-moon"></i> Duración de la NOCHE (20:00 a 06:00)</label>
+                                        <span class="speed-calc-val" id="night-calc-display">15 min reales</span>
+                                    </div>
+                                    <div class="input-with-presets">
+                                        <div class="input-unit-wrapper">
+                                            <input type="number" id="input-night-minutes" min="1" max="240" step="1" value="15" class="aura-input">
+                                            <span class="input-unit">min</span>
+                                        </div>
+                                        <div class="speed-quick-chips">
+                                            <button class="chip-btn" data-target="night" data-val="10">10 min (Corta)</button>
+                                            <button class="chip-btn" data-target="night" data-val="15">15 min (Equilibrada)</button>
+                                            <button class="chip-btn" data-target="night" data-val="20">20 min</button>
+                                            <button class="chip-btn" data-target="night" data-val="30">30 min</button>
+                                        </div>
+                                    </div>
+                                    <span class="speed-hint">Tiempo total de la vida real que tarda desde que se pone el sol (20:00) hasta el amanecer (06:00).</span>
+                                </div>
+
+                                <!-- Resumen visual del ciclo completo -->
+                                <div class="cycle-summary-card">
+                                    <i class="fa-solid fa-rotate"></i>
+                                    <span>Ciclo Completo (24h in-game): <strong id="total-cycle-summary">45 minutos reales</strong> (30m día + 15m noche)</span>
+                                </div>
+
+                                <button id="btn-save-speed" class="btn-save-settings">
+                                    <i class="fa-solid fa-floppy-disk"></i> Guardar Duración en Base de Datos
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 5: PHYSIOLOGICAL & THERMAL SIMULATOR -->
+                <div class="tab-content" id="tab-thermal">
+                    <div class="section-title">
+                        <i class="fa-solid fa-temperature-arrow-down"></i> Simulación Fisiológica Instantánea
+                    </div>
+                    <div class="presets-grid">
+                        <div class="preset-card preset-cold-severe" data-temp="32.0">
+                            <div class="preset-icon"><i class="fa-solid fa-icicles"></i></div>
+                            <div class="preset-info">
+                                <h4>Hipotermia Severa (32.0ºC)</h4>
+                                <p>Temblores violentos, HUD Copo al 100%, visión escarchada y daño periódico.</p>
+                            </div>
+                            <button class="btn-preset">Simular 32.0ºC</button>
+                        </div>
+
+                        <div class="preset-card preset-cold-moderate" data-temp="34.2">
+                            <div class="preset-icon"><i class="fa-solid fa-snowflake"></i></div>
+                            <div class="preset-info">
+                                <h4>Hipotermia Moderada (34.2ºC)</h4>
+                                <p>Animación de tiritar, pérdida rápida de stamina y HUD Copo al 40%.</p>
+                            </div>
+                            <button class="btn-preset">Simular 34.2ºC</button>
+                        </div>
+
+                        <div class="preset-card preset-normal" data-temp="37.0">
+                            <div class="preset-icon"><i class="fa-solid fa-heart-pulse"></i></div>
+                            <div class="preset-info">
+                                <h4>Homeostasis Normal (37.0ºC)</h4>
+                                <p>Estado saludable perfecto. Oculta todos los anillos térmicos del HUD.</p>
+                            </div>
+                            <button class="btn-preset">Normalizar 37.0ºC</button>
+                        </div>
+
+                        <div class="preset-card preset-heat-moderate" data-temp="39.5">
+                            <div class="preset-icon"><i class="fa-solid fa-droplet"></i></div>
+                            <div class="preset-info">
+                                <h4>Hipertermia Moderada (39.5ºC)</h4>
+                                <p>Sudoración visible empapada, visión borrosa, sed acelerada y HUD Sol al 45%.</p>
+                            </div>
+                            <button class="btn-preset">Simular 39.5ºC</button>
+                        </div>
+
+                        <div class="preset-card preset-heat-severe" data-temp="41.0">
+                            <div class="preset-icon"><i class="fa-solid fa-fire-flame-curved"></i></div>
+                            <div class="preset-info">
+                                <h4>Hipertermia Severa (41.0ºC)</h4>
+                                <p>Golpe de calor, tropiezos y desmayos (ragdoll), HUD Sol al 100% y daño.</p>
+                            </div>
+                            <button class="btn-preset">Simular 41.0ºC</button>
+                        </div>
+                    </div>
+
+                    <!-- Custom Temp Slider -->
+                    <div class="custom-slider-card">
+                        <div class="slider-header">
+                            <span><i class="fa-solid fa-sliders"></i> Ajuste Manual de Temperatura Corporal</span>
+                            <span class="slider-display" id="slider-temp-display">37.0ºC</span>
+                        </div>
+                        <input type="range" id="temp-slider" min="28.0" max="44.0" step="0.1" value="37.0" class="aura-slider">
+                        <div class="slider-actions">
+                            <button id="btn-apply-slider" class="btn-apply-slider">Fijar Temperatura Corporal</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 5: BUFFS & CONSUMABLES -->
+                <div class="tab-content" id="tab-buffs">
+                    <div class="section-title">
+                        <i class="fa-solid fa-shield-heart"></i> Gestión de Consumibles y Resistencias
+                    </div>
+                    <div class="buffs-grid">
+                        <div class="buff-card">
+                            <div class="buff-icon warmth-icon"><i class="fa-solid fa-mug-hot"></i></div>
+                            <div class="buff-details">
+                                <h4>Buff de Calor (Café Expreso)</h4>
+                                <p>+1.5ºC corporales inmediatos y 50% de resistencia contra el frío durante 10 min.</p>
+                            </div>
+                            <button class="btn-action btn-apply-warmth">Aplicar Buff Calor</button>
+                        </div>
+
+                        <div class="buff-card">
+                            <div class="buff-icon cooling-icon"><i class="fa-solid fa-bottle-water"></i></div>
+                            <div class="buff-details">
+                                <h4>Buff de Frío (Agua Fresca)</h4>
+                                <p>-1.2ºC corporales inmediatos y 50% de resistencia contra el calor durante 10 min.</p>
+                            </div>
+                            <button class="btn-action btn-apply-cooling">Aplicar Buff Frío</button>
+                        </div>
+
+                        <div class="buff-card">
+                            <div class="buff-icon test-icon"><i class="fa-solid fa-boxes-stacked"></i></div>
+                            <div class="buff-details">
+                                <h4>Entrega de Ítems de Prueba</h4>
+                                <p>Añade 2x Café y 2x Botellas de Agua a tu inventario (ox_inventory).</p>
+                            </div>
+                            <button class="btn-action btn-give-items">Dar Ítems de Prueba</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 6: CALENDAR & DAYS -->
+                <div class="tab-content" id="tab-calendar">
+                    <div class="section-title">
+                        <i class="fa-solid fa-calendar-check"></i> Calendario y Rotación Semanal
+                    </div>
+                    <div class="calendar-card">
+                        <div class="calendar-display">
+                            <div class="cal-stat">
+                                <span class="cal-label">DÍA DE LA ESTACIÓN</span>
+                                <span class="cal-big-val" id="cal-day-in-season">1 / 7</span>
+                            </div>
+                            <div class="cal-stat">
+                                <span class="cal-label">DÍA TOTAL SERVIDOR</span>
+                                <span class="cal-big-val" id="cal-total-day">1</span>
+                            </div>
+                        </div>
+
+                        <div class="calendar-controls">
+                            <button class="btn-cal-action" id="btn-day-prev"><i class="fa-solid fa-backward-step"></i> Retroceder -1 Día</button>
+                            <button class="btn-cal-action" id="btn-day-next"><i class="fa-solid fa-forward-step"></i> Avanzar +1 Día</button>
+                            <button class="btn-cal-action highlight" id="btn-rotate-next"><i class="fa-solid fa-rotate"></i> Rotar Estación Inmediatamente</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FOOTER -->
+            <div class="panel-footer">
+                <span class="footer-note"><i class="fa-solid fa-circle-info"></i> AuraRP Framework — Fase 6 Sincronizada con GlobalState y Base de Datos</span>
+                <span class="footer-keys">Presiona <strong>ESC</strong> para salir</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>

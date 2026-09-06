@@ -16,6 +16,7 @@ RegisterNetEvent('aura_appearance:saveAppearance', function(appearanceData)
     if exports.aura_multichar and exports.aura_multichar.SetCharacterAppearance then
         local success = exports.aura_multichar:SetCharacterAppearance(src, appearanceData)
         if success then
+            TriggerClientEvent('aura_appearance:client:onAppearanceSaved', src, appearanceData)
             print(("^2[AURA APPEARANCE] Appearance saved and synced successfully for character ID: %s (Player: %s)^7"):format(char.id, src))
             return
         end
@@ -24,12 +25,15 @@ RegisterNetEvent('aura_appearance:saveAppearance', function(appearanceData)
     -- Fallback de seguridad si el export no estuviera disponible
     char.metadata = char.metadata or {}
     char.metadata.appearance = appearanceData
+    char.metadata.base_appearance = appearanceData
+    char.metadata.clothing_toggles = nil
 
     MySQL.update('UPDATE characters SET metadata = ? WHERE id = ?', {
         json.encode(char.metadata),
         char.id
     }, function(affectedRows)
         if affectedRows > 0 then
+            TriggerClientEvent('aura_appearance:client:onAppearanceSaved', src, appearanceData)
             print(("^2[AURA APPEARANCE] Appearance saved successfully for character ID: %s (Player: %s)^7"):format(char.id, src))
         else
             print(("^1[AURA APPEARANCE] Error saving appearance for character ID: %s (Player: %s)^7"):format(char.id, src))

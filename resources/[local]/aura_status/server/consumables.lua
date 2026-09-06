@@ -30,6 +30,9 @@ exports('consumeItem', function(event, item, inventory, slot, data)
         if consumeData then
             -- Añadir estado seguro
             TriggerClientEvent('aura_status:client:AddStatus', src, consumeData.type, consumeData.amount)
+            
+            -- Sincronizar efectos térmicos con aura_seasons si aplica (café, agua, etc.)
+            TriggerEvent('aura_seasons:server:itemConsumed', src, item.name)
         end
         return true
     end

@@ -6,11 +6,12 @@
     padding: 0;
 }
 
-body {
-    font-family: 'Inter', sans-serif;
+html, body {
+    background: transparent !important;
+    background-color: transparent !important;
     overflow: hidden;
-    /* Para evitar que el fondo de GTA sea blanco durante el desarrollo, dejamos background transparente */
-    background-color: transparent; 
+    font-family: 'Inter', sans-serif;
+    user-select: none;
 }
 
 .hidden {
@@ -336,3 +337,78 @@ body {
     z-index: 5;
     box-shadow: 0 0 15px rgba(0, 255, 255, 0.4), inset 0 0 10px rgba(255, 20, 147, 0.2);
 }
+
+/* ========================================================================== */
+/* INDICADORES TÉRMICOS & SUPERVIVENCIA ESTACIONAL (AURARP PHASE 6)           */
+/* ========================================================================== */
+
+.hud-thermal {
+    background: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+/* Cold Alert (Turquoise / Cyan Pulse Animation) */
+@keyframes pulse-cold {
+    0% {
+        transform: scale(1);
+        filter: drop-shadow(0 0 2px rgba(0, 255, 255, 0.6));
+    }
+    50% {
+        transform: scale(1.1);
+        filter: drop-shadow(0 0 8px #40E0D0) drop-shadow(0 0 14px #00FFFF);
+    }
+    100% {
+        transform: scale(1);
+        filter: drop-shadow(0 0 2px rgba(0, 255, 255, 0.6));
+    }
+}
+
+.hud-cold .hud-icon i {
+    color: #00FFFF;
+    text-shadow: 0 0 8px rgba(0, 255, 255, 0.85);
+}
+
+.hud-cold.thermal-alert {
+    animation: pulse-cold 1.3s infinite ease-in-out;
+}
+
+.hud-cold.thermal-alert .hud-icon i {
+    color: #40E0D0;
+    text-shadow: 0 0 12px #00FFFF, 0 0 18px #40E0D0;
+}
+
+/* Heat Alert (Neon Pink / Orange Fast Blink Animation) */
+@keyframes blink-heat {
+    0% {
+        transform: scale(1);
+        filter: drop-shadow(0 0 2px rgba(255, 69, 0, 0.6));
+        opacity: 0.9;
+    }
+    50% {
+        transform: scale(1.12);
+        filter: drop-shadow(0 0 8px #FF4500) drop-shadow(0 0 14px #FF007F);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1);
+        filter: drop-shadow(0 0 2px rgba(255, 69, 0, 0.6));
+        opacity: 0.9;
+    }
+}
+
+.hud-heat .hud-icon i {
+    color: #FF4500;
+    text-shadow: 0 0 8px rgba(255, 69, 0, 0.85);
+}
+
+.hud-heat.thermal-alert {
+    animation: blink-heat 0.75s infinite ease-in-out;
+}
+
+.hud-heat.thermal-alert .hud-icon i {
+    color: #FF007F;
+    text-shadow: 0 0 14px #FF4500, 0 0 18px #FF007F;
+}
+
+

@@ -99,6 +99,20 @@ AddEventHandler('aura_hud:updateStatus', function(health, armor, hunger, thirst,
     })
 end)
 
+-- Escuchar datos térmicos desde aura_seasons
+RegisterNetEvent('aura_hud:client:updateTemperature')
+AddEventHandler('aura_hud:client:updateTemperature', function(coldLevel, heatLevel, coreTemp, ambientTemp)
+    if not HUD_VISIBLE then return end
+
+    SendNUIMessage({
+        action = 'updateTemperature',
+        coldLevel = coldLevel,
+        heatLevel = heatLevel,
+        coreTemp = coreTemp,
+        ambientTemp = ambientTemp
+    })
+end)
+
 local wasTalking = false
 local wasRadio = false
 local isRadioActive = false

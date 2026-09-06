@@ -895,3 +895,156 @@ body.inv-dragging .tooltip-wrapper {
     transform: translateX(0) scale(1);
   }
 }
+
+/* ==========================================================================
+   AURA ROLEPLAY - CLOTHING & APPAREL MENU BAR (INDUMENTARIA RÁPIDA)
+   ========================================================================== */
+
+.aura-clothing-container {
+  display: flex !important;
+  flex-direction: column !important;
+  background: rgba(10, 14, 24, 0.85) !important;
+  border: 1px solid var(--aura-border-subtle) !important;
+  border-radius: 8px !important;
+  padding: 8px 10px !important;
+  margin-bottom: 8px !important;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.45) !important;
+  position: relative !important;
+  backdrop-filter: blur(10px) !important;
+  transition: border-color 0.2s ease !important;
+}
+
+.aura-clothing-container:hover {
+  border-color: rgba(0, 240, 255, 0.3) !important;
+}
+
+.aura-clothing-header {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  margin-bottom: 6px !important;
+  padding-bottom: 4px !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+.aura-clothing-title {
+  font-family: var(--aura-font-title) !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  letter-spacing: 1.2px !important;
+  color: var(--aura-cyan-primary) !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  text-transform: uppercase !important;
+  margin: 0 !important;
+}
+
+.aura-clothing-title-icon {
+  color: var(--aura-cyan-secondary) !important;
+  font-size: 11px !important;
+  filter: drop-shadow(0 0 5px var(--aura-cyan-secondary)) !important;
+}
+
+.aura-clothing-hint {
+  font-size: 9.5px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.5px !important;
+  color: var(--aura-text-muted) !important;
+  text-transform: uppercase !important;
+}
+
+.aura-clothing-grid {
+  display: grid !important;
+  grid-template-columns: repeat(7, 1fr) !important;
+  gap: 5px !important;
+  width: 100% !important;
+}
+
+.aura-clothing-btn {
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 34px !important;
+  min-width: 0 !important;
+  background: rgba(18, 24, 40, 0.75) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 6px !important;
+  cursor: pointer !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  padding: 0 !important;
+  outline: none !important;
+}
+
+.aura-clothing-btn svg {
+  transition: all 0.2s ease !important;
+  display: block !important;
+}
+
+/* Estado Activo (Prenda Puesta) */
+.aura-clothing-btn.active {
+  background: linear-gradient(180deg, rgba(0, 240, 255, 0.12) 0%, rgba(16, 22, 38, 0.85) 100%) !important;
+  border-color: rgba(0, 240, 255, 0.45) !important;
+  box-shadow: 0 0 8px rgba(0, 240, 255, 0.15) !important;
+}
+
+.aura-clothing-btn.active svg {
+  stroke: #00f0ff !important;
+  filter: drop-shadow(0 0 4px rgba(0, 240, 255, 0.5)) !important;
+}
+
+.aura-clothing-btn.active .aura-clothing-status-dot {
+  background: #00f0ff !important;
+  box-shadow: 0 0 5px #00f0ff !important;
+}
+
+/* Estado Inactivo (Prenda Quitada) */
+.aura-clothing-btn.inactive {
+  background: rgba(26, 16, 20, 0.7) !important;
+  border-color: rgba(239, 68, 68, 0.35) !important;
+  opacity: 0.75 !important;
+}
+
+.aura-clothing-btn.inactive svg {
+  stroke: #94a3b8 !important;
+  opacity: 0.4 !important;
+  transform: scale(0.92) !important;
+}
+
+.aura-clothing-btn.inactive .aura-clothing-status-dot {
+  background: #ef4444 !important;
+  box-shadow: 0 0 4px #ef4444 !important;
+}
+
+/* Hover & Focus */
+.aura-clothing-btn:hover {
+  transform: translateY(-2px) scale(1.05) !important;
+  border-color: var(--aura-cyan-primary) !important;
+  box-shadow: 0 4px 12px rgba(0, 240, 255, 0.3) !important;
+  background: rgba(24, 34, 58, 0.95) !important;
+  opacity: 1 !important;
+  z-index: 5 !important;
+}
+
+.aura-clothing-btn:hover svg {
+  stroke: #ffffff !important;
+  filter: drop-shadow(0 0 6px var(--aura-cyan-primary)) !important;
+  opacity: 1 !important;
+}
+
+.aura-clothing-btn:active {
+  transform: scale(0.95) !important;
+}
+
+/* Punto indicador de estado */
+.aura-clothing-status-dot {
+  position: absolute !important;
+  bottom: 3px !important;
+  right: 3px !important;
+  width: 4px !important;
+  height: 4px !important;
+  border-radius: 50% !important;
+  transition: all 0.2s ease !important;
+}
+

@@ -90,3 +90,36 @@ exports('HasItem', function(src, itemName, count)
     return (exports.ox_inventory:GetItemCount(src, itemName) or 0) >= required
 end)
 
+-- ============================================================================
+-- 5. PERSISTENCIA ATÓMICA DE INDUMENTARIA Y PRENDAS (AuraRP Luxury)
+-- ============================================================================
+
+RegisterNetEvent('aura_inventory:server:saveClothingState', function(currentAppearance, baseAppearance, clothingToggles)
+    local src = source
+    if not src or src <= 0 then return end
+
+    local char = exports.aura_multichar and exports.aura_multichar:GetActiveCharacter(src)
+    if not char or not char.id then return end
+
+    char.metadata = char.metadata or {}
+    
+    if currentAppearance and type(currentAppearance) == 'table' then
+        char.metadata.appearance = currentAppearance
+    end
+
+    if baseAppearance and type(baseAppearance) == 'table' then
+        char.metadata.base_appearance = baseAppearance
+    end
+
+    if clothingToggles and type(clothingToggles) == 'table' then
+        char.metadata.clothing_toggles = clothingToggles
+    end
+
+    -- Guardado persistente atómico en la base de datos MariaDB
+    MySQL.update('UPDATE characters SET metadata = ? WHERE id = ?', {
+        json.encode(char.metadata),
+        char.id
+    })
+end)
+
+

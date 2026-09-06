@@ -9,12 +9,20 @@
 </head>
 <body>
     <div id="hud-container" class="hidden">
-        <!-- Definición global del Gradiente Aura -->
+        <!-- Definición global del Gradiente Aura & Térmicos -->
         <svg width="0" height="0">
             <defs>
                 <linearGradient id="auraGradient" x1="0%" y1="0%" x2="100%" y2="100%">
                     <stop offset="0%" stop-color="#00FFFF" /> <!-- Strong Turquoise -->
                     <stop offset="100%" stop-color="#FF1493" /> <!-- Strong Pink -->
+                </linearGradient>
+                <linearGradient id="coldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#40E0D0" /> <!-- Turquoise -->
+                    <stop offset="100%" stop-color="#00FFFF" /> <!-- Cyan -->
+                </linearGradient>
+                <linearGradient id="heatGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#FF007F" /> <!-- Neon Pink -->
+                    <stop offset="100%" stop-color="#FF4500" /> <!-- Neon Orange -->
                 </linearGradient>
             </defs>
         </svg>
@@ -70,6 +78,24 @@
             <svg class="progress-ring" width="44" height="44">
                 <circle class="progress-ring-track" stroke-width="3" fill="rgba(15, 15, 20, 0.75)" r="18" cx="22" cy="22"/>
                 <circle class="progress-ring-circle" id="circle-thirst" stroke="url(#auraGradient)" stroke-width="3" fill="transparent" r="18" cx="22" cy="22"/>
+            </svg>
+        </div>
+
+        <!-- Indicador: Cold Alert (Hipotermia) -->
+        <div class="hud-item hud-thermal hud-cold" id="item-cold">
+            <div class="hud-icon"><i class="fa-solid fa-snowflake"></i></div>
+            <svg class="progress-ring" width="44" height="44">
+                <circle class="progress-ring-track" stroke-width="3" fill="rgba(15, 15, 20, 0.75)" r="18" cx="22" cy="22"/>
+                <circle class="progress-ring-circle" id="circle-cold" stroke="url(#coldGradient)" stroke-width="3" fill="transparent" r="18" cx="22" cy="22"/>
+            </svg>
+        </div>
+
+        <!-- Indicador: Heat Alert (Hipertermia) -->
+        <div class="hud-item hud-thermal hud-heat" id="item-heat">
+            <div class="hud-icon"><i class="fa-solid fa-sun"></i></div>
+            <svg class="progress-ring" width="44" height="44">
+                <circle class="progress-ring-track" stroke-width="3" fill="rgba(15, 15, 20, 0.75)" r="18" cx="22" cy="22"/>
+                <circle class="progress-ring-circle" id="circle-heat" stroke="url(#heatGradient)" stroke-width="3" fill="transparent" r="18" cx="22" cy="22"/>
             </svg>
         </div>
     </div>

@@ -135,12 +135,16 @@ local function SetCharacterAppearance(target, appearanceData)
     if char then
         char.metadata = char.metadata or {}
         char.metadata.appearance = appearanceData
+        char.metadata.base_appearance = appearanceData
+        char.metadata.clothing_toggles = nil
     end
 
     if charId then
         local charRow = MySQL.single.await('SELECT metadata FROM characters WHERE id = ?', { charId })
         local meta = (charRow and json.decode(charRow.metadata)) or (char and char.metadata) or {}
         meta.appearance = appearanceData
+        meta.base_appearance = appearanceData
+        meta.clothing_toggles = nil
 
         MySQL.update.await('UPDATE characters SET metadata = ? WHERE id = ?', {
             json.encode(meta),

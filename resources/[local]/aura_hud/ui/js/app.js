@@ -26,6 +26,14 @@ const rings = {
     voice: {
         circle: document.getElementById('circle-voice'),
         item: document.getElementById('item-voice')
+    },
+    cold: {
+        circle: document.getElementById('circle-cold'),
+        item: document.getElementById('item-cold')
+    },
+    heat: {
+        circle: document.getElementById('circle-heat'),
+        item: document.getElementById('item-heat')
     }
 };
 
@@ -148,7 +156,7 @@ function updateRing(type, percent) {
     if (type === 'hunger' || type === 'thirst') {
         setVisibility(rings[type].item, percent <= 70);
     } else if (type === 'health') {
-        setVisibility(rings[type].item, percent <= 95);
+        setVisibility(rings[type].item, percent <= 90);
     } else if (type === 'stamina') {
         setVisibility(rings[type].item, percent < 99);
     }
@@ -186,6 +194,46 @@ window.addEventListener('message', (event) => {
             updateRing('hunger', data.hunger);
             updateRing('thirst', data.thirst);
             break;
+
+        case 'updateTemperature': {
+            const coldLevel = Number(data.coldLevel) || 0;
+            const heatLevel = Number(data.heatLevel) || 0;
+
+            // 1. Indicador de Frío (Hipotermia)
+            if (rings.cold && rings.cold.circle && rings.cold.item) {
+                if (coldLevel > 0) {
+                    setVisibility(rings.cold.item, true);
+                    const offsetCold = CIRCUMFERENCE - (coldLevel / 100) * CIRCUMFERENCE;
+                    rings.cold.circle.style.strokeDashoffset = offsetCold;
+                    if (coldLevel >= 35) {
+                        rings.cold.item.classList.add('thermal-alert');
+                    } else {
+                        rings.cold.item.classList.remove('thermal-alert');
+                    }
+                } else {
+                    setVisibility(rings.cold.item, false);
+                    rings.cold.item.classList.remove('thermal-alert');
+                }
+            }
+
+            // 2. Indicador de Calor (Hipertermia)
+            if (rings.heat && rings.heat.circle && rings.heat.item) {
+                if (heatLevel > 0) {
+                    setVisibility(rings.heat.item, true);
+                    const offsetHeat = CIRCUMFERENCE - (heatLevel / 100) * CIRCUMFERENCE;
+                    rings.heat.circle.style.strokeDashoffset = offsetHeat;
+                    if (heatLevel >= 35) {
+                        rings.heat.item.classList.add('thermal-alert');
+                    } else {
+                        rings.heat.item.classList.remove('thermal-alert');
+                    }
+                } else {
+                    setVisibility(rings.heat.item, false);
+                    rings.heat.item.classList.remove('thermal-alert');
+                }
+            }
+            break;
+        }
 
         case 'updateVoice': {
             const iconEl = rings.voice.item ? rings.voice.item.querySelector('.hud-icon i') : null;
