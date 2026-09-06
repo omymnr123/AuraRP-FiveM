@@ -416,6 +416,23 @@ CreateThread(function()
     end
 end)
 
+-- Función y Export para forzar guardado síncrono de todas las cuentas activas
+local function SaveAllAccounts()
+    local count = 0
+    for src, data in pairs(AuraEconomy.ActiveAccounts) do
+        if data and data.charId then
+            MySQL.update.await('UPDATE characters SET accounts = ? WHERE id = ?', {
+                json.encode(data.accounts),
+                data.charId
+            })
+            data.dirty = false
+            count = count + 1
+        end
+    end
+    return count
+end
+exports('SaveAllAccounts', SaveAllAccounts)
+
 -- Callback para ox_lib en caso de peticiones síncronas de cliente
 lib.callback.register('aura_economy:getAccounts', function(source)
     local src = source

@@ -2833,5 +2833,7 @@ function Inventory.InspectInventory(playerId, invId)
 end
 
 exports('InspectInventory', Inventory.InspectInventory)
+exports('saveInventories', Inventory.SaveInventories)
+exports('SaveInventories', Inventory.SaveInventories)
 
 return Inventory

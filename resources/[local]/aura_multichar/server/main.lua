@@ -101,14 +101,74 @@ local function SaveCharacterToDatabase(src)
     
     char.metadata = EnsureCharacterAppearance(char.id, char.metadata)
 
-    MySQL.update('UPDATE characters SET metadata = ? WHERE id = ?', {
-        json.encode(char.metadata),
-        char.id
-    })
+    if char.accounts then
+        MySQL.update('UPDATE characters SET metadata = ?, accounts = ? WHERE id = ?', {
+            json.encode(char.metadata),
+            json.encode(char.accounts),
+            char.id
+        })
+    else
+        MySQL.update('UPDATE characters SET metadata = ? WHERE id = ?', {
+            json.encode(char.metadata),
+            char.id
+        })
+    end
 end
 
--- Export para forzar guardado desde otros scripts
+-- Export para forzar guardado individual desde otros scripts
 exports('SaveCharacterLocation', SaveCharacterToDatabase)
+
+-- Función y Export para guardar todos los personajes activos de forma masiva y síncrona
+local function SaveAllCharacters()
+    local count = 0
+    for srcStr, char in pairs(activeCharacters) do
+        local src = tonumber(srcStr)
+        if src and char and char.id then
+            local ped = GetPlayerPed(src)
+            if ped and ped ~= 0 then
+                local coords = GetEntityCoords(ped)
+                local heading = GetEntityHeading(ped)
+                local health = GetEntityHealth(ped)
+                local armor = GetPedArmour(ped)
+
+                if coords and (coords.x ~= 0.0 or coords.y ~= 0.0 or coords.z ~= 0.0) then
+                    char.metadata = char.metadata or {}
+                    char.metadata.last_location = {
+                        x = coords.x,
+                        y = coords.y,
+                        z = coords.z,
+                        heading = heading
+                    }
+                    char.metadata.health = health
+                    char.metadata.armor = armor
+                    if char.metadata.status then
+                        char.metadata.status.health = health
+                        char.metadata.status.armor = armor
+                    end
+                end
+            end
+
+            char.metadata = EnsureCharacterAppearance(char.id, char.metadata)
+
+            if char.accounts then
+                MySQL.update.await('UPDATE characters SET metadata = ?, accounts = ? WHERE id = ?', {
+                    json.encode(char.metadata),
+                    json.encode(char.accounts),
+                    char.id
+                })
+            else
+                MySQL.update.await('UPDATE characters SET metadata = ? WHERE id = ?', {
+                    json.encode(char.metadata),
+                    char.id
+                })
+            end
+
+            count = count + 1
+        end
+    end
+    return count
+end
+exports('SaveAllCharacters', SaveAllCharacters)
 
 -- Función para actualizar la apariencia en memoria activa y en la base de datos sincronizadamente
 local function SetCharacterAppearance(target, appearanceData)

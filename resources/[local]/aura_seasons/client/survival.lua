@@ -104,6 +104,7 @@ local function UpdateThermalHomeostasis()
     if isSheltered then
         local rate = Config.Survival.Shelter.CoreRecoveryRate or 0.20
         if ActiveBuffs.warmth.active then rate = rate * 1.5 end
+        if ActiveBuffs.cooling.active then rate = rate * 1.5 end
 
         if CoreTemperature < 37.0 then
             CoreTemperature = math.min(37.0, CoreTemperature + rate)
@@ -114,10 +115,56 @@ local function UpdateThermalHomeostasis()
     end
 
     -- ------------------------------------------------------------------------
-    -- MODELO DE EQUILIBRIO TÉRMICO Y TERMORREGULACIÓN HUMANA
+    -- CASO 2: DISIPACIÓN RÁPIDA DE CALOR AL QUITARSE LA ROPA (DESVESTIDO / HIPERTERMIA)
+    -- ------------------------------------------------------------------------
+    -- Si el jugador tiene temperatura corporal alta (> 37.0ºC) y se quita la ropa (poco o ningún aislamiento),
+    -- el cuerpo disipa el calor acumulado rápidamente mediante transpiración y convección cutánea directa.
+    if CoreTemperature > 37.0 and insulation < 35.0 then
+        -- Tasa de disipación rápida: cuanto más desvestido (0%), más rápido baja
+        local coolingSpeed = 0.08 + ((35.0 - insulation) / 35.0) * 0.14 -- De 0.08 a 0.22 por tick al estar desnudo
+
+        -- Diferencia térmica entre el cuerpo caliente y el aire ambiental más fresco
+        if ambientTemp < CoreTemperature then
+            local gradient = (CoreTemperature - ambientTemp) * 0.003
+            coolingSpeed = coolingSpeed + math.min(0.08, gradient)
+        end
+
+        -- Alivio instantáneo por inmersión en agua
+        if IsEntityInWater(ped) then
+            coolingSpeed = coolingSpeed + 0.25
+        end
+
+        -- Resistencia / Ayuda por consumibles fríos
+        if ActiveBuffs.cooling.active then
+            coolingSpeed = coolingSpeed * 1.5
+        end
+
+        -- Si está corriendo/sprintando genera algo de calor metabólico
+        if IsPedSprinting(ped) or IsPedRunning(ped) then
+            coolingSpeed = coolingSpeed * 0.65
+        end
+
+        CoreTemperature = math.max(37.0, CoreTemperature - coolingSpeed)
+
+        -- Si la temperatura ambiente es baja (< idealComfortTemp - 5), el frío ambiental seguirá enfriando hacia hipotermia
+        local idealComfortTemp = 26.0 - ((insulation / 100.0) * 34.0)
+        local thermalDelta = ambientTemp - idealComfortTemp
+        if thermalDelta < -5.0 and CoreTemperature <= 37.0 then
+            local coldSeverity = math.abs(thermalDelta + 5.0)
+            local exposureMultiplier = 1.0 + ((30.0 - insulation) / 30.0) * 2.0
+            local baseLoss = math.min(0.080, (coldSeverity * 0.0022) * exposureMultiplier)
+            CoreTemperature = CoreTemperature - baseLoss
+        end
+
+        CoreTemperature = math.max(29.0, math.min(43.0, CoreTemperature))
+        return
+    end
+
+    -- ------------------------------------------------------------------------
+    -- MODELO DE EQUILIBRIO TÉRMICO Y TERMORREGULACIÓN HUMANA (CUERPO ESTABLE / VESTIDO)
     -- ------------------------------------------------------------------------
     -- Temperatura ambiente ideal para el nivel de abrigo que lleva puesto:
-    -- 0% Aislamiento   -> Confort en 26.0ºC (playa / bañador)
+    -- 0% Aislamiento   -> Confort en 26.0ºC (desnudo / playa / bañador)
     -- 30% Aislamiento  -> Confort en 16.0ºC a 21.0ºC (ropa ligera de primavera)
     -- 60% Aislamiento  -> Confort en 6.0ºC a 12.0ºC (chaqueta / otoño)
     -- 100% Aislamiento -> Confort en -8.0ºC (equipo ártico / ventisca invernal)
@@ -132,35 +179,52 @@ local function UpdateThermalHomeostasis()
         -- SENSACIÓN DE FRÍO (Ropa insuficiente para el frío exterior)
         -- --------------------------------------------------------------------
         local coldSeverity = math.abs(thermalDelta + 5.0)
-        local baseLoss = math.min(0.025, coldSeverity * 0.0015)
+
+        -- Multiplicador por exposición directa de la piel (Desnudo / Aislamiento < 30%)
+        -- Al estar completamente desnudo (0% aislamiento), el cuerpo pierde calor rápidamente por convección
+        local exposureMultiplier = 1.0
+        if insulation < 30.0 then
+            exposureMultiplier = 1.0 + ((30.0 - insulation) / 30.0) * 2.0 -- Hasta 3.0x de velocidad cuando está desnudo (0%)
+        end
+
+        local baseLoss = math.min(0.080, (coldSeverity * 0.0022) * exposureMultiplier)
 
         -- Reducción por Buff de Café / Bebida caliente
         if ActiveBuffs.warmth.active then
             baseLoss = baseLoss * (1.0 - ActiveBuffs.warmth.resistance)
         end
 
-        -- Inmersión en agua helada
+        -- Inmersión en agua helada (multiplicador configurable)
         if IsEntityInWater(ped) then
-            baseLoss = baseLoss + (coldSeverity * 0.020)
+            local waterMult = Config.Survival.WaterCoolingMultiplier or 2.2
+            baseLoss = baseLoss * waterMult
         end
 
         CoreTemperature = CoreTemperature - baseLoss
 
     elseif thermalDelta > 5.0 then
         -- --------------------------------------------------------------------
-        -- SENSACIÓN DE CALOR (Sobre-abrigo / Exceso de ropa u Ola de calor) - PROGRESO PAUSADO
+        -- SENSACIÓN DE CALOR (Sobre-abrigo / Exceso de ropa con calor ambiental)
         -- --------------------------------------------------------------------
         local heatSeverity = (thermalDelta - 5.0)
-        local baseGain = math.min(0.020, heatSeverity * 0.0012)
+
+        -- Multiplicador por sobre-abrigo en clima caluroso (atrapa calor metabólico)
+        -- Al llevar parkas, abrigos o ropa pesada (>45% aislamiento) con calor, la temperatura sube más rápido
+        local overcoatMultiplier = 1.0
+        if insulation > 45.0 then
+            overcoatMultiplier = 1.0 + ((insulation - 45.0) / 55.0) * 1.5 -- Hasta 2.5x más rápido cuando va muy abrigado
+        end
+
+        local baseGain = math.min(0.060, (heatSeverity * 0.0018) * overcoatMultiplier)
 
         -- Resistencia por Buff de Agua fresca / Hidratación
         if ActiveBuffs.cooling.active then
             baseGain = baseGain * (1.0 - ActiveBuffs.cooling.resistance)
         end
 
-        -- Actividad física intensa (Sprintar / Correr)
+        -- Actividad física intensa (Sprintar / Correr genera calor metabólico adicional)
         if IsPedSprinting(ped) or IsPedRunning(ped) then
-            baseGain = baseGain * 1.25
+            baseGain = baseGain * 1.35
         end
 
         CoreTemperature = CoreTemperature + baseGain
@@ -169,10 +233,15 @@ local function UpdateThermalHomeostasis()
         -- --------------------------------------------------------------------
         -- ZONA DE CONFORT (Ropa equilibrada con el clima actual)
         -- --------------------------------------------------------------------
+        local recoverySpeed = 0.06
+        if CoreTemperature > 37.0 and insulation <= 35.0 then
+            recoverySpeed = 0.15
+        end
+
         if CoreTemperature < 37.0 then
-            CoreTemperature = math.min(37.0, CoreTemperature + 0.03)
+            CoreTemperature = math.min(37.0, CoreTemperature + recoverySpeed)
         elseif CoreTemperature > 37.0 then
-            CoreTemperature = math.max(37.0, CoreTemperature - 0.03)
+            CoreTemperature = math.max(37.0, CoreTemperature - recoverySpeed)
         end
     end
 

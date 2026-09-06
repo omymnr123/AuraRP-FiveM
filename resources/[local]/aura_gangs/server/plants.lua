@@ -524,3 +524,25 @@ exports('DeletePlant', function(gangId, plantId)
     end
     return false
 end)
+
+-- Función y Export para forzar el guardado de todas las plantas pendientes
+local function SaveAllPlants()
+    local count = 0
+    for plantId in pairs(DirtyPlants) do
+        for _, plants in pairs(GangPlants) do
+            local p = plants[plantId]
+            if p then
+                MySQL.update.await([[
+                    UPDATE aura_plants 
+                    SET stage = ?, growth = ?, thirst = ?, nutrition = ?, 
+                        neglected_time = ?, mature_time = ? 
+                    WHERE id = ?
+                ]], { p.stage, p.growth, p.thirst, p.nutrition, p.neglected_time or 0, p.mature_time or 0, plantId })
+                count = count + 1
+            end
+        end
+    end
+    DirtyPlants = {}
+    return count
+end
+exports('SaveAllPlants', SaveAllPlants)

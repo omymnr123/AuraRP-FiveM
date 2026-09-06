@@ -9,14 +9,14 @@ local lastCheckedProps = {}
 -- 1. Componente 11: Tops / Chaquetas / Uniformes / Parkas / Bomberos
 local function EvaluateTopInsulation(ped, isMale)
     local drawable = GetPedDrawableVariation(ped, 11)
-    if drawable == -1 or drawable == 15 then 
+    if drawable <= 0 or drawable == 15 or drawable == -1 then 
         return 0.0 -- Desnudo superior
     end
 
     if isMale then
-        -- Torso Desnudo / Tirantes ligeros / Sin camiseta
-        if drawable == 0 or drawable == 15 or drawable == 16 or drawable == 18 or drawable == 21 or drawable == 22 or drawable == 34 or drawable == 35 or drawable == 57 then
-            return 8.0
+        -- Torso Desnudo / Tirantes ligeros / Sin camiseta / Tatuajes al aire
+        if drawable == 15 or drawable == 16 or drawable == 18 or drawable == 21 or drawable == 22 or drawable == 34 or drawable == 35 or drawable == 57 or drawable == 91 or drawable == 252 then
+            return 0.0
         -- Camisetas cortas / Polos finos / Camisas de manga corta LSPD/BCSO (EUP)
         elseif (drawable >= 1 and drawable <= 14) or (drawable >= 23 and drawable <= 33) or (drawable >= 40 and drawable <= 55) or drawable == 73 or drawable == 74 or drawable == 150 or drawable == 151 or drawable == 250 then
             return 18.0
@@ -28,9 +28,9 @@ local function EvaluateTopInsulation(ped, isMale)
             return 45.0
         end
     else
-        -- Femenino: Bikinis / Tops cortos / Espalda descubierta
-        if drawable == 0 or drawable == 14 or drawable == 15 or drawable == 17 or drawable == 18 or drawable == 24 or drawable == 26 or drawable == 86 then
-            return 8.0
+        -- Femenino: Bikinis / Tops cortos / Espalda descubierta / Desnuda
+        if drawable == 14 or drawable == 15 or drawable == 17 or drawable == 18 or drawable == 24 or drawable == 26 or drawable == 86 or drawable == 101 then
+            return 0.0
         -- Camisetas / Blusas / Camisas de manga corta EUP
         elseif (drawable >= 1 and drawable <= 13) or (drawable >= 27 and drawable <= 45) or (drawable >= 70 and drawable <= 85) or drawable == 147 then
             return 18.0
@@ -47,10 +47,10 @@ end
 -- 2. Componente 9: Chalecos Antibalas / Porta-Placas Tácticos / Chalecos Reflectantes EUP
 local function EvaluateBodyArmorInsulation(ped)
     local drawable = GetPedDrawableVariation(ped, 9)
-    if drawable <= 0 then
+    if drawable <= 0 or drawable == 15 or drawable == -1 then
         return 0.0 -- Sin chaleco / Sin protección
     -- Arnés ligero / Funda de pistola / Cartuchera / Placa en pecho
-    elseif drawable == 1 or drawable == 2 or drawable == 15 or drawable == 16 then
+    elseif drawable == 1 or drawable == 2 or drawable == 16 then
         return 4.0
     -- Chaleco antibalas reglamentario LSPD/BCSO / Chaleco de tráfico reflectante
     elseif (drawable >= 3 and drawable <= 14) or (drawable >= 17 and drawable <= 23) then
@@ -64,34 +64,26 @@ end
 -- 3. Componente 3: Brazos / Torso 1 / Mangas / Guantes Térmicos
 local function EvaluateArmsInsulation(ped, isMale)
     local drawable = GetPedDrawableVariation(ped, 3)
-    if drawable == -1 then return 5.0 end
+    if drawable <= 15 or drawable == -1 then return 0.0 end
 
-    -- IDs estándar de brazos descubiertos en GTA V Freemode
-    local bareArms = {
-        [0] = true, [1] = true, [2] = true, [4] = true, [5] = true, 
-        [6] = true, [11] = true, [12] = true, [14] = true, [15] = true
-    }
-
-    if bareArms[drawable] then
-        return 0.0 -- Brazos al aire
-    elseif (drawable >= 16 and drawable <= 40) or drawable == 8 then
+    if (drawable >= 16 and drawable <= 40) or drawable == 8 then
         return 12.0 -- Manga larga estándar / Camisa policial
     elseif drawable > 40 then
         return 20.0 -- Guantes tácticos / Mangas acolchadas / Guantes térmicos de bombero
     end
 
-    return 8.0
+    return 0.0
 end
 
 -- 4. Componente 4: Pantalones / Piernas / Pantalones de Nieve y Bomberos
 local function EvaluatePantsInsulation(ped, isMale)
     local drawable = GetPedDrawableVariation(ped, 4)
-    if drawable == -1 then return 10.0 end
+    if drawable == -1 or drawable == 15 then return 0.0 end
 
     if isMale then
-        -- Bañadores / Calzoncillos / Pantalones cortos
-        if drawable == 14 or drawable == 15 or drawable == 16 or drawable == 17 or drawable == 18 or drawable == 20 or drawable == 21 or drawable == 56 or drawable == 65 then
-            return 5.0
+        -- Bañadores / Calzoncillos / Ropa interior / Boxers / Piernas desnudas (0% de aislamiento de piernas)
+        if drawable == 14 or drawable == 15 or drawable == 16 or drawable == 17 or drawable == 18 or drawable == 20 or drawable == 21 or drawable == 26 or drawable == 56 or drawable == 61 or drawable == 65 or (drawable >= 87 and drawable <= 146) then
+            return 0.0
         -- Vaqueros estándar / Pantalones de traje / Pantalones de servicio LSPD/BCSO (EUP)
         elseif (drawable >= 0 and drawable <= 13) or (drawable >= 22 and drawable <= 38) or (drawable >= 40 and drawable <= 55) then
             return 15.0
@@ -100,9 +92,9 @@ local function EvaluatePantsInsulation(ped, isMale)
             return 20.0
         end
     else
-        -- Faldas cortas / Shorts / Ropa interior / Bikinis
-        if drawable == 14 or drawable == 15 or drawable == 16 or drawable == 17 or drawable == 19 or drawable == 20 or drawable == 21 or drawable == 57 or drawable == 67 then
-            return 5.0
+        -- Faldas cortas / Shorts / Ropa interior / Bikinis / Piernas desnudas (0% de aislamiento)
+        if drawable == 14 or drawable == 15 or drawable == 16 or drawable == 17 or drawable == 19 or drawable == 20 or drawable == 21 or drawable == 26 or drawable == 57 or drawable == 67 or (drawable >= 87 and drawable <= 146) then
+            return 0.0
         -- Pantalones largos / Jeans / Leggins / Pantalones de servicio EUP
         elseif (drawable >= 0 and drawable <= 13) or (drawable >= 22 and drawable <= 38) then
             return 15.0
@@ -116,8 +108,8 @@ end
 -- 5. Componente 8: Camisetas Interiores / Undershirts / Polos de Servicio
 local function EvaluateUndershirtInsulation(ped, isMale)
     local drawable = GetPedDrawableVariation(ped, 8)
-    if drawable == -1 or drawable == 15 or drawable == 14 then
-        return 0.0 -- Sin camiseta interior
+    if drawable <= 0 or drawable == 15 or drawable == 14 or drawable == -1 or drawable == 57 or drawable == 58 then
+        return 0.0 -- Sin camiseta interior / Piel al descubierto
     elseif (drawable >= 1 and drawable <= 13) or (drawable >= 16 and drawable <= 25) then
         return 5.0 -- Camiseta interior de tirantes o manga corta
     elseif (drawable >= 50 and drawable <= 85) then
@@ -130,9 +122,9 @@ end
 -- 6. Componente 6: Calzado / Botas Tácticas / Botas de Nieve y Bomberos
 local function EvaluateFootwearInsulation(ped, isMale)
     local drawable = GetPedDrawableVariation(ped, 6)
-    if drawable == -1 or drawable == 34 or drawable == 35 or drawable == 5 then
+    if drawable == -1 or drawable == 34 or drawable == 35 or drawable == 5 or drawable == 0 then
         return 0.0 -- Descalzo o Chanclas
-    elseif (drawable >= 0 and drawable <= 15) or (drawable >= 25 and drawable <= 40) then
+    elseif (drawable >= 1 and drawable <= 15) or (drawable >= 25 and drawable <= 40) then
         return 3.0 -- Zapatillas deportivas / Zapatos de vestir
     else
         return 5.0 -- Botas de nieve / Botas tácticas policiales / Botas de bombero
@@ -142,7 +134,7 @@ end
 -- 7. Componente 7: Accesorios de Cuello / Bufandas / Shemagh
 local function EvaluateNeckInsulation(ped)
     local drawable = GetPedDrawableVariation(ped, 7)
-    if drawable <= 0 then return 0.0 end
+    if drawable <= 0 or drawable == -1 or drawable == 15 then return 0.0 end
     -- Bufandas / Pañuelos de cuello / Shemagh táctico
     if drawable == 2 or drawable == 3 or drawable == 4 or drawable == 8 or drawable == 14 or (drawable >= 20 and drawable <= 30) then
         return 5.0
@@ -156,7 +148,7 @@ local function EvaluateHeadgearInsulation(ped)
 
     -- Componente 1: Máscara / Pasamontañas / Balaclava / Máscara de Bombero
     local maskDrawable = GetPedDrawableVariation(ped, 1)
-    if maskDrawable > 0 then
+    if maskDrawable > 0 and maskDrawable ~= 15 and maskDrawable ~= -1 then
         if maskDrawable == 51 or maskDrawable == 52 or (maskDrawable >= 110 and maskDrawable <= 130) then
             bonus = bonus + 8.0 -- Pasamontañas térmico completo
         else
@@ -166,7 +158,7 @@ local function EvaluateHeadgearInsulation(ped)
 
     -- Prop 0: Gorros / Beanies / Cascos de Bombero / Cascos de Policía / Cascos SWAT
     local hatProp = GetPedPropIndex(ped, 0)
-    if hatProp ~= -1 then
+    if hatProp ~= -1 and hatProp ~= 255 then
         if hatProp == 2 or hatProp == 4 or hatProp == 5 or hatProp == 18 or (hatProp >= 45 and hatProp <= 60) then
             bonus = bonus + 8.0 -- Gorro de lana / Beanie / Casco con acolchado térmico
         else
@@ -183,14 +175,14 @@ end
 
 local function RecalculateInsulation()
     local ped = PlayerPedId()
-    if not DoesEntityExist(ped) then return 25.0 end
+    if not DoesEntityExist(ped) then return 0.0 end
 
     local model = GetEntityModel(ped)
     local isMale = (model == `mp_m_freemode_01`)
     local isFemale = (model == `mp_f_freemode_01`)
 
     if not isMale and not isFemale then
-        CurrentInsulation = 35.0
+        CurrentInsulation = 25.0
         return CurrentInsulation
     end
 
@@ -202,6 +194,24 @@ local function RecalculateInsulation()
     local shoeScore = EvaluateFootwearInsulation(ped, isMale)    -- Max 5
     local neckScore = EvaluateNeckInsulation(ped)                -- Max 5
     local headScore = EvaluateHeadgearInsulation(ped)            -- Max 12
+
+    -- Si no lleva parte superior (torso desnudo), los brazos no pueden dar aislamiento de manga larga
+    if topScore == 0.0 then
+        armsScore = 0.0
+        if underScore <= 5.0 then
+            underScore = 0.0
+        end
+    end
+
+    -- Si el personaje está completamente desvestido (sin torso ni pantalones ni chaleco)
+    if topScore == 0.0 and pantsScore == 0.0 and armorScore == 0.0 then
+        if shoeScore <= 3.0 and neckScore <= 1.0 and headScore == 0.0 then
+            armsScore = 0.0
+            underScore = 0.0
+            shoeScore = 0.0
+            neckScore = 0.0
+        end
+    end
 
     local total = topScore + armorScore + armsScore + pantsScore + underScore + shoeScore + neckScore + headScore
     CurrentInsulation = math.max(0.0, math.min(100.0, total))

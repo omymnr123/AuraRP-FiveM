@@ -148,3 +148,34 @@ exports('UpdatePlayerMetadata', function(source, key, value)
     end
     return false
 end)
+
+local function SaveAllPlayers()
+    local count = 0
+    for srcStr, player in pairs(AuraCore.Players) do
+        local src = tonumber(srcStr)
+        if src and player and player.license then
+            local ped = GetPlayerPed(src)
+            if ped and ped ~= 0 then
+                local coords = GetEntityCoords(ped)
+                local heading = GetEntityHeading(ped)
+                if coords and (coords.x ~= 0.0 or coords.y ~= 0.0 or coords.z ~= 0.0) then
+                    player.metadata = player.metadata or {}
+                    player.metadata.last_location = {
+                        x = coords.x,
+                        y = coords.y,
+                        z = coords.z,
+                        heading = heading
+                    }
+                end
+            end
+
+            MySQL.update.await('UPDATE players SET metadata = ?, last_login = CURRENT_TIMESTAMP WHERE license = ?', {
+                json.encode(player.metadata),
+                player.license
+            })
+            count = count + 1
+        end
+    end
+    return count
+end
+exports('SaveAllPlayers', SaveAllPlayers)

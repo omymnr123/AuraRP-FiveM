@@ -601,4 +601,5 @@ exports('AdvanceDay', AdvanceDayServer)
 exports('SetTime', SetTimeServer)
 exports('SetTimeFrozen', SetTimeFrozenServer)
 exports('SetTimeSpeed', SetTimeSpeedServer)
+exports('SaveSeasonState', SaveSeasonState)
 
