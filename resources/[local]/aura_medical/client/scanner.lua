@@ -149,14 +149,7 @@ local function OpenMedicalScanner()
             local currentBones = exports['aura_medical']:GetBoneDamage()
 
             for groupKey, groupConfig in pairs(Config.Bones) do
-                local boneIndex = GetPedBoneIndex(targetPed, groupConfig.primaryBone)
-                local boneCoords = GetWorldPositionOfEntityBone(targetPed, boneIndex)
-                
-                -- Fallback si el hueso específico falla
-                if boneCoords.x == 0.0 and boneCoords.y == 0.0 and boneCoords.z == 0.0 then
-                    boneCoords = GetPedBoneCoords(targetPed, groupConfig.primaryBone, 0.0, 0.0, 0.0)
-                end
-
+                local boneCoords = GetPedBoneCoords(targetPed, groupConfig.primaryBone, 0.0, 0.0, 0.0)
                 local onScreen, screenX, screenY = GetScreenCoordFromWorldCoord(boneCoords.x, boneCoords.y, boneCoords.z)
                 
                 local boneInfo = currentBones[groupKey] or { health = 100, injuries = {} }
@@ -169,7 +162,8 @@ local function OpenMedicalScanner()
                     health = boneInfo.health,
                     injuriesCount = #boneInfo.injuries,
                     isInjured = isInjured,
-                    label = groupConfig.label
+                    label = groupConfig.label,
+                    side = groupConfig.side or "right"
                 }
             end
 

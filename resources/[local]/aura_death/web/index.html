@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AuraRP - Estado Crítico</title>
+    <!-- Google Fonts: Outfit, JetBrains Mono, Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700;800&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
+    <!-- FontAwesome 6 CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="death-app" class="death-app hidden">
+        <!-- Barra Superior Flotante Despegada del Borde -->
+        <main class="death-container">
+            <!-- Sección Izquierda: Estado Crítico, ECG y Prompt de Rol -->
+            <div class="hud-col hud-left">
+                <div class="status-badge">
+                    <span class="pulse-dot"></span>
+                    <span class="badge-text">ESTADO CRÍTICO</span>
+                </div>
+                <div class="ecg-monitor">
+                    <svg class="ecg-svg" viewBox="0 0 200 24" preserveAspectRatio="none">
+                        <defs>
+                            <linearGradient id="ecg-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stop-color="#40E0D0" />
+                                <stop offset="50%" stop-color="#00f2fe" />
+                                <stop offset="100%" stop-color="#FF007F" />
+                            </linearGradient>
+                        </defs>
+                        <path class="ecg-path" d="M 0,12 L 50,12 L 58,4 L 64,20 L 70,7 L 76,16 L 82,12 L 140,12 L 148,4 L 154,20 L 160,7 L 166,16 L 172,12 L 200,12" />
+                    </svg>
+                </div>
+                <div class="roleplay-hint">
+                    <i class="fa-solid fa-keyboard"></i>
+                    <span><strong>[T]</strong> Chat • <strong class="highlight-action">[Click Derecho]</strong> Modo Cámara / Ratón</span>
+                </div>
+            </div>
+
+            <div class="hud-divider"></div>
+
+            <!-- Sección Central: Temporizador de Desangrado y Signos Vitales -->
+            <div class="hud-col hud-center">
+                <div class="timer-wrapper">
+                    <span class="timer-tag">DESANGRADO</span>
+                    <div id="countdown-timer" class="countdown-digits">10:00</div>
+                </div>
+                <div class="telemetry-row">
+                    <span class="tele-item"><i class="fa-solid fa-heart-pulse"></i> <b id="tele-heart">32 BPM</b></span>
+                    <span class="tele-dot">•</span>
+                    <span class="tele-item"><i class="fa-solid fa-lungs"></i> <b id="tele-spo2">48%</b> SpO2</span>
+                    <span class="tele-dot">•</span>
+                    <span class="tele-item"><i class="fa-solid fa-satellite-dish"></i> GPS ACTIVO</span>
+                </div>
+            </div>
+
+            <div class="hud-divider"></div>
+
+            <!-- Sección Derecha: Acciones (Emergencias y Reaparecer en Hospital) -->
+            <div class="hud-col hud-right">
+                <button id="dispatch-btn" class="aura-btn aura-btn-dispatch" type="button">
+                    <div class="btn-content">
+                        <i class="fa-solid fa-truck-medical btn-icon"></i>
+                        <span id="btn-text" class="btn-text">EMERGENCIAS</span>
+                    </div>
+                    <div id="cooldown-overlay" class="cooldown-overlay hidden">
+                        <div id="cooldown-bar" class="cooldown-bar"></div>
+                    </div>
+                </button>
+
+                <button id="respawn-btn" class="aura-btn aura-btn-respawn" type="button">
+                    <div class="btn-content">
+                        <i class="fa-solid fa-bed-pulse btn-icon"></i>
+                        <span class="btn-text">HOSPITAL</span>
+                    </div>
+                </button>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>

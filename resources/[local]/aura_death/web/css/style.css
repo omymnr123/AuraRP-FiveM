@@ -1,0 +1,382 @@
+/* ==========================================================================
+   AURARP - CRITICAL STATE & COMA SYSTEM (PHASE 8 - TOP HUD NO-CHROMIUM BUG)
+   Palette: Electric Turquoise (#40E0D0), Cyan (#00f2fe), Neon Pink (#FF007F),
+   Magenta (#d946ef), Solid Alpha Background (rgba(10, 15, 29, 0.94))
+   ========================================================================== */
+
+/* CEF BUG FIX CRITICAL - SIN BACKDROP-FILTER (ELIMINA FONDO NEGRO EN CHROMIUM) */
+html, body {
+    background: transparent !important;
+    background-color: transparent !important;
+    overflow: hidden !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    user-select: none !important;
+    pointer-events: none !important;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: #f8fafc;
+    -webkit-font-smoothing: antialiased;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    --aura-turquoise: #40E0D0;
+    --aura-cyan: #00f2fe;
+    --aura-pink: #FF007F;
+    --aura-magenta: #d946ef;
+    --aura-danger: #ff0055;
+    
+    --aura-hud-bg: rgba(10, 15, 29, 0.94);
+    --aura-border: rgba(255, 255, 255, 0.14);
+    --aura-gradient-primary: linear-gradient(90deg, #40E0D0 0%, #FF007F 100%);
+    --aura-gradient-respawn: linear-gradient(90deg, #ff0055 0%, #d946ef 100%);
+
+    --aura-font-title: 'Outfit', sans-serif;
+    --aura-font-mono: 'JetBrains Mono', monospace;
+    --aura-font-sans: 'Inter', sans-serif;
+}
+
+/* Contenedor Superior Flotante */
+.death-app {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    background: transparent !important;
+    background-color: transparent !important;
+    pointer-events: none !important;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 28px; /* Despegado del borde superior */
+    z-index: 999999;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+.death-app.hidden {
+    display: none !important;
+    opacity: 0 !important;
+}
+
+/* Barra Superior Glassmorphism sin backdrop-filter (Cero fondo negro) */
+.death-container {
+    pointer-events: auto !important;
+    width: 890px;
+    max-width: 96vw;
+    background: var(--aura-hud-bg);
+    border: 1px solid var(--aura-border);
+    border-radius: 18px;
+    padding: 12px 20px;
+    box-shadow: 
+        0 14px 40px rgba(0, 0, 0, 0.70),
+        0 0 20px rgba(64, 224, 208, 0.12),
+        inset 0 1px 1px rgba(255, 255, 255, 0.12);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    animation: slideDownHUD 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes slideDownHUD {
+    0% { transform: translateY(-40px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+}
+
+.hud-col {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.hud-divider {
+    width: 1px;
+    height: 44px;
+    background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.12), transparent);
+    flex-shrink: 0;
+}
+
+/* Columna Izquierda: Badge, ECG y Prompt de Rol */
+.hud-left {
+    flex: 1;
+    gap: 3px;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.pulse-dot {
+    width: 8px;
+    height: 8px;
+    background-color: var(--aura-pink);
+    border-radius: 50%;
+    box-shadow: 0 0 10px var(--aura-pink);
+    animation: heartPulse 1.2s infinite ease-in-out;
+}
+
+@keyframes heartPulse {
+    0% { transform: scale(0.9); opacity: 0.6; }
+    50% { transform: scale(1.35); opacity: 1; box-shadow: 0 0 14px var(--aura-pink); }
+    100% { transform: scale(0.9); opacity: 0.6; }
+}
+
+.badge-text {
+    font-family: var(--aura-font-title);
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    background: var(--aura-gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-transform: uppercase;
+}
+
+.ecg-monitor {
+    width: 100%;
+    height: 20px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+}
+
+.ecg-svg {
+    width: 100%;
+    height: 100%;
+}
+
+.ecg-path {
+    fill: none;
+    stroke: url(#ecg-gradient);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 200;
+    stroke-dashoffset: 200;
+    animation: ecgFlow 2.4s linear infinite;
+    filter: drop-shadow(0 0 6px rgba(64, 224, 208, 0.6));
+}
+
+@keyframes ecgFlow {
+    0% { stroke-dashoffset: 200; }
+    100% { stroke-dashoffset: 0; }
+}
+
+.roleplay-hint {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 10px;
+    color: #94a3b8;
+}
+
+.roleplay-hint i {
+    color: var(--aura-turquoise);
+    font-size: 11px;
+}
+
+.roleplay-hint strong {
+    color: #ffffff;
+}
+
+.roleplay-hint strong.highlight-action {
+    color: var(--aura-pink);
+    font-weight: 700;
+}
+
+.roleplay-hint code {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 1px 4px;
+    border-radius: 4px;
+    color: var(--aura-cyan);
+    font-family: var(--aura-font-mono);
+}
+
+/* Columna Central: Temporizador y Telemetría */
+.hud-center {
+    flex: 1.1;
+    align-items: center;
+    text-align: center;
+    gap: 2px;
+}
+
+.timer-wrapper {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+}
+
+.timer-tag {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: #64748b;
+    text-transform: uppercase;
+}
+
+.countdown-digits {
+    font-family: var(--aura-font-mono);
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    color: #ffffff;
+    text-shadow: 
+        0 0 16px rgba(255, 255, 255, 0.5),
+        0 0 28px rgba(64, 224, 208, 0.35);
+    line-height: 1;
+}
+
+.telemetry-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 10px;
+    color: #94a3b8;
+}
+
+.tele-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.tele-item i {
+    color: var(--aura-turquoise);
+    font-size: 10px;
+}
+
+.tele-item b {
+    font-family: var(--aura-font-mono);
+    color: #e2e8f0;
+}
+
+.tele-dot {
+    color: #475569;
+    font-size: 8px;
+}
+
+/* Columna Derecha: Botones de Acción */
+.hud-right {
+    flex: 1.2;
+    flex-direction: row !important;
+    align-items: center;
+    gap: 10px;
+}
+
+.aura-btn {
+    position: relative;
+    height: 42px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0 14px;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.aura-btn-dispatch {
+    flex: 1.2;
+    background: var(--aura-gradient-primary);
+    box-shadow: 0 0 14px rgba(64, 224, 208, 0.35), 0 0 25px rgba(255, 0, 127, 0.15);
+    animation: btnPulse 2.4s infinite ease-in-out;
+}
+
+.aura-btn-respawn {
+    flex: 0.9;
+    background: var(--aura-gradient-respawn);
+    box-shadow: 0 0 12px rgba(255, 0, 85, 0.35);
+}
+
+@keyframes btnPulse {
+    0% {
+        box-shadow: 0 0 12px rgba(64, 224, 208, 0.30), 0 0 20px rgba(255, 0, 127, 0.15);
+        transform: scale(1);
+    }
+    50% {
+        box-shadow: 0 0 20px rgba(64, 224, 208, 0.60), 0 0 35px rgba(255, 0, 127, 0.30);
+        transform: scale(1.015);
+    }
+    100% {
+        box-shadow: 0 0 12px rgba(64, 224, 208, 0.30), 0 0 20px rgba(255, 0, 127, 0.15);
+        transform: scale(1);
+    }
+}
+
+.aura-btn:hover {
+    transform: translateY(-2px) scale(1.02);
+}
+
+.aura-btn:active {
+    transform: translateY(1px) scale(0.99);
+}
+
+.btn-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    z-index: 2;
+    color: #ffffff;
+}
+
+.btn-icon {
+    font-size: 13px;
+    filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.5));
+}
+
+.btn-text {
+    font-family: var(--aura-font-title);
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+/* Cooldown State */
+.aura-btn.disabled,
+.aura-btn:disabled {
+    background: rgba(22, 28, 48, 0.85) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    box-shadow: none !important;
+    cursor: not-allowed !important;
+    transform: none !important;
+    animation: none !important;
+}
+
+.aura-btn.disabled .btn-content,
+.aura-btn:disabled .btn-content {
+    color: #64748b;
+}
+
+.cooldown-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.cooldown-overlay.hidden {
+    display: none;
+}
+
+.cooldown-bar {
+    height: 100%;
+    width: 100%;
+    background: rgba(64, 224, 208, 0.15);
+    transition: width 1s linear;
+}

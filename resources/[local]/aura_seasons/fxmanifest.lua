@@ -12,6 +12,7 @@ shared_scripts {
 }
 
 client_scripts {
+    'client/clothing_catalog.lua',
     'client/weather.lua',
     'client/thermal.lua',
     'client/survival.lua',

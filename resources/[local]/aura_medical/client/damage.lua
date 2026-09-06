@@ -5,10 +5,14 @@
 local CurrentBoneDamage = {
     head = { health = 100, injuries = {} },
     torso = { health = 100, injuries = {} },
-    left_arm = { health = 100, injuries = {} },
     right_arm = { health = 100, injuries = {} },
+    left_arm = { health = 100, injuries = {} },
+    right_hand = { health = 100, injuries = {} },
+    left_hand = { health = 100, injuries = {} },
+    right_leg = { health = 100, injuries = {} },
     left_leg = { health = 100, injuries = {} },
-    right_leg = { health = 100, injuries = {} }
+    right_foot = { health = 100, injuries = {} },
+    left_foot = { health = 100, injuries = {} }
 }
 
 local lastHealth = 200
@@ -35,7 +39,6 @@ local function ResolveDamageType(weaponHash, isMelee)
 
     -- Armas de fuego / Balística
     local weaponGroup = GetWeapontypeGroup(weaponHash)
-    -- Grupos FiveM: 416676503 (Pistol), -957766203 (SMG), 970310034 (Rifle), 860032945 (Shotgun), -1212426201 (Sniper), 1159398588 (MG)
     if weaponGroup == 416676503 or weaponGroup == -957766203 or weaponGroup == 970310034 or 
        weaponGroup == 860032945 or weaponGroup == -1212426201 or weaponGroup == 1159398588 or
        weaponGroup == GetHashKey("GROUP_PISTOL") or weaponGroup == GetHashKey("GROUP_SMG") or
@@ -74,13 +77,13 @@ end
 ---Calcula el nivel de severidad basado en los puntos de salud perdidos
 local function CalculateSeverity(damageAmount)
     if damageAmount >= 60 then
-        return "Critical", Config.DamageTypes[ "Bullet" ].severityLevels.Critical
+        return "Critical", Config.DamageTypes["Bullet"].severityLevels.Critical
     elseif damageAmount >= 35 then
-        return "Severe", Config.DamageTypes[ "Bullet" ].severityLevels.Severe
+        return "Severe", Config.DamageTypes["Bullet"].severityLevels.Severe
     elseif damageAmount >= 15 then
-        return "Moderate", Config.DamageTypes[ "Bullet" ].severityLevels.Moderate
+        return "Moderate", Config.DamageTypes["Bullet"].severityLevels.Moderate
     else
-        return "Minor", Config.DamageTypes[ "Bullet" ].severityLevels.Minor
+        return "Minor", Config.DamageTypes["Bullet"].severityLevels.Minor
     end
 end
 
@@ -120,6 +123,10 @@ AddEventHandler('gameEventTriggered', function(name, args)
     local severityLabel = typeConfig.severityLevels[severityKey] or typeConfig.label
 
     -- Reducir salud ósea del grupo
+    if not CurrentBoneDamage[targetGroup] then
+        CurrentBoneDamage[targetGroup] = { health = 100, injuries = {} }
+    end
+
     local boneGroup = CurrentBoneDamage[targetGroup]
     local healthReduction = math.floor(damageDealt * 0.75)
     boneGroup.health = math.max(0, boneGroup.health - healthReduction)
@@ -128,7 +135,7 @@ AddEventHandler('gameEventTriggered', function(name, args)
     local injuryRecord = {
         id = #boneGroup.injuries + 1,
         boneGroup = targetGroup,
-        boneLabel = Config.Bones[targetGroup].label,
+        boneLabel = Config.Bones[targetGroup] and Config.Bones[targetGroup].label or targetGroup,
         type = damageTypeKey,
         typeLabel = typeConfig.label,
         severity = severityKey,
@@ -136,7 +143,7 @@ AddEventHandler('gameEventTriggered', function(name, args)
         damage = damageDealt,
         badgeColor = typeConfig.badgeColor,
         timestamp = GetGameTimer(),
-        timeFormatted = os.date("%H:%M:%S")
+        timeFormatted = string.format("%02d:%02d:%02d", GetClockHours(), GetClockMinutes(), GetClockSeconds())
     }
 
     table.insert(boneGroup.injuries, injuryRecord)
@@ -152,14 +159,64 @@ AddEventHandler('gameEventTriggered', function(name, args)
 end)
 
 -- ============================================================================
--- SINCRONIZACIÓN Y RESET AL SPAWN
+-- INICIALIZACIÓN Y SEGUIMIENTO DE SALUD
 -- ============================================================================
 
 local function InitDamageTracking()
     local ped = PlayerPedId()
     lastHealth = GetEntityHealth(ped)
-    LocalPlayer.state:set('bone_damage', CurrentBoneDamage, true)
+    if not LocalPlayer.state.bone_damage then
+        LocalPlayer.state:set('bone_damage', CurrentBoneDamage, true)
+    end
 end
+
+-- ============================================================================
+-- CURACIÓN TOTAL Y RESET DE LESIONES (txAdmin & Revives)
+-- ============================================================================
+
+local function ResetAllInjuries()
+    for groupKey, _ in pairs(Config.Bones) do
+        CurrentBoneDamage[groupKey] = { health = 100, injuries = {} }
+    end
+    LocalPlayer.state:set('bone_damage', CurrentBoneDamage, true)
+    TriggerServerEvent('aura_medical:server:syncDamage', CurrentBoneDamage)
+    
+    local ped = PlayerPedId()
+    ClearPedBloodDamage(ped)
+    ResetPedVisibleDamage(ped)
+    ClearPedLastDamageBone(ped)
+    lastHealth = GetEntityHealth(ped)
+    
+    if Config.Debug then
+        print("[AURA_MEDICAL] Todas las fracturas y lesiones han sido curadas y restablecidas.")
+    end
+end
+
+-- Eventos de txAdmin
+RegisterNetEvent('txAdmin:events:healed', function(eventData)
+    ResetAllInjuries()
+end)
+
+RegisterNetEvent('txAdmin:events:playerHealed', function()
+    ResetAllInjuries()
+end)
+
+RegisterNetEvent('txAdmin:events:playerRevived', function()
+    ResetAllInjuries()
+end)
+
+-- Eventos estándar de curación y reaparición
+RegisterNetEvent('aura_medical:client:resetDamage', function()
+    ResetAllInjuries()
+end)
+
+RegisterNetEvent('hospital:client:Revive', function()
+    ResetAllInjuries()
+end)
+
+RegisterNetEvent('esx_ambulancejob:revive', function()
+    ResetAllInjuries()
+end)
 
 AddEventHandler('playerSpawned', function()
     InitDamageTracking()
@@ -169,17 +226,41 @@ RegisterNetEvent('aura_core:client:playerSpawned', function()
     InitDamageTracking()
 end)
 
-RegisterNetEvent('aura_medical:client:resetDamage', function()
-    for groupKey, _ in pairs(CurrentBoneDamage) do
-        CurrentBoneDamage[groupKey] = { health = 100, injuries = {} }
+-- Watchdog de Curación en Vivo (Detecta cuando la vida sube al máximo por txAdmin o admin)
+CreateThread(function()
+    while true do
+        Wait(1000)
+        local ped = PlayerPedId()
+        local curHealth = GetEntityHealth(ped)
+        local maxHealth = GetEntityMaxHealth(ped)
+
+        -- Si la vida sube al 100% de forma externa y teníamos huesos dañados, curar fracturas
+        if curHealth >= maxHealth and lastHealth < maxHealth then
+            local hasDamage = false
+            for _, b in pairs(CurrentBoneDamage) do
+                if b.health < 100 or #b.injuries > 0 then
+                    hasDamage = true
+                    break
+                end
+            end
+            if hasDamage then
+                ResetAllInjuries()
+            end
+        end
+
+        lastHealth = curHealth
     end
-    LocalPlayer.state:set('bone_damage', CurrentBoneDamage, true)
-    TriggerServerEvent('aura_medical:server:syncDamage', CurrentBoneDamage)
 end)
 
 RegisterNetEvent('aura_medical:client:loadDamage', function(savedDamage)
     if savedDamage and type(savedDamage) == "table" then
-        CurrentBoneDamage = savedDamage
+        for groupKey, _ in pairs(Config.Bones) do
+            if savedDamage[groupKey] then
+                CurrentBoneDamage[groupKey] = savedDamage[groupKey]
+            else
+                CurrentBoneDamage[groupKey] = { health = 100, injuries = {} }
+            end
+        end
         LocalPlayer.state:set('bone_damage', CurrentBoneDamage, true)
     end
 end)

@@ -7,7 +7,32 @@ local function ShowHUD()
         action = 'showHUD'
     })
     HUD_VISIBLE = true
+    DisplayRadar(true)
 end
+
+local function HideHUD()
+    SendNUIMessage({
+        action = 'hideHUD'
+    })
+    HUD_VISIBLE = false
+    DisplayRadar(false)
+end
+
+RegisterNetEvent('aura_hud:toggle', function(show)
+    if show then
+        ShowHUD()
+    else
+        HideHUD()
+    end
+end)
+
+RegisterNetEvent('aura_hud:client:toggle', function(show)
+    if show then
+        ShowHUD()
+    else
+        HideHUD()
+    end
+end)
 
 -- Mostrar el HUD cuando el jugador hace spawn o se inicializa
 CreateThread(function()
@@ -61,8 +86,8 @@ CreateThread(function()
     while true do
         Wait(0)
         
-        -- Forzar que el mapa siempre esté visible (incluso a pie)
-        DisplayRadar(true)
+        -- Forzar visibilidad del mapa según el estado del HUD
+        DisplayRadar(HUD_VISIBLE)
 
         -- Ocultar el punto "N" sobresaliente del borde
         SetBlipAlpha(GetNorthRadarBlip(), 0)

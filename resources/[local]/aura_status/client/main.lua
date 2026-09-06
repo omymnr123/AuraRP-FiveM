@@ -34,11 +34,14 @@ AddEventHandler('aura_status:client:LoadStatus', function(statusData)
     LocalPlayer.state:set('thirst', PlayerData.thirst, true)
     
     local ped = PlayerPedId()
-    if statusData.health and tonumber(statusData.health) then
-        SetEntityHealth(ped, tonumber(statusData.health))
-    end
-    if statusData.armor and tonumber(statusData.armor) then
-        SetPedArmour(ped, tonumber(statusData.armor))
+    local isDead = LocalPlayer.state.isDead or (exports.aura_death and exports.aura_death.isPlayerDead and exports.aura_death:isPlayerDead())
+    if not isDead then
+        if statusData.health and tonumber(statusData.health) then
+            SetEntityHealth(ped, tonumber(statusData.health))
+        end
+        if statusData.armor and tonumber(statusData.armor) then
+            SetPedArmour(ped, tonumber(statusData.armor))
+        end
     end
     
     PlayerData.isLoggedIn = true

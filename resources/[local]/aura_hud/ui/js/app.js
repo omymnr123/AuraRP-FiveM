@@ -284,6 +284,20 @@ window.addEventListener('message', (event) => {
             break;
         }
             
+        case 'showHUD':
+            container.classList.remove('hidden');
+            container.style.display = 'flex';
+            const borderShow = document.getElementById('minimap-border');
+            if (borderShow) borderShow.classList.remove('hidden');
+            break;
+
+        case 'hideHUD':
+            container.classList.add('hidden');
+            container.style.display = 'none';
+            const borderHide = document.getElementById('minimap-border');
+            if (borderHide) borderHide.classList.add('hidden');
+            break;
+
         case 'editMode':
             document.getElementById('edit-overlay').classList.remove('hidden');
             container.classList.add('editing');

@@ -32,10 +32,14 @@ exports('GetPlayerBoneDamage', function(targetSrc)
     return {
         head = { health = 100, injuries = {} },
         torso = { health = 100, injuries = {} },
-        left_arm = { health = 100, injuries = {} },
         right_arm = { health = 100, injuries = {} },
+        left_arm = { health = 100, injuries = {} },
+        right_hand = { health = 100, injuries = {} },
+        left_hand = { health = 100, injuries = {} },
+        right_leg = { health = 100, injuries = {} },
         left_leg = { health = 100, injuries = {} },
-        right_leg = { health = 100, injuries = {} }
+        right_foot = { health = 100, injuries = {} },
+        left_foot = { health = 100, injuries = {} }
     }
 end)
 
@@ -44,4 +48,25 @@ exports('SetPlayerBoneDamage', function(targetSrc, damageData)
     Player(targetSrc).state:set('bone_damage', damageData, true)
     TriggerClientEvent('aura_medical:client:loadDamage', targetSrc, damageData)
     return true
+end)
+
+-- Interceptación en Servidor de Curaciones por txAdmin
+AddEventHandler('txAdmin:events:healed', function(eventData)
+    local target = eventData and eventData.target
+    if target and target > 0 then
+        local defaultDamage = {
+            head = { health = 100, injuries = {} },
+            torso = { health = 100, injuries = {} },
+            right_arm = { health = 100, injuries = {} },
+            left_arm = { health = 100, injuries = {} },
+            right_hand = { health = 100, injuries = {} },
+            left_hand = { health = 100, injuries = {} },
+            right_leg = { health = 100, injuries = {} },
+            left_leg = { health = 100, injuries = {} },
+            right_foot = { health = 100, injuries = {} },
+            left_foot = { health = 100, injuries = {} }
+        }
+        Player(target).state:set('bone_damage', defaultDamage, true)
+        TriggerClientEvent('aura_medical:client:resetDamage', target)
+    end
 end)

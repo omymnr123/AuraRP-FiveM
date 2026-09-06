@@ -169,6 +169,15 @@ local function PerformMasterSave(initiatorSource, broadcastNotification)
     end)
 
     -- ------------------------------------------------------------------------
+    -- 7. GUARDADO DE ESTADOS DE COMA Y MUERTE (aura_death)
+    -- ------------------------------------------------------------------------
+    pcall(function()
+        if exports.aura_death and exports.aura_death.SaveAllDeathStates then
+            stats.deathsSaved = exports.aura_death:SaveAllDeathStates()
+        end
+    end)
+
+    -- ------------------------------------------------------------------------
     -- CÁLCULO DE TELEMETRÍA Y LOGS ESTRUCTURADOS
     -- ------------------------------------------------------------------------
     local endTime = os.nanotime and os.nanotime() or (os.clock() * 1e9)

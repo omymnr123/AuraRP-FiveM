@@ -36,15 +36,32 @@
 
   const nodeElements = {};
 
-  // Nombres de Extremidades
+  // Nombres de las 10 Extremidades Anatómicas
   const LimbLabels = {
     head: 'Cabeza y Cuello',
     torso: 'Tórax y Espina Dorsal',
-    left_arm: 'Brazo Izquierdo',
     right_arm: 'Brazo Derecho',
+    left_arm: 'Brazo Izquierdo',
+    right_hand: 'Mano Derecha',
+    left_hand: 'Mano Izquierda',
+    right_leg: 'Pierna Derecha',
     left_leg: 'Pierna Izquierda',
-    right_leg: 'Pierna Derecha'
+    right_foot: 'Pie Derecho',
+    left_foot: 'Pie Izquierdo'
   };
+
+  const KeysOrder = [
+    'head',
+    'torso',
+    'right_arm',
+    'left_arm',
+    'right_hand',
+    'left_hand',
+    'right_leg',
+    'left_leg',
+    'right_foot',
+    'left_foot'
+  ];
 
   // Helper de Comunicación NUI
   function postNui(endpoint, data = {}) {
@@ -69,9 +86,8 @@
   // Inicializar Nodos Flotantes HTML en el DOM
   function createBoneNodes() {
     nodesContainer.innerHTML = '';
-    const keys = ['head', 'torso', 'left_arm', 'right_arm', 'left_leg', 'right_leg'];
 
-    keys.forEach(key => {
+    KeysOrder.forEach(key => {
       const nodeEl = document.createElement('div');
       nodeEl.className = 'node-3d';
       nodeEl.id = `bone-node-${key}`;
@@ -110,6 +126,11 @@
       el.classList.remove('hidden');
       el.style.left = `${data.x}%`;
       el.style.top = `${data.y}%`;
+
+      // Aplicar orientación direccional de etiquetas para evitar solapamientos
+      const side = data.side || 'right';
+      el.classList.remove('side-left', 'side-right', 'side-head', 'side-torso');
+      el.classList.add(`side-${side}`);
 
       // Estado de Daño
       if (data.isInjured) {
@@ -169,7 +190,7 @@
     if (!injuries || injuries.length === 0) {
       injuriesListEl.innerHTML = `
         <div class="no-injuries-banner">
-          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#40E0D0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#ff00a0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
             <polyline points="22 4 12 14.01 9 11.01"></polyline>
           </svg>
@@ -202,21 +223,18 @@
     const health = vitals.health !== undefined ? vitals.health : 100;
     healthPercentEl.textContent = `${health}%`;
 
-    // Radio del círculo = 46 -> Circunferencia = 2 * PI * 46 ≈ 289
-    const circumference = 289;
+    // Radio del círculo = 48 -> Circunferencia = 2 * PI * 48 ≈ 301.59
+    const circumference = 301.59;
     const offset = circumference - (health / 100) * circumference;
     healthRing.style.strokeDashoffset = offset;
 
     if (health >= 75) {
-      healthRing.style.stroke = '#00f2fe';
       overallBadgeEl.className = 'badge-status badge-healthy';
       overallBadgeEl.textContent = 'ESTABLE';
     } else if (health >= 35) {
-      healthRing.style.stroke = '#ffaa00';
       overallBadgeEl.className = 'badge-status badge-warning';
       overallBadgeEl.textContent = 'COMPROMETIDO';
     } else {
-      healthRing.style.stroke = '#FF007F';
       overallBadgeEl.className = 'badge-status badge-critical';
       overallBadgeEl.textContent = 'CRÍTICO';
     }
@@ -230,7 +248,7 @@
     // 4. Temperatura Corporal (aura_seasons)
     const temp = vitals.temperature !== undefined ? vitals.temperature : 36.8;
     tempBadgeEl.textContent = `${temp.toFixed(1)} °C`;
-    tempBadgeEl.style.color = vitals.tempColor || '#00f2fe';
+    tempBadgeEl.style.color = vitals.tempColor || '#ff00a0';
     tempStatusEl.textContent = vitals.tempStatus || 'Normal';
 
     // 5. Hambre y Sed (aura_status)

@@ -26,10 +26,14 @@ local function InitPlayerMedicalState(src)
     local defaultDamage = {
         head = { health = 100, injuries = {} },
         torso = { health = 100, injuries = {} },
-        left_arm = { health = 100, injuries = {} },
         right_arm = { health = 100, injuries = {} },
+        left_arm = { health = 100, injuries = {} },
+        right_hand = { health = 100, injuries = {} },
+        left_hand = { health = 100, injuries = {} },
+        right_leg = { health = 100, injuries = {} },
         left_leg = { health = 100, injuries = {} },
-        right_leg = { health = 100, injuries = {} }
+        right_foot = { health = 100, injuries = {} },
+        left_foot = { health = 100, injuries = {} }
     }
 
     local finalData = medicalData or defaultDamage
