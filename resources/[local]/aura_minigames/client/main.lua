@@ -87,6 +87,15 @@ local function WeedPackaging(options)
 end
 exports('WeedPackaging', WeedPackaging)
 
+--- Minijuego de Desfibrilador Biomédico DEA / Reanimación Cardiorrespiratoria
+--- @param options table | nil { timeLimit = 25, chargeDuration = 2.5, requiredShocks = 2, shockTolerance = 0.22 }
+--- @return boolean
+local function StartDefib(options)
+    return StartMinigame('StartDefib', options)
+end
+exports('StartDefib', StartDefib)
+exports('Defibrillator', StartDefib)
+
 -- ============================================================================
 -- NUI CALLBACKS
 -- ============================================================================
@@ -162,10 +171,19 @@ RegisterCommand('testminigame', function(source, args)
             lib.notify({ title = 'Minijuego', description = 'Fallo en el pesaje o sellado hermético. (FALSE)', type = 'error' })
         end
 
+    elseif gameName == 'defib' or gameName == 'desfibrilador' or gameName == 'dea' or gameName == 'cpr' then
+        lib.notify({ title = 'Minijuego AuraRP', description = 'Iniciando Desfibrilador Lifepack-15 DEA...', type = 'inform' })
+        local res = StartDefib({ timeLimit = 25, chargeDuration = 2.5, requiredShocks = 2 })
+        if res then
+            lib.notify({ title = 'Minijuego', description = '¡Descarga sincronizada! Ritmo sinusal recuperado. (TRUE)', type = 'success' })
+        else
+            lib.notify({ title = 'Minijuego', description = 'Fallo en la desfibrilación o tiempo agotado. (FALSE)', type = 'error' })
+        end
+
     else
         lib.notify({
             title = 'Test Minijuegos',
-            description = 'Uso: /testminigame [lockpick | ecu | reactor | cipher | weed]',
+            description = 'Uso: /testminigame [lockpick | ecu | reactor | cipher | weed | defib]',
             type = 'error'
         })
     end

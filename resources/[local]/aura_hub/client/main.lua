@@ -274,9 +274,26 @@ local function OpenTabletMode(targetMode)
 
         local openModal = nil
         local isPolice = (data.job and (data.job.name == 'police' or data.job.name == 'sheriff'))
+        local isEms = (data.job and (data.job.name == 'ambulance' or data.job.name == 'ems' or data.job.name == 'doctor'))
         local isGang = (data.isGang == true) or (data.job and (data.job.isGang == true or data.job.name == 'cartel' or data.job.name == 'salieri' or data.job.name == 'vazou' or data.job.name == 'ballas' or data.job.name == 'families' or data.job.name == 'vagos'))
 
-        if targetMode == 'modalPoliceMdt' or targetMode == 'police' then
+        if targetMode == 'modalEmsMdt' or targetMode == 'ems' then
+            if isEms then
+                if exports.aura_ems then
+                    exports.aura_ems:OpenEmsMdt()
+                else
+                    ExecuteCommand('mdt_ems')
+                end
+                return
+            else
+                lib.notify({
+                    title = 'MDT Médico EMS',
+                    description = 'Acceso denegado: No perteneces al cuerpo médico o sanitario.',
+                    type = 'error'
+                })
+                return
+            end
+        elseif targetMode == 'modalPoliceMdt' or targetMode == 'police' then
             if isPolice then
                 openModal = 'modalPoliceMdt'
             else
@@ -301,6 +318,13 @@ local function OpenTabletMode(targetMode)
         elseif targetMode == 'auto' then
             if isPolice then
                 openModal = 'modalPoliceMdt'
+            elseif isEms then
+                if exports.aura_ems then
+                    exports.aura_ems:OpenEmsMdt()
+                else
+                    ExecuteCommand('mdt_ems')
+                end
+                return
             elseif isGang then
                 openModal = 'modalDarkWeb'
             end
@@ -515,6 +539,17 @@ RegisterNUICallback('toggleDuty', function(_, cb)
     lib.callback('aura_hub:server:toggleDuty', false, function(success, newDuty)
         cb({ success = success, newDuty = newDuty })
     end)
+end)
+
+RegisterNUICallback('openEmsMdt', function(_, cb)
+    CloseAuraHub()
+    Wait(150)
+    if exports.aura_ems then
+        exports.aura_ems:OpenEmsMdt()
+    else
+        ExecuteCommand('mdt_ems')
+    end
+    cb('ok')
 end)
 
 -- ============================================================================
@@ -775,6 +810,11 @@ end, false)
 --- Comando de acceso directo para miembros de bandas
 RegisterCommand('darkweb', function()
     OpenTabletMode('modalDarkWeb')
+end, false)
+
+--- Comando de acceso directo para médicos y sanitarios
+RegisterCommand('mdt_ems', function()
+    OpenTabletMode('modalEmsMdt')
 end, false)
 
 -- Limpieza de memoria gráfica y props al detener el recurso

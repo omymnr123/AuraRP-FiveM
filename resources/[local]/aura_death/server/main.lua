@@ -240,6 +240,12 @@ RegisterNetEvent('aura_death:server:callDispatch', function()
     local coords = GetEntityCoords(ped)
 
     TriggerEvent('aura_death:onDispatchCalled', src, coords, charInfo.citizenid)
+    TriggerEvent('aura_ems:server:reportComaEmergency', {
+        src = src,
+        coords = coords,
+        citizenid = charInfo.citizenid,
+        deathReason = playerData and playerData.reason or "Parada Cardiorrespiratoria / Coma"
+    })
 
     TriggerClientEvent('ox_lib:notify', src, {
         title = 'Emergencias 911 / EMS',
@@ -248,6 +254,16 @@ RegisterNetEvent('aura_death:server:callDispatch', function()
         icon = 'satellite-dish',
         duration = 6000
     })
+end)
+
+-- Pausado de temporizador de desangrado (por aplicación de torniquete táctico)
+RegisterNetEvent('aura_death:server:pauseBleedout', function(targetSrc)
+    local target = tonumber(targetSrc) or source
+    if deadPlayers[target] then
+        deadPlayers[target].isPaused = true
+    end
+    Player(target).state:set('bleedoutPaused', true, true)
+    TriggerClientEvent('aura_death:client:pauseBleedout', target)
 end)
 
 -- Reaparición voluntaria en Hospital (Botón "HOSPITAL")

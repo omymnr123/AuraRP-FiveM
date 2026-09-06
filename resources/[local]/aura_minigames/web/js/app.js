@@ -69,6 +69,8 @@ window.addEventListener('DOMContentLoaded', () => {
                 currentGameInstance = new CipherMatrixGame(mountEl, config);
             } else if (gameType === 'weedpackaging' || gameType === 'packaging' || gameType === 'weed' || gameType === 'cogollo') {
                 currentGameInstance = new WeedPackagingGame(mountEl, config);
+            } else if (gameType === 'startdefib' || gameType === 'defib' || gameType === 'defibrillator') {
+                currentGameInstance = new DefibrillatorGame(mountEl, config);
             } else {
                 console.warn('Unknown minigame type:', gameType);
                 sendNUICancel();

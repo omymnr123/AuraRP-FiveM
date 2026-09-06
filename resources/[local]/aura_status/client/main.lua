@@ -175,6 +175,39 @@ end)
 -- Export para obtener estado actual (útil para guardar o consultar desde otros recursos)
 exports('GetStatus', GetPlayerStatus)
 
+-- Establecer estado directamente
+local function SetPlayerStatus(hunger, thirst)
+    if hunger ~= nil then
+        PlayerData.hunger = Clamp(tonumber(hunger) or 100.0, 0.0, 100.0)
+        LocalPlayer.state:set('hunger', PlayerData.hunger, true)
+    end
+    if thirst ~= nil then
+        PlayerData.thirst = Clamp(tonumber(thirst) or 100.0, 0.0, 100.0)
+        LocalPlayer.state:set('thirst', PlayerData.thirst, true)
+    end
+    TriggerServerEvent('aura_status:server:UpdateStatus', GetPlayerStatus())
+end
+exports('SetStatus', SetPlayerStatus)
+
+-- Aplicar agotamiento metabólico post-reanimación de coma
+local function ApplyPostComaExhaustion()
+    PlayerData.hunger = 15.0
+    PlayerData.thirst = 15.0
+    LocalPlayer.state:set('hunger', 15.0, true)
+    LocalPlayer.state:set('thirst', 15.0, true)
+    
+    -- Agotar estamina
+    local pId = PlayerId()
+    RestorePlayerStamina(pId, 0.0)
+    SetPlayerSprint(pId, false)
+    
+    TriggerServerEvent('aura_status:server:UpdateStatus', GetPlayerStatus())
+end
+exports('ApplyPostComaExhaustion', ApplyPostComaExhaustion)
+
+RegisterNetEvent('aura_status:client:SetStatus', SetPlayerStatus)
+RegisterNetEvent('aura_status:client:ApplyPostComaExhaustion', ApplyPostComaExhaustion)
+
 -- Guardado periódico si el cliente sufre crash
 CreateThread(function()
     while true do

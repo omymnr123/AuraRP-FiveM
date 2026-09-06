@@ -188,8 +188,28 @@ window.addEventListener('message', (event) => {
         case 'openDeathScreen':
             appContainer.classList.remove('hidden');
             appContainer.style.display = 'flex';
+
+            // Limpieza y reinicio garantizado del botón de emergencias
+            cooldownRemaining = 0;
+            if (cooldownTimer) {
+                clearInterval(cooldownTimer);
+                cooldownTimer = null;
+            }
+            if (dispatchBtn) {
+                dispatchBtn.disabled = false;
+                dispatchBtn.classList.remove('disabled');
+            }
+            if (cooldownOverlay) cooldownOverlay.classList.add('hidden');
+            if (btnText) btnText.innerHTML = 'EMERGENCIAS <span style="font-size:11px; opacity:0.8; margin-left:4px;">[G]</span>';
+
             startCountdown(data.timeRemaining || 600);
             startTelemetrySimulation();
+            break;
+
+        case 'triggerDispatchKey':
+            if (dispatchBtn && !dispatchBtn.disabled && cooldownRemaining <= 0) {
+                dispatchBtn.click();
+            }
             break;
 
         case 'closeDeathScreen':
@@ -213,7 +233,7 @@ window.addEventListener('message', (event) => {
                 dispatchBtn.disabled = false;
                 dispatchBtn.classList.remove('disabled');
                 if (cooldownOverlay) cooldownOverlay.classList.add('hidden');
-                if (btnText) btnText.textContent = 'EMERGENCIAS';
+                if (btnText) btnText.innerHTML = 'EMERGENCIAS <span style="font-size:11px; opacity:0.8; margin-left:4px;">[G]</span>';
             }
             break;
 
@@ -221,6 +241,18 @@ window.addEventListener('message', (event) => {
             if (data.timeRemaining !== undefined) {
                 secondsRemaining = data.timeRemaining;
                 countdownEl.textContent = formatTime(secondsRemaining);
+            }
+            break;
+
+        case 'pauseBleedout':
+            if (countdownTimer) {
+                clearInterval(countdownTimer);
+                countdownTimer = null;
+            }
+            if (countdownEl) {
+                countdownEl.textContent = `${formatTime(secondsRemaining)} [PAUSA]`;
+                countdownEl.style.color = '#40E0D0';
+                countdownEl.style.textShadow = '0 0 15px #40E0D0';
             }
             break;
     }

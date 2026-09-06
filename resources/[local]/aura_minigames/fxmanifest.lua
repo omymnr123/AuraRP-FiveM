@@ -27,6 +27,7 @@ files {
     'web/js/reactor.js',
     'web/js/cipher.js',
     'web/js/weedpackaging.js',
+    'web/js/defib.js',
     'web/js/app.js'
 }
 
@@ -35,5 +36,6 @@ exports {
     'ECUBypass',
     'ChemicalReactor',
     'CipherMatrix',
-    'WeedPackaging'
+    'WeedPackaging',
+    'StartDefib'
 }

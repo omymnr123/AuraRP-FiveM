@@ -197,6 +197,12 @@ window.openDarkWeb = () => {
     loadDarkWebOverview();
 };
 
+window.openEmsMdt = () => {
+    playTone('click');
+    closeHub();
+    postFetch('openEmsMdt');
+};
+
 window.openModal = (modalId) => {
     playTone('click');
     if (modalId === 'modalPoliceMdt') {
@@ -312,6 +318,14 @@ function renderHub(data) {
         if (btnPoliceMdt) btnPoliceMdt.style.display = 'none';
     }
 
+    // Botón MDT EMS (Visible si perteneces a servicios médicos / ambulance)
+    const btnEmsMdt = document.getElementById('btnActionEmsMdt');
+    if (data.job && (data.job.name === 'ambulance' || data.job.name === 'ems' || data.job.name === 'doctor')) {
+        if (btnEmsMdt) btnEmsMdt.style.display = 'flex';
+    } else {
+        if (btnEmsMdt) btnEmsMdt.style.display = 'none';
+    }
+
     // Identificar si pertenece a banda u organización criminal
     const isGang = (data.isGang === true) || 
                    (data.job && data.job.isGang === true) || 
@@ -342,6 +356,12 @@ function renderHub(data) {
             if (pEl) pEl.textContent = `${data.job.label.toUpperCase()} (${data.job.gradeLabel})`;
             if (hintSpan) hintSpan.textContent = 'TERMINAL POLICIAL MDT';
             if (iconI) iconI.className = 'fa-solid fa-shield-halved';
+            tileOrgEl.style.borderColor = 'rgba(64, 224, 208, 0.45)';
+        } else if (data.job && (data.job.name === 'ambulance' || data.job.name === 'ems' || data.job.name === 'doctor')) {
+            if (titleEl) titleEl.textContent = 'HOSPITAL Y EMERGENCIAS';
+            if (pEl) pEl.textContent = `${data.job.label.toUpperCase()} (${data.job.gradeLabel})`;
+            if (hintSpan) hintSpan.textContent = 'TERMINAL MÉDICO MDT EMS';
+            if (iconI) iconI.className = 'fa-solid fa-heart-pulse';
             tileOrgEl.style.borderColor = 'rgba(64, 224, 208, 0.45)';
         } else if (data.job && data.job.isBusiness) {
             if (titleEl) titleEl.textContent = 'MI COMERCIO';
@@ -657,6 +677,8 @@ document.getElementById('tileOrg').addEventListener('click', () => {
         openDarkWeb();
     } else if (currentHubData && currentHubData.job && (currentHubData.job.name === 'police' || currentHubData.job.name === 'sheriff')) {
         openPoliceMdt();
+    } else if (currentHubData && currentHubData.job && (currentHubData.job.name === 'ambulance' || currentHubData.job.name === 'ems' || currentHubData.job.name === 'doctor')) {
+        openEmsMdt();
     } else if (currentHubData && currentHubData.job && currentHubData.job.isBusiness) {
         openModal('modalBusiness');
         const firstTab = document.querySelectorAll('.modal-tab-btn')[0];
@@ -669,6 +691,21 @@ document.getElementById('tileOrg').addEventListener('click', () => {
 // Botones de Cabecera
 document.getElementById('btnActionSettings').addEventListener('click', () => openModal('modalSettings'));
 document.getElementById('btnActionInvoices').addEventListener('click', () => openModal('modalInvoices'));
+
+const btnActionPoliceMdt = document.getElementById('btnActionPoliceMdt');
+if (btnActionPoliceMdt) {
+    btnActionPoliceMdt.addEventListener('click', openPoliceMdt);
+}
+
+const btnActionDarkWeb = document.getElementById('btnActionDarkWeb');
+if (btnActionDarkWeb) {
+    btnActionDarkWeb.addEventListener('click', openDarkWeb);
+}
+
+const btnActionEmsMdt = document.getElementById('btnActionEmsMdt');
+if (btnActionEmsMdt) {
+    btnActionEmsMdt.addEventListener('click', openEmsMdt);
+}
 
 btnCloseHub.addEventListener('click', closeHub);
 

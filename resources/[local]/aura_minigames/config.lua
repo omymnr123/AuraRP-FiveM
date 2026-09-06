@@ -46,5 +46,22 @@ Config.Defaults = {
         sealSpeed = 1.0,            -- Velocidad de oscilación del cabezal térmico
         timeLimit = 35,             -- Tiempo límite en segundos
         difficulty = 'medium'
+    },
+
+    -- 6. Desfibrilador Biomédico DEA / Reanimación Cardiorrespiratoria
+    StartDefib = {
+        timeLimit = 25,             -- Tiempo límite en segundos
+        chargeDuration = 2.5,       -- Segundos de carga del condensador
+        requiredShocks = 2,         -- Descargas sincronizadas requeridas
+        shockTolerance = 0.22,      -- Ventana de tiempo de la onda R (Sweet spot)
+        difficulty = 'medium'
+    },
+
+    Defibrillator = {
+        timeLimit = 25,
+        chargeDuration = 2.5,
+        requiredShocks = 2,
+        shockTolerance = 0.22,
+        difficulty = 'medium'
     }
 }

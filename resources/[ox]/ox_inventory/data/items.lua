@@ -40,6 +40,28 @@ return {
 		}
 	},
 
+	['torniquete'] = {
+		label = 'Torniquete Táctico C-A-T',
+		weight = 150,
+		stack = true,
+		close = true,
+		description = 'Torniquete de compresión hemostática de combate. Detiene hemorragias masivas y detiene el avance del desangrado en pacientes críticos.',
+		client = {
+			image = 'torniquete.png'
+		}
+	},
+
+	['desfibrilador'] = {
+		label = 'Desfibrilador Externo Automático (DEA)',
+		weight = 3500,
+		stack = false,
+		close = true,
+		description = 'Equipo biomédico portátil bifásico de descarga eléctrica controlada para restablecer el ritmo sinusal en pacientes en parada cardiorrespiratoria.',
+		client = {
+			image = 'desfibrilador.png'
+		}
+	},
+
 	['black_money'] = {
 		label = 'Dinero Negro',
 		weight = 0,

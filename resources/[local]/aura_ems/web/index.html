@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AuraRP - EMS Fleet & Medical MDT</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- =====================================================================
+         1. HUD DE DESPACHO SANITARIO (SMART DISPATCH BANNER - SIMÉTRICO A POLICE)
+    ====================================================================== -->
+    <div id="dispatchContainer" class="dispatch-hud-container"></div>
+
+    <!-- =====================================================================
+         2. CENTRAL DE AVISOS MÉDICOS (TACTICAL MEDICAL BOARD)
+    ====================================================================== -->
+    <div id="dispatchBoardApp" class="dispatch-board-wrapper hidden">
+        <div class="dispatch-board-backdrop" id="dispatchBoardBackdrop"></div>
+        <div class="dispatch-board-container">
+            <div class="neon-glow-strip"></div>
+            
+            <header class="dispatch-board-header">
+                <div class="header-left">
+                    <div class="dispatch-board-icon">
+                        <i class="fa-solid fa-truck-medical"></i>
+                    </div>
+                    <div>
+                        <div class="header-badge-tag">
+                            <span class="pulse-dot"></span>
+                            <span>CENTRALITA DE EMERGENCIAS SANITARIAS (10-33)</span>
+                        </div>
+                        <h2 class="dispatch-board-title">AVISOS Y PARADAS CARDÍACAS EN VIVO</h2>
+                        <p class="dispatch-board-subtitle">Supervisión de pacientes en coma y gestión de ambulancias asignadas</p>
+                    </div>
+                </div>
+
+                <div class="header-right">
+                    <button class="btn-board-refresh" id="btnRefreshBoard" title="Refrescar lista">
+                        <i class="fa-solid fa-arrows-rotate"></i>
+                        <span>Actualizar</span>
+                    </button>
+                    <button class="btn-close" id="btnCloseBoard" title="Cerrar (ESC / U)">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Lista de Avisos Activos -->
+            <main class="dispatch-board-body" id="dispatchBoardList">
+                <!-- Tarjetas inyectadas dinámicamente por app.js -->
+            </main>
+
+            <footer class="dispatch-board-footer">
+                <div class="footer-info">
+                    <i class="fa-solid fa-circle-info"></i>
+                    <span>La sanidad pública de AuraRP es 100% gratuita. Los avisos se cierran al reanimar al paciente.</span>
+                </div>
+                <div class="footer-keys">
+                    <span><kbd>ESC</kbd> o <kbd>U</kbd> para cerrar</span>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <!-- =====================================================================
+         3. TABLET MÉDICA Y MDT SANITARIO DE ÉLITE (AURA EMS MDT)
+    ====================================================================== -->
+    <div id="emsMdtApp" class="ems-mdt-wrapper hidden">
+        <div class="ems-mdt-backdrop" id="emsMdtBackdrop"></div>
+
+        <div class="ems-mdt-container">
+            <div class="neon-glow-strip-ems"></div>
+
+            <!-- Header Superior de la Tablet -->
+            <header class="mdt-top-bar">
+                <div class="mdt-header-brand">
+                    <div class="mdt-logo-pulse">
+                        <i class="fa-solid fa-heart-pulse"></i>
+                    </div>
+                    <div>
+                        <div class="mdt-brand-tag">
+                            <span class="pulse-dot-cyan"></span>
+                            <span>AURA HEALTHCARE SYSTEM • SISTEMA HOSPITALARIO INTEGRAL</span>
+                        </div>
+                        <h1 class="mdt-title">TERMINAL CLÍNICO Y MDT DE EMERGENCIAS</h1>
+                    </div>
+                </div>
+
+                <div class="mdt-header-stats">
+                    <div class="mdt-stat-pill">
+                        <span class="lbl">MÉDICOS ACTIVOS</span>
+                        <strong id="statActiveDoctors">0</strong>
+                    </div>
+                    <div class="mdt-stat-pill">
+                        <span class="lbl">EXPEDIENTES</span>
+                        <strong id="statTotalRecords">0</strong>
+                    </div>
+                    <button class="btn-mdt-close" id="btnCloseMdt" title="Cerrar (ESC)">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Barra de Pestañas de Navegación -->
+            <nav class="mdt-nav-tabs">
+                <button class="mdt-tab-btn active" data-tab="tab-calls">
+                    <i class="fa-solid fa-tower-broadcast"></i>
+                    <span>DESPACHO & LLAMADAS</span>
+                </button>
+                <button class="mdt-tab-btn" data-tab="tab-records">
+                    <i class="fa-solid fa-address-book"></i>
+                    <span>HISTORIAL CLÍNICO</span>
+                </button>
+                <button class="mdt-tab-btn" data-tab="tab-radio">
+                    <i class="fa-solid fa-walkie-talkie"></i>
+                    <span>RADIO-EMERGENCIAS (#1 - #20)</span>
+                </button>
+                <button class="mdt-tab-btn" data-tab="tab-staff" id="tabStaffBtn">
+                    <i class="fa-solid fa-users-viewfinder"></i>
+                    <span>PLANTILLA & JEFATURA</span>
+                </button>
+            </nav>
+
+            <!-- Cuerpo de Pestañas -->
+            <main class="mdt-main-content">
+                
+                <!-- PESTAÑA 1: DESPACHO / LLAMADAS -->
+                <section class="mdt-tab-pane active" id="tab-calls">
+                    <div class="tab-header-row">
+                        <h3><i class="fa-solid fa-list-check text-cyan"></i> LLAMADAS Y PARADAS CARDÍACAS EN CURSO</h3>
+                        <span class="badge-count" id="activeCallsBadge">0 Activados</span>
+                    </div>
+                    <div class="calls-grid-container" id="mdtCallsGrid">
+                        <!-- Renderizado vía app.js -->
+                    </div>
+                </section>
+
+                <!-- PESTAÑA 2: HISTORIAL CLÍNICO Y PACIENTES -->
+                <section class="mdt-tab-pane" id="tab-records">
+                    <div class="records-control-bar">
+                        <div class="search-box">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <input type="text" id="inputSearchRecord" placeholder="Buscar por Nombre del Paciente, CitizenID o Médico tratante...">
+                            <button class="btn-search" id="btnSearchRecords">Buscar</button>
+                        </div>
+                        <button class="btn-create-record" id="btnOpenNewRecordModal">
+                            <i class="fa-solid fa-notes-medical"></i>
+                            <span>Nuevo Informe Clínico</span>
+                        </button>
+                    </div>
+
+                    <div class="records-list-wrapper">
+                        <table class="medical-records-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>FECHA / HORA</th>
+                                    <th>PACIENTE</th>
+                                    <th>CITIZEN ID</th>
+                                    <th>MÉDICO / TRATAMIENTO</th>
+                                    <th>DIAGNÓSTICO</th>
+                                    <th>ACCIONES</th>
+                                </tr>
+                            </thead>
+                            <tbody id="medicalRecordsTableBody">
+                                <!-- Inyectado vía app.js -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- PESTAÑA 3: RADIO ENCRIPTADA (CANALES #1 AL #20) -->
+                <section class="mdt-tab-pane" id="tab-radio">
+                    <!-- Banner de Estado de Radio Médica -->
+                    <div class="radio-status-banner">
+                        <div class="radio-active-info">
+                            <div class="radio-beacon-wrapper" id="emsRadioBeaconWrapper">
+                                <span class="radio-pulse-beacon" id="emsRadioActiveDot"></span>
+                                <i class="fa-solid fa-tower-broadcast"></i>
+                            </div>
+                            <div class="radio-active-texts">
+                                <span class="sub" id="emsRadioActiveFreqDesc">FRECUENCIA MÉDICA ENCRIPTADA</span>
+                                <h4 id="emsRadioActiveChannelTitle">DESCONECTADO DE LA RED</h4>
+                            </div>
+                        </div>
+                        <div class="radio-banner-actions">
+                            <div class="radio-keybinds-pill">
+                                <span><i class="fa-solid fa-microphone"></i> <strong>PTT:</strong> Tecla Radio</span>
+                            </div>
+                            <button class="btn-patrol-join disconnect" id="btnEmsDisconnectRadio" style="display: none;" onclick="leaveEmsRadio()">
+                                <i class="fa-solid fa-power-off"></i> Desconectar
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Encabezado de Malla Médica -->
+                    <div class="patrols-section-header">
+                        <h4><i class="fa-solid fa-truck-medical"></i> CANALES DE RADIO (#1 AL #20)</h4>
+                        <span class="header-badge-tag"><i class="fa-solid fa-shield-halved"></i> FRECUENCIAS ENCRIPTADAS (10.1 - 12.0 MHz)</span>
+                    </div>
+
+                    <!-- Grid de Canales (#01 al #20) -->
+                    <div class="radio-patrols-grid" id="emsRadioEmisorasContainer">
+                        <!-- Renderizado dinámico vía app.js -->
+                    </div>
+                </section>
+
+                <!-- PESTAÑA 4: PLANTILLA Y JEFATURA MÉDICA -->
+                <section class="mdt-tab-pane" id="tab-staff">
+                    <div class="staff-control-bar">
+                        <div class="tab-header-row">
+                            <h3><i class="fa-solid fa-user-doctor text-cyan"></i> CUERPO MÉDICO Y CUADRO DE PERSONAL</h3>
+                        </div>
+                        <div class="hire-box" id="hireBox">
+                            <input type="number" id="inputHireTargetSrc" placeholder="ID del Jugador (Server ID)">
+                            <button class="btn-hire" id="btnHireStaff">
+                                <i class="fa-solid fa-user-plus"></i>
+                                <span>Contratar</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="staff-list-wrapper">
+                        <table class="staff-table">
+                            <thead>
+                                <tr>
+                                    <th>SANITARIO</th>
+                                    <th>CITIZEN ID</th>
+                                    <th>RANGO</th>
+                                    <th>SALARIO</th>
+                                    <th>TELÉFONO</th>
+                                    <th>ESTADO</th>
+                                    <th>GESTIÓN</th>
+                                </tr>
+                            </thead>
+                            <tbody id="staffTableBody">
+                                <!-- Inyectado vía app.js -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- MODAL: NUEVO INFORME CLÍNICO -->
+    <div class="modal-overlay hidden" id="modalNewRecord">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-file-medical text-cyan"></i> Registrar Informe de Diagnóstico</h3>
+                <button class="btn-close-modal" id="btnCloseNewRecordModal"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Nombre del Paciente</label>
+                    <input type="text" id="newRecPatientName" placeholder="Ej: John Doe">
+                </div>
+                <div class="form-group">
+                    <label>CitizenID del Paciente</label>
+                    <input type="text" id="newRecCitizenId" placeholder="Ej: HLWWIZKU">
+                </div>
+                <div class="form-group">
+                    <label>Diagnóstico y Tratamiento Aplicado</label>
+                    <textarea id="newRecDiagnosis" rows="4" placeholder="Detalla el estado del paciente, huesos inmovilizados, fármacos administrados y reanimación DEA..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" id="btnCancelNewRecord">Cancelar</button>
+                <button class="btn-save" id="btnSaveNewRecord">Guardar Expediente</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dropdown Flotante Selector de Color Táctico Radio -->
+    <div id="radioColorPickerDropdown" class="radio-color-picker-dropdown hidden">
+        <div class="picker-header">
+            <span><i class="fa-solid fa-palette"></i> COLOR DE UNIDAD MÉDICA & BLIP</span>
+            <button class="btn-picker-close" onclick="closeRadioColorPicker()"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="picker-swatches-grid" id="pickerSwatchesGrid"></div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>

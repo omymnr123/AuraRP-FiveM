@@ -150,12 +150,21 @@ local function EnterCriticalState(timeRemaining, deathReason, killerSource)
                 SetDeathCursorMode(not isCursorActive)
             end
 
+            -- ACCESO DIRECTO TECLA [G] (INPUT_DETONATE = 47) PARA LLAMAR A EMERGENCIAS
+            if IsDisabledControlJustPressed(0, 47) or IsControlJustPressed(0, 47) then
+                SendNUIMessage({ action = 'triggerDispatchKey' })
+            end
+
             if isCursorActive then
                 -- MODO CURSOR ACTIVO: El ratón mueve el puntero de la interfaz NUI sin girar la cámara del juego
                 DisableControlAction(0, 1, true)   -- Look LR bloqueado
                 DisableControlAction(0, 2, true)   -- Look UD bloqueado
+                EnableControlAction(0, 237, true) -- Cursor Accept (Click Izquierdo)
+                EnableControlAction(0, 238, true) -- Cursor Cancel (Click Derecho)
                 EnableControlAction(0, 239, true) -- Cursor X
                 EnableControlAction(0, 240, true) -- Cursor Y
+                EnableControlAction(0, 24, true)  -- Attack / Left Click
+                EnableControlAction(0, 18, true)  -- Enter
             else
                 -- MODO CÁMARA LIBRE: El cursor desaparece y el ratón gira libremente la cámara del juego
                 EnableControlAction(0, 1, true)   -- Look LR habilitado
@@ -166,6 +175,7 @@ local function EnterCriticalState(timeRemaining, deathReason, killerSource)
             EnableControlAction(0, 245, true) -- Chat T (INPUT_MP_TEXT_CHAT_ALL)
             EnableControlAction(0, 246, true) -- Chat Y (INPUT_MP_TEXT_CHAT_TEAM)
             EnableControlAction(0, 199, true) -- Pause Menu / Esc
+            EnableControlAction(0, 47, true)  -- Tecla G (Emergencias)
 
             -- Silencio estricto de Voz Push-To-Talk
             DisableControlAction(0, 249, true) -- PTT N
@@ -387,6 +397,25 @@ end)
 -- Forzar entrada a coma con tiempo específico (reconectar o comando)
 RegisterNetEvent('aura_death:client:setInComa', function(timeRemaining, reason)
     EnterCriticalState(timeRemaining or Config.BleedoutTime, reason or "Estado Crítico Persistente", nil)
+end)
+
+-- Pausar desangrado por aplicación de torniquete táctico
+RegisterNetEvent('aura_death:client:pauseBleedout', function()
+    if isDead then
+        LocalPlayer.state:set('bleedoutPaused', true, true)
+        SendNUIMessage({
+            action = 'pauseBleedout'
+        })
+        if lib and lib.notify then
+            lib.notify({
+                title = 'Torniquete Aplicado',
+                description = 'Se te ha colocado un torniquete táctico. La hemorragia y el desangrado se han pausado.',
+                type = 'inform',
+                icon = 'kit-medical',
+                duration = 6000
+            })
+        end
+    end
 end)
 
 -- Forzar ejecución de muerte para pruebas (/kill)
