@@ -13,5 +13,5 @@ function Framework.Ox()
 end
 
 function Framework.Aura()
-    return not Framework.ESX() and not Framework.QBCore() and not Framework.Ox()
+    return GetResourceState("aura_core") ~= "missing" or (not Framework.ESX() and not Framework.QBCore() and not Framework.Ox())
 end

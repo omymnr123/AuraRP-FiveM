@@ -1621,6 +1621,38 @@ RegisterNUICallback('uiLoaded', function(_, cb)
 	cb(1)
 end)
 
+RegisterNUICallback('aura_toggleClothing', function(data, cb)
+	local pieceType = data and data.type
+	print(('[Aura Clothing DEBUG] NUI callback received. pieceType=%s, client.ToggleClothing=%s'):format(
+		tostring(pieceType), tostring(client.ToggleClothing ~= nil)))
+	if pieceType and client.ToggleClothing then
+		print('[Aura Clothing DEBUG] Using client.ToggleClothing')
+		local success, state = client.ToggleClothing(pieceType)
+		print(('[Aura Clothing DEBUG] Result: success=%s'):format(tostring(success)))
+		cb({ success = success, state = client.GetClothingState() })
+	elseif pieceType then
+		print('[Aura Clothing DEBUG] client.ToggleClothing is NIL, trying exports')
+		local ok, result = pcall(function()
+			return exports['ox_inventory']:ToggleClothing(pieceType)
+		end)
+		print(('[Aura Clothing DEBUG] exports pcall: ok=%s, result=%s'):format(tostring(ok), tostring(result)))
+		cb({ success = ok, state = {} })
+	else
+		print('[Aura Clothing DEBUG] No pieceType received')
+		cb({ success = false, state = {} })
+	end
+end)
+
+RegisterNUICallback('aura_getClothingState', function(_, cb)
+	if client.GetClothingState then
+		cb({ success = true, state = client.GetClothingState() })
+	elseif exports.ox_inventory and exports.ox_inventory.GetClothingState then
+		cb({ success = true, state = exports.ox_inventory.GetClothingState() })
+	else
+		cb({ success = true, state = {} })
+	end
+end)
+
 RegisterNUICallback('getItemData', function(itemName, cb)
 	cb(Items[itemName])
 end)
