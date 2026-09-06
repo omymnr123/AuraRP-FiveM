@@ -1653,6 +1653,12 @@ RegisterNUICallback('aura_getClothingState', function(_, cb)
 	end
 end)
 
+RegisterNUICallback('aura_openMedical', function(_, cb)
+	client.closeInventory()
+	TriggerEvent('aura_medical:client:openScanner')
+	cb(1)
+end)
+
 RegisterNUICallback('getItemData', function(itemName, cb)
 	cb(Items[itemName])
 end)

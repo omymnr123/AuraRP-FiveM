@@ -19,27 +19,27 @@ local function EvaluateTopInsulation(ped, isMale)
             return 0.0
         -- Camisetas cortas / Polos finos / Camisas de manga corta LSPD/BCSO (EUP)
         elseif (drawable >= 1 and drawable <= 14) or (drawable >= 23 and drawable <= 33) or (drawable >= 40 and drawable <= 55) or drawable == 73 or drawable == 74 or drawable == 150 or drawable == 151 or drawable == 250 then
-            return 18.0
-        -- Uniformes de manga larga LSPD/BCSO / Sudaderas / Blazers / Chaquetas ligeras / Cazadoras
-        elseif (drawable >= 56 and drawable <= 85) or (drawable >= 100 and drawable <= 130) or (drawable >= 140 and drawable <= 170) or drawable == 144 then
-            return 32.0
-        -- Parkas polares / Abrigos pesados / Chaquetones de plumas / Cazadoras de nieve / Cuero de motorista SAHP / Trajes de Bombero (Turnout/Bunker Gear) / Chaquetón de nieve BCSO
+            return 12.0
+        -- Parkas polares / Abrigos pesados / Plumíferos / Chaquetones de nieve / Trajes de Bombero (Turnout/Bunker Gear) / Chaquetón ártico
+        elseif (drawable >= 170 and drawable <= 185) or (drawable >= 220 and drawable <= 240) or drawable == 13 or drawable == 67 or drawable == 86 then
+            return 42.0
+        -- Uniformes de manga larga LSPD/BCSO / Sudaderas / Blazers / Chaquetas / Cazadoras / Ropa casual estándar (Default)
         else
-            return 45.0
+            return 22.0
         end
     else
         -- Femenino: Bikinis / Tops cortos / Espalda descubierta / Desnuda
         if drawable == 14 or drawable == 15 or drawable == 17 or drawable == 18 or drawable == 24 or drawable == 26 or drawable == 86 or drawable == 101 then
             return 0.0
-        -- Camisetas / Blusas / Camisas de manga corta EUP
+        -- Camisetas / Blusas / Tops ligeros / Camisas de manga corta EUP
         elseif (drawable >= 1 and drawable <= 13) or (drawable >= 27 and drawable <= 45) or (drawable >= 70 and drawable <= 85) or drawable == 147 then
-            return 18.0
-        -- Chaquetas / Cárdigans / Sudaderas / Uniformes de manga larga
-        elseif (drawable >= 46 and drawable <= 69) or (drawable >= 90 and drawable <= 125) or (drawable >= 140 and drawable <= 170) then
-            return 32.0
-        -- Abrigos largos / Parkas de invierno / Plumíferos / Trajes de Bombero / Chaquetones EUP
+            return 12.0
+        -- Abrigos largos polares / Parkas de invierno / Plumíferos / Trajes de Bombero / Chaquetones árticos
+        elseif (drawable >= 170 and drawable <= 190) or (drawable >= 220 and drawable <= 240) or drawable == 67 or drawable == 86 then
+            return 42.0
+        -- Chaquetas / Cárdigans / Sudaderas / Uniformes de manga larga / Ropa casual estándar (Default)
         else
-            return 45.0
+            return 22.0
         end
     end
 end
@@ -51,13 +51,13 @@ local function EvaluateBodyArmorInsulation(ped)
         return 0.0 -- Sin chaleco / Sin protección
     -- Arnés ligero / Funda de pistola / Cartuchera / Placa en pecho
     elseif drawable == 1 or drawable == 2 or drawable == 16 then
-        return 4.0
+        return 3.0
     -- Chaleco antibalas reglamentario LSPD/BCSO / Chaleco de tráfico reflectante
     elseif (drawable >= 3 and drawable <= 14) or (drawable >= 17 and drawable <= 23) then
-        return 12.0
+        return 8.0
     -- Chaleco Táctico SWAT pesado / Porta-placas militar / Arnés de bombero / Equipo EOD pesado
     else
-        return 18.0
+        return 14.0
     end
 end
 
@@ -66,13 +66,13 @@ local function EvaluateArmsInsulation(ped, isMale)
     local drawable = GetPedDrawableVariation(ped, 3)
     if drawable <= 15 or drawable == -1 then return 0.0 end
 
-    if (drawable >= 16 and drawable <= 40) or drawable == 8 then
-        return 12.0 -- Manga larga estándar / Camisa policial
-    elseif drawable > 40 then
-        return 20.0 -- Guantes tácticos / Mangas acolchadas / Guantes térmicos de bombero
+    -- Guantes tácticos pesados / Mangas acolchadas térmicas de bombero
+    if drawable >= 110 and drawable <= 140 then
+        return 12.0
+    -- Manga larga estándar / Camisa / Guantes ligeros (Default)
+    else
+        return 6.0
     end
-
-    return 0.0
 end
 
 -- 4. Componente 4: Pantalones / Piernas / Pantalones de Nieve y Bomberos
@@ -84,23 +84,23 @@ local function EvaluatePantsInsulation(ped, isMale)
         -- Bañadores / Calzoncillos / Ropa interior / Boxers / Piernas desnudas (0% de aislamiento de piernas)
         if drawable == 14 or drawable == 15 or drawable == 16 or drawable == 17 or drawable == 18 or drawable == 20 or drawable == 21 or drawable == 26 or drawable == 56 or drawable == 61 or drawable == 65 or (drawable >= 87 and drawable <= 146) then
             return 0.0
-        -- Vaqueros estándar / Pantalones de traje / Pantalones de servicio LSPD/BCSO (EUP)
-        elseif (drawable >= 0 and drawable <= 13) or (drawable >= 22 and drawable <= 38) or (drawable >= 40 and drawable <= 55) then
-            return 15.0
         -- Pantalones de nieve acolchados / Monos de esquí / Pantalones de Bombero (Bunker Pants) / BDU Táctico SWAT
+        elseif (drawable >= 70 and drawable <= 86) or drawable == 60 or drawable == 94 then
+            return 18.0
+        -- Vaqueros estándar / Pantalones de traje / Pantalones de servicio LSPD/BCSO / Ropa casual (Default)
         else
-            return 20.0
+            return 10.0
         end
     else
         -- Faldas cortas / Shorts / Ropa interior / Bikinis / Piernas desnudas (0% de aislamiento)
         if drawable == 14 or drawable == 15 or drawable == 16 or drawable == 17 or drawable == 19 or drawable == 20 or drawable == 21 or drawable == 26 or drawable == 57 or drawable == 67 or (drawable >= 87 and drawable <= 146) then
             return 0.0
-        -- Pantalones largos / Jeans / Leggins / Pantalones de servicio EUP
-        elseif (drawable >= 0 and drawable <= 13) or (drawable >= 22 and drawable <= 38) then
-            return 15.0
         -- Pantalones térmicos de invierno / Monos de nieve / Pantalones de Bombera
+        elseif (drawable >= 70 and drawable <= 86) or drawable == 60 or drawable == 94 then
+            return 18.0
+        -- Pantalones largos / Jeans / Leggins / Pantalones de servicio EUP / Ropa casual (Default)
         else
-            return 20.0
+            return 10.0
         end
     end
 end
@@ -111,11 +111,11 @@ local function EvaluateUndershirtInsulation(ped, isMale)
     if drawable <= 0 or drawable == 15 or drawable == 14 or drawable == -1 or drawable == 57 or drawable == 58 then
         return 0.0 -- Sin camiseta interior / Piel al descubierto
     elseif (drawable >= 1 and drawable <= 13) or (drawable >= 16 and drawable <= 25) then
-        return 5.0 -- Camiseta interior de tirantes o manga corta
+        return 3.0 -- Camiseta interior de tirantes o manga corta
     elseif (drawable >= 50 and drawable <= 85) then
-        return 8.0 -- Camisa de servicio interior EUP / Corbata policial
+        return 5.0 -- Camisa de servicio interior EUP / Corbata policial
     else
-        return 10.0 -- Cuello alto / Ropa térmica interior / Chaleco cerrado
+        return 4.0 -- Ropa interior estándar
     end
 end
 
@@ -125,9 +125,9 @@ local function EvaluateFootwearInsulation(ped, isMale)
     if drawable == -1 or drawable == 34 or drawable == 35 or drawable == 5 or drawable == 0 then
         return 0.0 -- Descalzo o Chanclas
     elseif (drawable >= 1 and drawable <= 15) or (drawable >= 25 and drawable <= 40) then
-        return 3.0 -- Zapatillas deportivas / Zapatos de vestir
+        return 2.0 -- Zapatillas deportivas / Zapatos de vestir
     else
-        return 5.0 -- Botas de nieve / Botas tácticas policiales / Botas de bombero
+        return 4.0 -- Botas de nieve / Botas tácticas policiales / Botas de bombero
     end
 end
 
@@ -137,7 +137,7 @@ local function EvaluateNeckInsulation(ped)
     if drawable <= 0 or drawable == -1 or drawable == 15 then return 0.0 end
     -- Bufandas / Pañuelos de cuello / Shemagh táctico
     if drawable == 2 or drawable == 3 or drawable == 4 or drawable == 8 or drawable == 14 or (drawable >= 20 and drawable <= 30) then
-        return 5.0
+        return 4.0
     end
     return 1.0 -- Corbatas / Placas de detective
 end
@@ -150,9 +150,9 @@ local function EvaluateHeadgearInsulation(ped)
     local maskDrawable = GetPedDrawableVariation(ped, 1)
     if maskDrawable > 0 and maskDrawable ~= 15 and maskDrawable ~= -1 then
         if maskDrawable == 51 or maskDrawable == 52 or (maskDrawable >= 110 and maskDrawable <= 130) then
-            bonus = bonus + 8.0 -- Pasamontañas térmico completo
+            bonus = bonus + 6.0 -- Pasamontañas térmico completo
         else
-            bonus = bonus + 4.0 -- Máscara estándar
+            bonus = bonus + 3.0 -- Máscara estándar
         end
     end
 
@@ -160,9 +160,9 @@ local function EvaluateHeadgearInsulation(ped)
     local hatProp = GetPedPropIndex(ped, 0)
     if hatProp ~= -1 and hatProp ~= 255 then
         if hatProp == 2 or hatProp == 4 or hatProp == 5 or hatProp == 18 or (hatProp >= 45 and hatProp <= 60) then
-            bonus = bonus + 8.0 -- Gorro de lana / Beanie / Casco con acolchado térmico
+            bonus = bonus + 6.0 -- Gorro de lana / Beanie / Casco con acolchado térmico
         else
-            bonus = bonus + 4.0 -- Gorra o casco ligero
+            bonus = bonus + 2.0 -- Gorra o casco ligero
         end
     end
 

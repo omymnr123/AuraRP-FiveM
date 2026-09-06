@@ -102,26 +102,32 @@ local function UpdateThermalHomeostasis()
     -- CASO 1: EN REFUGIO (Interiores MLO, Casas, Garajes o Vehículos Climatizados)
     -- ------------------------------------------------------------------------
     if isSheltered then
+        local targetTemp = 37.0
+        -- Si está excesivamente abrigado dentro de un interior/vehículo (> 85% aislamiento), la temperatura sube a más de 37ºC
+        if insulation > 85.0 then
+            targetTemp = 37.0 + ((insulation - 85.0) / 15.0) * 2.5 -- Sube a 37.5ºC - 39.5ºC por sobre-abrigo en interior
+        end
+
         local rate = Config.Survival.Shelter.CoreRecoveryRate or 0.20
         if ActiveBuffs.warmth.active then rate = rate * 1.5 end
         if ActiveBuffs.cooling.active then rate = rate * 1.5 end
 
-        if CoreTemperature < 37.0 then
-            CoreTemperature = math.min(37.0, CoreTemperature + rate)
-        elseif CoreTemperature > 37.0 then
-            CoreTemperature = math.max(37.0, CoreTemperature - rate)
+        if CoreTemperature < targetTemp then
+            CoreTemperature = math.min(targetTemp, CoreTemperature + rate)
+        elseif CoreTemperature > targetTemp then
+            CoreTemperature = math.max(targetTemp, CoreTemperature - rate)
         end
         return
     end
 
     -- ------------------------------------------------------------------------
-    -- CASO 2: DISIPACIÓN RÁPIDA DE CALOR AL QUITARSE LA ROPA (DESVESTIDO / HIPERTERMIA)
+    -- CASO 2: DISIPACIÓN RÁPIDA DE CALOR AL QUITARSE LA ROPA / REDUCIR ABRIGO (HIPERTERMIA)
     -- ------------------------------------------------------------------------
-    -- Si el jugador tiene temperatura corporal alta (> 37.0ºC) y se quita la ropa (poco o ningún aislamiento),
-    -- el cuerpo disipa el calor acumulado rápidamente mediante transpiración y convección cutánea directa.
-    if CoreTemperature > 37.0 and insulation < 35.0 then
-        -- Tasa de disipación rápida: cuanto más desvestido (0%), más rápido baja
-        local coolingSpeed = 0.08 + ((35.0 - insulation) / 35.0) * 0.14 -- De 0.08 a 0.22 por tick al estar desnudo
+    -- Si el jugador tiene temperatura corporal alta (> 37.0ºC) y no lleva equipo polar extremo (aislamiento <= 80%),
+    -- el cuerpo disipa el exceso de calor acumulado hacia los 37.0ºC normales mediante sudoración y convección.
+    if CoreTemperature > 37.0 and insulation <= 80.0 then
+        -- Tasa de disipación: cuanto menos ropa (0%), más rápido baja (de 0.06 a 0.25 por tick)
+        local coolingSpeed = 0.06 + ((80.0 - insulation) / 80.0) * 0.19
 
         -- Diferencia térmica entre el cuerpo caliente y el aire ambiental más fresco
         if ambientTemp < CoreTemperature then
@@ -233,15 +239,22 @@ local function UpdateThermalHomeostasis()
         -- --------------------------------------------------------------------
         -- ZONA DE CONFORT (Ropa equilibrada con el clima actual)
         -- --------------------------------------------------------------------
+        local targetComfort = 37.0
+        -- Si llevamos más del 85% de aislamiento en un clima que no es polar (ambientTemp > -5ºC),
+        -- el calor metabólico acumulado sube la temperatura corporal a más de 37ºC
+        if insulation > 85.0 and ambientTemp > -5.0 then
+            targetComfort = 37.0 + ((insulation - 85.0) / 15.0) * 2.5 -- Sube a 37.5ºC - 39.5ºC
+        end
+
         local recoverySpeed = 0.06
         if CoreTemperature > 37.0 and insulation <= 35.0 then
             recoverySpeed = 0.15
         end
 
-        if CoreTemperature < 37.0 then
-            CoreTemperature = math.min(37.0, CoreTemperature + recoverySpeed)
-        elseif CoreTemperature > 37.0 then
-            CoreTemperature = math.max(37.0, CoreTemperature - recoverySpeed)
+        if CoreTemperature < targetComfort then
+            CoreTemperature = math.min(targetComfort, CoreTemperature + 0.05)
+        elseif CoreTemperature > targetComfort then
+            CoreTemperature = math.max(targetComfort, CoreTemperature - recoverySpeed)
         end
     end
 
@@ -369,11 +382,14 @@ local function SyncWithHUD()
     end
 
     local ambientTemp = exports['aura_seasons']:GetAmbientTemperature() or 21.0
+    local formattedTemp = tonumber(string.format('%.1f', CoreTemperature))
+    
+    LocalPlayer.state:set('body_temperature', formattedTemp, true)
 
     TriggerEvent('aura_hud:client:updateTemperature', 
         math.floor(coldLevel), 
         math.floor(heatLevel), 
-        tonumber(string.format('%.1f', CoreTemperature)),
+        formattedTemp,
         ambientTemp
     )
 end

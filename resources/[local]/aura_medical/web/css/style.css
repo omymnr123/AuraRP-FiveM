@@ -1,0 +1,783 @@
+/* ==========================================================================
+   AURA ROLEPLAY - ADVANCED MEDICAL DIAGNOSTICS & 3D SCANNER UI (CSS)
+   Palette: Turquoise (#40E0D0), Neon Cyan (#00f2fe), Neon Pink/Red (#FF007F),
+   Dark Obsidian (#070a12), Glassmorphism Blur (15px)
+   ========================================================================== */
+
+/* CEF BUG FIX CRITICAL */
+html, body {
+  background: transparent !important;
+  background-color: transparent !important;
+  overflow: hidden !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  user-select: none !important;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  color: #f8fafc;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  --aura-cyan: #00f2fe;
+  --aura-turquoise: #40E0D0;
+  --aura-pink: #FF007F;
+  --aura-red: #ff0055;
+  --aura-amber: #ffaa00;
+  --aura-glass-bg: rgba(10, 15, 26, 0.88);
+  --aura-card-bg: rgba(18, 24, 38, 0.75);
+  --aura-border: rgba(255, 255, 255, 0.08);
+  --aura-border-glow: rgba(0, 242, 254, 0.4);
+  --aura-font-title: 'Outfit', sans-serif;
+  --aura-font-mono: 'JetBrains Mono', monospace;
+}
+
+/* Master App Container */
+.medical-app {
+  width: 100vw;
+  height: 100vh;
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+.medical-app.hidden {
+  display: none !important;
+  opacity: 0 !important;
+}
+
+/* Holographic Overlays & Scanlines */
+.hologram-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.vignette-layer {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, transparent 40%, rgba(5, 8, 15, 0.7) 100%);
+}
+
+.scan-grid-lines {
+  position: absolute;
+  inset: 0;
+  background-size: 40px 40px;
+  background-image: 
+    linear-gradient(to right, rgba(0, 242, 254, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 242, 254, 0.03) 1px, transparent 1px);
+}
+
+.scanner-sweep-line {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent 0%, rgba(0, 242, 254, 0.6) 50%, transparent 100%);
+  box-shadow: 0 0 15px var(--aura-cyan);
+  animation: sweepDown 4.5s infinite linear;
+}
+
+@keyframes sweepDown {
+  0% { top: 0%; opacity: 0; }
+  10% { opacity: 0.8; }
+  90% { opacity: 0.8; }
+  100% { top: 100%; opacity: 0; }
+}
+
+/* HUD Futuristic Corners */
+.hud-corner {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  border-color: var(--aura-cyan);
+  border-style: solid;
+  opacity: 0.5;
+}
+
+.hud-corner.top-left { top: 20px; left: 20px; border-width: 2px 0 0 2px; }
+.hud-corner.top-right { top: 20px; right: 20px; border-width: 2px 2px 0 0; }
+.hud-corner.bottom-left { bottom: 20px; left: 20px; border-width: 0 0 2px 2px; }
+.hud-corner.bottom-right { bottom: 20px; right: 20px; border-width: 0 2px 2px 0; }
+
+/* Top Navigation Bar */
+.top-nav-bar {
+  position: absolute;
+  top: 25px;
+  left: 35px;
+  right: 35px;
+  height: 55px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 10;
+  pointer-events: auto;
+}
+
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.medical-cross-logo {
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, rgba(0, 242, 254, 0.2), rgba(255, 0, 127, 0.2));
+  border: 1px solid var(--aura-cyan);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--aura-cyan);
+  box-shadow: 0 0 15px rgba(0, 242, 254, 0.35);
+}
+
+.brand-title {
+  font-family: var(--aura-font-title);
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  background: linear-gradient(135deg, #00f2fe 0%, #40E0D0 50%, #ffffff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-transform: uppercase;
+}
+
+.brand-subtitle {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1.2px;
+  color: #94a3b8;
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.system-status-tag {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background: rgba(0, 242, 254, 0.08);
+  border: 1px solid rgba(0, 242, 254, 0.25);
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--aura-cyan);
+  letter-spacing: 1px;
+}
+
+.pulse-dot {
+  width: 7px;
+  height: 7px;
+  background: var(--aura-cyan);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--aura-cyan);
+  animation: dotPulse 1.5s infinite ease-in-out;
+}
+
+@keyframes dotPulse {
+  0%, 100% { transform: scale(1); opacity: 0.6; }
+  50% { transform: scale(1.3); opacity: 1; }
+}
+
+.btn-close-modal {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 16px;
+  background: rgba(255, 0, 85, 0.15);
+  border: 1px solid rgba(255, 0, 85, 0.4);
+  border-radius: 8px;
+  color: #ffffff;
+  font-family: var(--aura-font-title);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(255, 0, 85, 0.25);
+  transition: all 0.2s ease;
+}
+
+.btn-close-modal:hover {
+  background: rgba(255, 0, 85, 0.35);
+  border-color: var(--aura-red);
+  box-shadow: 0 0 15px rgba(255, 0, 85, 0.6);
+  transform: translateY(-1px);
+}
+
+/* 3D World-to-Screen Floating Bone Nodes */
+.nodes-container {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.node-3d {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  pointer-events: auto;
+  transition: transform 0.1s ease, filter 0.2s ease;
+}
+
+.node-3d.hidden {
+  display: none !important;
+}
+
+.node-circle-box {
+  width: 28px;
+  height: 28px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.node-ring-pulse {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1.5px solid var(--aura-turquoise);
+  animation: nodeRingPulse 2.2s infinite ease-out;
+  pointer-events: none;
+}
+
+@keyframes nodeRingPulse {
+  0% { transform: scale(0.8); opacity: 0.9; }
+  100% { transform: scale(2); opacity: 0; }
+}
+
+.node-core {
+  width: 14px;
+  height: 14px;
+  background: var(--aura-turquoise);
+  border-radius: 50%;
+  border: 2px solid #ffffff;
+  box-shadow: 0 0 12px var(--aura-turquoise), 0 0 20px rgba(64, 224, 208, 0.6);
+  transition: all 0.25s ease;
+}
+
+/* Estado Dañado (Neon Pink/Red) */
+.node-3d.damaged .node-core {
+  background: var(--aura-pink);
+  border-color: #ffffff;
+  box-shadow: 0 0 14px var(--aura-pink), 0 0 25px rgba(255, 0, 127, 0.8);
+}
+
+.node-3d.damaged .node-ring-pulse {
+  border-color: var(--aura-pink);
+  animation: nodeDamageRing 1.2s infinite ease-out;
+}
+
+@keyframes nodeDamageRing {
+  0% { transform: scale(0.8); opacity: 1; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+
+/* Badge de Etiqueta Flotante */
+.node-label-pill {
+  background: rgba(7, 10, 18, 0.85);
+  border: 1px solid rgba(64, 224, 208, 0.4);
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-family: var(--aura-font-title);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  color: #ffffff;
+  white-space: nowrap;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  transition: all 0.2s ease;
+}
+
+.node-3d.damaged .node-label-pill {
+  border-color: rgba(255, 0, 127, 0.6);
+  background: rgba(25, 6, 15, 0.9);
+  color: #ffb3d9;
+}
+
+.node-3d:hover .node-core {
+  transform: scale(1.3);
+}
+
+.node-3d:hover .node-label-pill {
+  transform: translateX(4px);
+  border-color: #ffffff;
+  box-shadow: 0 0 12px rgba(0, 242, 254, 0.5);
+}
+
+.node-3d.selected .node-core {
+  transform: scale(1.4);
+  border-color: #ffff00;
+}
+
+.node-3d.selected .node-label-pill {
+  border-color: var(--aura-cyan);
+  background: rgba(0, 242, 254, 0.2);
+  color: #ffffff;
+  box-shadow: 0 0 15px rgba(0, 242, 254, 0.5);
+}
+
+/* Side Diagnostics Panel (Glassmorphism Luxury) */
+.side-diagnostics-panel {
+  width: 420px;
+  margin-left: auto;
+  height: 100vh;
+  position: relative;
+  z-index: 10;
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.panel-glass-backdrop {
+  position: absolute;
+  inset: 0;
+  background: var(--aura-glass-bg);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border-left: 1px solid var(--aura-border);
+  box-shadow: -15px 0 35px rgba(0, 0, 0, 0.7);
+  z-index: -1;
+}
+
+.panel-content-scroll {
+  padding: 95px 24px 30px 24px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  height: 100%;
+}
+
+.panel-content-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+
+.panel-content-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+}
+
+/* Tarjetas Genéricas Glass */
+.vital-card {
+  background: var(--aura-card-bg);
+  border: 1px solid var(--aura-border);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+  transition: border-color 0.2s ease;
+}
+
+.vital-card:hover {
+  border-color: rgba(0, 242, 254, 0.25);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-tag {
+  font-family: var(--aura-font-title);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  color: #94a3b8;
+  text-transform: uppercase;
+}
+
+/* Badges de Estado */
+.badge-status {
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.badge-healthy {
+  background: rgba(64, 224, 208, 0.15);
+  color: var(--aura-turquoise);
+  border: 1px solid rgba(64, 224, 208, 0.4);
+}
+
+.badge-warning {
+  background: rgba(255, 170, 0, 0.15);
+  color: var(--aura-amber);
+  border: 1px solid rgba(255, 170, 0, 0.4);
+}
+
+.badge-critical {
+  background: rgba(255, 0, 127, 0.18);
+  color: var(--aura-pink);
+  border: 1px solid rgba(255, 0, 127, 0.5);
+  box-shadow: 0 0 10px rgba(255, 0, 127, 0.3);
+}
+
+/* Radial Gauge Salud */
+.health-radial-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.radial-gauge {
+  position: relative;
+  width: 110px;
+  height: 110px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.progress-ring-circle {
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
+  transition: stroke-dashoffset 0.6s ease, stroke 0.3s ease;
+}
+
+.gauge-center-info {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.gauge-value {
+  font-family: var(--aura-font-title);
+  font-size: 22px;
+  font-weight: 900;
+  color: #ffffff;
+}
+
+.gauge-label {
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  color: #64748b;
+  text-transform: uppercase;
+}
+
+.vital-stats-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.stat-mini-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(10, 15, 25, 0.6);
+  border: 1px solid var(--aura-border);
+  padding: 8px 12px;
+  border-radius: 8px;
+}
+
+.stat-mini-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stat-mini-icon.ecg-icon {
+  background: rgba(255, 0, 85, 0.15);
+  color: var(--aura-red);
+}
+
+.stat-mini-icon.armor-icon {
+  background: rgba(0, 242, 254, 0.15);
+  color: var(--aura-cyan);
+}
+
+.stat-mini-label {
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #64748b;
+  text-transform: uppercase;
+}
+
+.stat-mini-value {
+  font-family: var(--aura-font-mono);
+  font-size: 15px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+/* ECG Line Animation */
+.ecg-waveform-box {
+  height: 42px;
+  background: rgba(5, 8, 15, 0.9);
+  border: 1px solid var(--aura-border);
+  border-radius: 8px;
+  position: relative;
+  overflow: hidden;
+}
+
+.ecg-grid {
+  position: absolute;
+  inset: 0;
+  background-size: 10px 10px;
+  background-image: 
+    linear-gradient(to right, rgba(0, 242, 254, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 242, 254, 0.05) 1px, transparent 1px);
+}
+
+.ecg-line-anim {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent 0%, var(--aura-turquoise) 50%, transparent 100%);
+  box-shadow: 0 0 10px var(--aura-turquoise);
+  animation: ecgWave 1.4s infinite ease-in-out;
+}
+
+@keyframes ecgWave {
+  0% { transform: translateY(0) scaleY(1); }
+  30% { transform: translateY(-10px) scaleY(2); }
+  50% { transform: translateY(12px) scaleY(2.5); }
+  70% { transform: translateY(-6px) scaleY(1.5); }
+  100% { transform: translateY(0) scaleY(1); }
+}
+
+/* Metabolismo: Hambre, Sed y Temperatura */
+.metabolism-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(10, 15, 25, 0.5);
+  border: 1px solid var(--aura-border);
+  padding: 10px 12px;
+  border-radius: 8px;
+}
+
+.meta-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.temp-icon { background: rgba(0, 242, 254, 0.15); color: var(--aura-cyan); }
+.hunger-icon { background: rgba(255, 170, 0, 0.15); color: var(--aura-amber); }
+.thirst-icon { background: rgba(0, 150, 255, 0.15); color: #38bdf8; }
+
+.meta-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.meta-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.meta-title {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #cbd5e1;
+}
+
+.meta-badge {
+  font-family: var(--aura-font-mono);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--aura-cyan);
+}
+
+.meta-substatus {
+  font-size: 10px;
+  font-weight: 600;
+  color: #94a3b8;
+}
+
+.meta-val {
+  font-family: var(--aura-font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.bar-container {
+  height: 5px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.5s ease;
+}
+
+.hunger-fill { background: linear-gradient(90deg, #ffaa00, #ffd000); }
+.thirst-fill { background: linear-gradient(90deg, #00f2fe, #38bdf8); }
+
+/* Inspector de Extremidades */
+.selected-limb-title-box {
+  background: rgba(8, 12, 20, 0.7);
+  border: 1px solid var(--aura-border);
+  padding: 10px 12px;
+  border-radius: 8px;
+}
+
+.limb-name-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.limb-accent-dot {
+  width: 8px;
+  height: 8px;
+  background: var(--aura-turquoise);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--aura-turquoise);
+}
+
+#selected-limb-name {
+  margin: 0;
+  font-family: var(--aura-font-title);
+  font-size: 14px;
+  font-weight: 800;
+  color: #ffffff;
+  text-transform: uppercase;
+}
+
+.limb-subtitle {
+  margin: 4px 0 0 0;
+  font-size: 10.5px;
+  color: #64748b;
+}
+
+.injuries-list-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.no-injuries-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px;
+  background: rgba(64, 224, 208, 0.08);
+  border: 1px dashed rgba(64, 224, 208, 0.3);
+  border-radius: 8px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--aura-turquoise);
+}
+
+.injury-item-card {
+  background: rgba(25, 8, 16, 0.85);
+  border: 1px solid rgba(255, 0, 127, 0.4);
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  box-shadow: 0 4px 12px rgba(255, 0, 127, 0.15);
+}
+
+.injury-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.injury-type-label {
+  font-family: var(--aura-font-title);
+  font-size: 12px;
+  font-weight: 800;
+  color: #ffffff;
+  text-transform: uppercase;
+}
+
+.injury-severity-tag {
+  font-size: 9.5px;
+  font-weight: 700;
+  color: var(--aura-pink);
+  background: rgba(255, 0, 127, 0.2);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.injury-detail-desc {
+  font-size: 11px;
+  color: #f1a3c7;
+  line-height: 1.3;
+}
+
+.injury-time-stamp {
+  font-size: 9.5px;
+  color: #885566;
+  font-family: var(--aura-font-mono);
+}
+
+/* Footer Instructions */
+.scanner-instruction-footer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: rgba(10, 15, 25, 0.6);
+  border: 1px solid var(--aura-border);
+  border-radius: 8px;
+  font-size: 10.5px;
+  color: #94a3b8;
+}
+
+.key-pill {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--aura-font-mono);
+  font-size: 9.5px;
+  font-weight: 700;
+  color: #ffffff;
+}

@@ -219,6 +219,62 @@ body, html {
   margin: 0 !important;
 }
 
+/* Health Diagnostics Button - Injected in Player Grid Header */
+.aura-health-btn {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 5px !important;
+  padding: 3px 10px !important;
+  background: linear-gradient(135deg, rgba(255, 0, 85, 0.16) 0%, rgba(180, 0, 50, 0.28) 100%) !important;
+  border: 1px solid rgba(255, 0, 85, 0.65) !important;
+  border-radius: 5px !important;
+  color: #ffffff !important;
+  font-family: var(--aura-font-title) !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  letter-spacing: 1px !important;
+  text-transform: uppercase !important;
+  cursor: pointer !important;
+  box-shadow: 0 0 12px rgba(255, 0, 85, 0.55), inset 0 0 6px rgba(255, 0, 85, 0.3) !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  outline: none !important;
+  position: relative !important;
+  overflow: hidden !important;
+  margin: 0 6px !important;
+}
+
+.aura-health-btn svg {
+  color: #ff0055 !important;
+  filter: drop-shadow(0 0 4px #ff0055) !important;
+  animation: aura-ecg-pulse 1.8s infinite ease-in-out !important;
+}
+
+.aura-health-btn:hover {
+  background: linear-gradient(135deg, rgba(255, 0, 85, 0.38) 0%, rgba(255, 0, 60, 0.55) 100%) !important;
+  border-color: #ff0055 !important;
+  box-shadow: 0 0 16px rgba(255, 0, 85, 0.85), inset 0 0 10px rgba(255, 0, 85, 0.45) !important;
+  transform: translateY(-1px) scale(1.03) !important;
+  color: #ffffff !important;
+}
+
+.aura-health-btn:active {
+  transform: translateY(0) scale(0.97) !important;
+  box-shadow: 0 0 8px rgba(255, 0, 85, 0.6) !important;
+}
+
+@keyframes aura-ecg-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.85;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 1;
+    filter: drop-shadow(0 0 8px #ff0055);
+  }
+}
+
 /* Weight Bar (Turquoise Gradient) */
 .weight-bar {
   background: rgba(0, 0, 0, 0.5) !important;

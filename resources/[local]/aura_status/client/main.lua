@@ -30,6 +30,9 @@ AddEventHandler('aura_status:client:LoadStatus', function(statusData)
     PlayerData.hunger = tonumber(statusData.hunger) or 100.0
     PlayerData.thirst = tonumber(statusData.thirst) or 100.0
     
+    LocalPlayer.state:set('hunger', PlayerData.hunger, true)
+    LocalPlayer.state:set('thirst', PlayerData.thirst, true)
+    
     local ped = PlayerPedId()
     if statusData.health and tonumber(statusData.health) then
         SetEntityHealth(ped, tonumber(statusData.health))
@@ -64,8 +67,10 @@ RegisterNetEvent('aura_status:client:AddStatus')
 AddEventHandler('aura_status:client:AddStatus', function(type, amount)
     if type == 'hunger' then
         PlayerData.hunger = Clamp(PlayerData.hunger + amount, 0.0, 100.0)
+        LocalPlayer.state:set('hunger', PlayerData.hunger, true)
     elseif type == 'thirst' then
         PlayerData.thirst = Clamp(PlayerData.thirst + amount, 0.0, 100.0)
+        LocalPlayer.state:set('thirst', PlayerData.thirst, true)
     end
 end)
 
@@ -86,6 +91,9 @@ CreateThread(function()
             -- Reducir estados basados en el cálculo matemático dinámico
             PlayerData.hunger = Clamp(PlayerData.hunger - hungerDrainPerTick, 0.0, 100.0)
             PlayerData.thirst = Clamp(PlayerData.thirst - thirstDrainPerTick, 0.0, 100.0)
+            
+            LocalPlayer.state:set('hunger', PlayerData.hunger, true)
+            LocalPlayer.state:set('thirst', PlayerData.thirst, true)
             
             -- Aplicar daño por inanición / deshidratación si llega a 0
             if PlayerData.hunger <= 0.0 then

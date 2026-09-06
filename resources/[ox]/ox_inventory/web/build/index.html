@@ -71,8 +71,37 @@
           invWrapper.parentElement.insertBefore(header, invWrapper);
         }
 
-        // 2. Inyectar Buscador y Filtros en Español dentro del panel izquierdo (Player)
+        // 1.5. Inyectar Botón "Salud" en el Header del Jugador (entre Nombre y Peso)
         const leftGridWrapper = invWrapper.querySelector('.inventory-grid-wrapper:first-child');
+        if (leftGridWrapper) {
+          const leftHeader = leftGridWrapper.querySelector('.inventory-grid-header-wrapper');
+          if (leftHeader && !leftHeader.querySelector('.aura-health-btn')) {
+            const healthBtn = document.createElement('button');
+            healthBtn.className = 'aura-health-btn';
+            healthBtn.id = 'aura-health-btn';
+            healthBtn.innerHTML = `
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+              </svg>
+              <span>Salud</span>
+            `;
+            healthBtn.addEventListener('click', (e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              postNui('aura_openMedical', {});
+            });
+
+            const firstP = leftHeader.querySelector('p:first-child');
+            const lastP = leftHeader.querySelector('p:last-child');
+            if (firstP && lastP && firstP !== lastP) {
+              firstP.after(healthBtn);
+            } else {
+              leftHeader.appendChild(healthBtn);
+            }
+          }
+        }
+
+        // 2. Inyectar Buscador y Filtros en Español dentro del panel izquierdo (Player)
         if (leftGridWrapper && !leftGridWrapper.querySelector('.aura-filter-container')) {
           const filterContainer = document.createElement('div');
           filterContainer.className = 'aura-filter-container';
