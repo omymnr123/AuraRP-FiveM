@@ -96,29 +96,42 @@ Config.FieldOps = {
 Config.Vehicles = {
     {
         model = 'ambulance',
-        label = 'Ambulancia de Soporte Vital (Bravado)',
-        category = 'SVB',
+        label = 'Ambulancia de Soporte Vital (SVB)',
+        category = 'Ambulancia',
         minGrade = 0,
+        desc = 'Unidad de traslado asistencial y soporte vital básico con camilla medicalizada.',
         icon = 'fa-solid fa-truck-medical',
         image = 'ambulance.png',
         livery = 0
     },
     {
         model = 'granger2',
-        label = 'SUV Rápido de Intervención Médica',
-        category = 'VIR',
+        label = 'SUV Rápido de Intervención Médica (VIR)',
+        category = 'Intervención',
         minGrade = 1,
+        desc = 'SUV 4x4 de respuesta médica urgente con equipamiento de reanimación avanzada.',
         icon = 'fa-solid fa-car-side',
         image = 'granger2.png',
         livery = 0
     },
     {
         model = 'polalamo',
-        label = 'Unidad Táctica de Rescate en Montaña',
-        category = 'RESCUE',
+        label = 'Unidad Táctica de Rescate y Catástrofes',
+        category = 'Rescate',
         minGrade = 2,
+        desc = 'Vehículo de rescate en montaña, zonas hostiles y triaje de múltiples víctimas.',
         icon = 'fa-solid fa-truck-pickup',
         image = 'polalamo.png',
+        livery = 0
+    },
+    {
+        model = 'fbi2',
+        label = 'Unidad de Mando Médico / Jefatura EMS',
+        category = 'Jefatura',
+        minGrade = 3,
+        desc = 'Vehículo de coordinación médica de incidentes, supervisión y mando directivo.',
+        icon = 'fa-solid fa-shield-halved',
+        image = 'fbi2.png',
         livery = 0
     }
 }
@@ -127,8 +140,9 @@ Config.Helicopters = {
     {
         model = 'supervolito2',
         label = 'Helicóptero Medevac Air-Ambulance',
-        category = 'AIR',
+        category = 'Aéreo',
         minGrade = 2,
+        desc = 'Unidad aérea sanitaria de evacuación crítica con monitor multiparamétrico y soporte vital.',
         icon = 'fa-solid fa-helicopter',
         image = 'supervolito.png',
         livery = 0
@@ -184,9 +198,9 @@ Config.Stations = {
             maxWeight = 250000
         },
         garage = {
-            interact = vector3(1142.15, -1518.22, 34.69),
-            spawn = vector4(1136.52, -1523.10, 34.69, 1.0),
-            heading = 1.0
+            interact = vector3(1119.39, -1620.09, 34.69),
+            spawn = vector4(1121.46, -1612.72, 34.69, 265.80),
+            heading = 117.77
         },
         helipad = {
             interact = vector3(1178.50, -1490.20, 48.50),

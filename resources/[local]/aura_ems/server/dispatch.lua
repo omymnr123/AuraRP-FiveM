@@ -199,6 +199,68 @@ lib.callback.register('aura_ems:server:resolveCall', function(source, callId)
     return true, string.format("Aviso #%s marcado como RESUELTO.", call.id)
 end)
 
+--- Crear una llamada de misión médica (NPC / Simulador de Emergencias)
+RegisterNetEvent('aura_ems:server:createEmergencyMissionCall', function(data)
+    local src = source
+    if not data or not data.coords then return end
+
+    local now = os.time()
+    local patientName = data.patientName or "Ciudadano Inconsciente"
+
+    local alertData = {
+        id = #RecentMedicalCalls + 1,
+        missionId = data.missionId,
+        isMission = true,
+        dummyId = data.dummyId,
+        type = 'medical',
+        code = '10-33',
+        title = data.title or 'Parada Cardiorrespiratoria / Paciente Inconsciente',
+        description = string.format("Paciente %s en parada cardiorrespiratoria en %s (%s). Se requiere asistencia inmediata.", patientName, data.street or "Vía Pública", data.zone or "Los Santos"),
+        coords = data.coords,
+        street = data.street or "Vía Pública",
+        zone = data.zone or "Los Santos",
+        patientName = patientName,
+        deathReason = data.deathReason or "Traumatismo Severo y Parada Cardíaca",
+        time = os.date('%H:%M:%S'),
+        timestamp = now,
+        maxUnits = Config.Dispatch.maxUnitsPerCall or 2,
+        units = {},
+        status = 'pending'
+    }
+
+    BroadcastMedicalAlert(alertData)
+end)
+
+--- Resolver llamada por ID de misión o ID de aviso
+RegisterNetEvent('aura_ems:server:resolveMissionCall', function(missionId, dummyId)
+    local resolvedCall = nil
+    for _, call in ipairs(RecentMedicalCalls) do
+        if (missionId and call.missionId == missionId) or (dummyId and call.dummyId == dummyId) then
+            call.status = 'resolved'
+            call.resolvedAt = os.date('%H:%M:%S')
+            resolvedCall = call
+            break
+        end
+    end
+
+    if resolvedCall then
+        BroadcastCallUpdate(resolvedCall)
+
+        for _, pid in ipairs(GetPlayers()) do
+            local pSrc = tonumber(pid)
+            if pSrc and IsEmsOnDuty(pSrc) then
+                TriggerClientEvent('ox_lib:notify', pSrc, {
+                    title = 'Central 10-33 | Emergencia Resuelta',
+                    description = string.format("🚑 Paciente reanimado y estabilizado con éxito en %s.", resolvedCall.street or "la zona"),
+                    type = 'success',
+                    icon = 'heart-circle-check',
+                    duration = 8000
+                })
+            end
+        end
+    end
+end)
+
 --- Obtener listado de llamadas activas para la Central de Avisos NUI
 lib.callback.register('aura_ems:server:getDispatchBoardCalls', function(source)
     if not IsEmsOnDuty(source) then return {} end
@@ -208,3 +270,6 @@ end)
 lib.callback.register('aura_ems:server:getDispatchHistory', function(source)
     return RecentMedicalCalls
 end)
+
+exports('CreateMedicalAlert', BroadcastMedicalAlert)
+exports('GetRecentDispatchCalls', function() return RecentMedicalCalls end)

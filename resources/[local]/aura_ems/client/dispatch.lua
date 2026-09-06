@@ -149,23 +149,20 @@ RegisterKeyMapping('dispatch_ems_gps', 'Acudir / Responder a última emergencia 
 local function ToggleDispatchBoard()
     local pState = LocalPlayer.state
     if not (pState.job == Config.JobName and pState.job_duty == true) then
-        lib.notify({
-            title = 'Centralita EMS',
-            description = 'Debes estar de servicio como personal médico para abrir la central.',
-            type = 'error'
-        })
         return
     end
 
     if IsBoardOpen then
         IsBoardOpen = false
         SetNuiFocus(false, false)
+        TriggerScreenblurFadeOut(350)
         SendNUIMessage({ action = 'closeDispatchBoard' })
         return
     end
 
     lib.callback('aura_ems:server:getDispatchBoardCalls', false, function(calls)
         IsBoardOpen = true
+        TriggerScreenblurFadeIn(350)
         SetNuiFocus(true, true)
         SendNUIMessage({
             action = 'openDispatchBoard',
@@ -185,6 +182,7 @@ RegisterKeyMapping('dispatch_ems_board', 'Abrir Central de Avisos Médicos (10-3
 RegisterNUICallback('closeDispatchBoard', function(_, cb)
     IsBoardOpen = false
     SetNuiFocus(false, false)
+    TriggerScreenblurFadeOut(350)
     cb(true)
 end)
 
@@ -219,3 +217,10 @@ RegisterNUICallback('setDispatchGps', function(data, cb)
     end
     cb(true)
 end)
+
+RegisterNUICallback('getDispatchBoardCalls', function(_, cb)
+    lib.callback('aura_ems:server:getDispatchBoardCalls', false, function(calls)
+        cb(calls or {})
+    end)
+end)
+

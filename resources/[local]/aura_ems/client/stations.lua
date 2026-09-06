@@ -1,9 +1,12 @@
 -- ============================================================================
 -- AURA EMS: CLIENT STATIONS & HOSPITALS CONTROLLER
--- Duty Toggles, Pharmacy Stashes by Grade, Garage & Helipad Spawners
+-- Duty Toggles, Pharmacy Stashes by Grade, Fleet Command Garages & Helipad Spawners
 -- ============================================================================
 
 local SpawnedVehicles = {}
+local SpawnedStationProps = {}
+local currentStationSpawn = nil
+local myEmsVehicle = nil
 
 -- ============================================================================
 -- 1. BLIPS DE HOSPITALES
@@ -27,116 +30,183 @@ CreateThread(function()
 end)
 
 -- ============================================================================
--- 2. SPAWN DE VEHÍCULOS Y HELICÓPTEROS MÉDICOS
+-- 2. CONTROLADOR NUI Y SPAWN DE VEHÍCULOS MÉDICOS (FLEET COMMAND)
 -- ============================================================================
 
-local function SpawnEmsVehicle(modelName, spawnCoords, heading)
-    local model = joaat(modelName)
-    lib.requestModel(model, 5000)
-
-    -- Limpiar vehículo anterior si existía en el punto
-    local clearRadius = 4.0
-    local vehiclesNearby = lib.getNearbyVehicles(vec3(spawnCoords.x, spawnCoords.y, spawnCoords.z), clearRadius, true)
-    for _, v in ipairs(vehiclesNearby) do
-        if DoesEntityExist(v.vehicle) then
-            SetEntityAsMissionEntity(v.vehicle, true, true)
-            DeleteVehicle(v.vehicle)
-        end
+local function OpenEmsGarageNUI(stationKey, stationData, isHelipad)
+    local pState = LocalPlayer.state
+    if pState.job ~= Config.JobName then
+        lib.notify({
+            title = 'Parque Móvil EMS',
+            description = 'Acceso reservado a personal médico y sanitario.',
+            type = 'error'
+        })
+        return
     end
 
-    local vehicle = CreateVehicle(model, spawnCoords.x, spawnCoords.y, spawnCoords.z, heading or spawnCoords.w or 0.0, true, false)
+    if not pState.job_duty then
+        lib.notify({
+            title = 'Parque Móvil EMS',
+            description = 'Debes entrar EN SERVICIO para solicitar un vehículo de emergencias.',
+            type = 'error'
+        })
+        return
+    end
+
+    local grade = pState.job_grade or 0
+    local doctorName = pState.name or 'Personal Médico'
+
+    if isHelipad then
+        currentStationSpawn = stationData.helipad.spawn
+    else
+        currentStationSpawn = stationData.garage.spawn
+    end
+
+    local vehiclesList = isHelipad and (Config.Helicopters or {}) or (Config.Vehicles or {})
+
+    TriggerScreenblurFadeIn(350)
+    SetNuiFocus(true, true)
+    SendNUIMessage({
+        action = 'openEmsGarage',
+        vehicles = vehiclesList,
+        doctorGrade = grade,
+        doctorName = doctorName,
+        stationName = stationData.label or 'Hospital General EMS'
+    })
+end
+
+local function CloseEmsGarageNUI()
+    SetNuiFocus(false, false)
+    TriggerScreenblurFadeOut(350)
+    SendNUIMessage({ action = 'closeEmsGarage' })
+end
+
+RegisterNUICallback('closeGarage', function(data, cb)
+    CloseEmsGarageNUI()
+    cb('ok')
+end)
+
+local function ReturnAndStoreEmsVehicle(veh)
+    if not DoesEntityExist(veh) then return end
+
+    -- Animación de guardado
+    TaskLeaveVehicle(PlayerPedId(), veh, 0)
+    Wait(1200)
+
+    SetEntityAsMissionEntity(veh, true, true)
+    DeleteVehicle(veh)
+
+    if myEmsVehicle == veh then
+        myEmsVehicle = nil
+    end
+
+    lib.notify({
+        title = 'Garaje Sanitario',
+        description = 'Vehículo de emergencias estacionado e inventariado con éxito.',
+        type = 'success',
+        icon = 'square-parking',
+        duration = 5000
+    })
+end
+
+RegisterNUICallback('storeVehicle', function(data, cb)
+    CloseEmsGarageNUI()
+    local ped = cache.ped or PlayerPedId()
+    local veh = GetVehiclePedIsIn(ped, false)
+    if veh ~= 0 then
+        ReturnAndStoreEmsVehicle(veh)
+    else
+        local nearbyVeh = lib.getClosestVehicle(GetEntityCoords(ped), 8.0, true)
+        if nearbyVeh and DoesEntityExist(nearbyVeh) then
+            ReturnAndStoreEmsVehicle(nearbyVeh)
+        else
+            lib.notify({ title = 'Garaje EMS', description = 'No hay ningún vehículo médico cercano para guardar.', type = 'error' })
+        end
+    end
+    cb('ok')
+end)
+
+function SpawnEmsVehicle(modelName, customSpawn)
+    local spawnCoords = customSpawn or currentStationSpawn
+    if not spawnCoords then
+        lib.notify({ title = 'Garaje EMS', description = 'Error al determinar el punto de salida del garaje.', type = 'error' })
+        return
+    end
+
+    -- 1. Verificar si el punto de salida está bloqueado
+    local spawnPos = vec3(spawnCoords.x, spawnCoords.y, spawnCoords.z)
+    local blockingVeh = lib.getClosestVehicle(spawnPos, 3.5, true)
+    if blockingVeh and DoesEntityExist(blockingVeh) then
+        lib.notify({
+            title = 'Punto de Salida Ocupado',
+            description = 'Hay un vehículo bloqueando la zona de salida. Despeja el área antes de solicitar otro.',
+            type = 'error'
+        })
+        return
+    end
+
+    -- 2. Cargar modelo
+    local hash = joaat(modelName)
+    if not IsModelInCdimage(hash) or not IsModelAVehicle(hash) then
+        lib.notify({ title = 'Garaje EMS', description = 'Modelo de vehículo inválido o no disponible.', type = 'error' })
+        return
+    end
+
+    lib.requestModel(hash, 5000)
+
+    local vehHeading = spawnCoords.w or 0.0
+    local vehicle = CreateVehicle(hash, spawnCoords.x, spawnCoords.y, spawnCoords.z, vehHeading, true, false)
+
     if DoesEntityExist(vehicle) then
+        SetEntityAsMissionEntity(vehicle, true, true)
         SetVehicleOnGroundProperly(vehicle)
         SetVehicleNumberPlateText(vehicle, "EMS " .. math.random(100, 999))
         SetVehicleColours(vehicle, 111, 111) -- Blanco puro
         SetVehicleLivery(vehicle, 0)
         SetVehicleEngineOn(vehicle, true, true, false)
 
-        -- Poner al jugador dentro del vehículo
-        TaskWarpPedIntoVehicle(PlayerPedId(), vehicle, -1)
+        -- Poner al médico dentro del vehículo
+        local ped = cache.ped or PlayerPedId()
+        TaskWarpPedIntoVehicle(ped, vehicle, -1)
 
-        -- Guardar referencia
+        myEmsVehicle = vehicle
         table.insert(SpawnedVehicles, vehicle)
 
         lib.notify({
             title = 'Parque Móvil EMS',
-            description = 'Vehículo de emergencias asignado y listo para el servicio.',
+            description = string.format("Unidad de emergencias '%s' asignada y lista para el servicio.", modelName),
             type = 'success',
             icon = 'truck-medical',
-            duration = 5000
+            duration = 6000
         })
     end
-    SetModelAsNoLongerNeeded(model)
+
+    SetModelAsNoLongerNeeded(hash)
 end
 
-local function OpenGarageMenu(stationKey, stationData, isHelipad)
-    local pState = LocalPlayer.state
-    if pState.job ~= Config.JobName then
-        lib.notify({ title = 'Garaje EMS', description = 'Acceso reservado a personal médico.', type = 'error' })
-        return
+RegisterNUICallback('spawnVehicle', function(data, cb)
+    CloseEmsGarageNUI()
+    if data and data.model then
+        SpawnEmsVehicle(data.model)
     end
+    cb('ok')
+end)
 
-    if not pState.job_duty then
-        lib.notify({ title = 'Garaje EMS', description = 'Debes estar EN SERVICIO para retirar una unidad móvil.', type = 'error' })
-        return
-    end
+AddEventHandler('onResourceStop', function(resourceName)
+    if GetCurrentResourceName() ~= resourceName then return end
+    SetNuiFocus(false, false)
+    TriggerScreenblurFadeOut(0)
 
-    local userGrade = pState.job_grade or 0
-    local options = {}
-
-    local catalog = isHelipad and Config.Helicopters or Config.Vehicles
-    local spawnTarget = isHelipad and stationData.helipad.spawn or stationData.garage.spawn
-    local spawnHeading = isHelipad and stationData.helipad.heading or stationData.garage.heading
-
-    for _, item in ipairs(catalog) do
-        local isLocked = userGrade < (item.minGrade or 0)
-        table.insert(options, {
-            title = item.label,
-            description = isLocked and string.format("Requiere Grado %s o superior", item.minGrade) or string.format("Categoría: %s", item.category),
-            icon = item.icon or 'fa-solid fa-truck-medical',
-            disabled = isLocked,
-            onSelect = function()
-                SpawnEmsVehicle(item.model, spawnTarget, spawnHeading)
-            end
-        })
-    end
-
-    -- Opción de guardar vehículo
-    table.insert(options, {
-        title = 'Guardar / Devolver Vehículo',
-        description = 'Estaciona y guarda tu vehículo de emergencias en el garaje',
-        icon = 'fa-solid fa-square-parking',
-        onSelect = function()
-            local ped = PlayerPedId()
-            local veh = GetVehiclePedIsIn(ped, false)
-            if veh and veh ~= 0 then
-                SetEntityAsMissionEntity(veh, true, true)
-                DeleteVehicle(veh)
-                lib.notify({ title = 'Garaje EMS', description = 'Vehículo guardado correctamente.', type = 'inform' })
-            else
-                local nearby = lib.getNearbyVehicles(GetEntityCoords(ped), 6.0, true)
-                if nearby and #nearby > 0 then
-                    SetEntityAsMissionEntity(nearby[1].vehicle, true, true)
-                    DeleteVehicle(nearby[1].vehicle)
-                    lib.notify({ title = 'Garaje EMS', description = 'Vehículo cercano guardado.', type = 'inform' })
-                else
-                    lib.notify({ title = 'Garaje EMS', description = 'No hay ningún vehículo cercano para guardar.', type = 'error' })
-                end
-            end
+    for _, prop in ipairs(SpawnedStationProps) do
+        if DoesEntityExist(prop) then
+            DeleteEntity(prop)
         end
-    })
-
-    lib.registerContext({
-        id = 'ems_garage_context_' .. stationKey,
-        title = isHelipad and ('Helipuerto - ' .. (stationData.shortName or stationData.label)) or ('Garaje - ' .. (stationData.shortName or stationData.label)),
-        options = options
-    })
-
-    lib.showContext('ems_garage_context_' .. stationKey)
-end
+    end
+    SpawnedStationProps = {}
+end)
 
 -- ============================================================================
--- 3. REGISTRO DE PUNTOS OX_TARGET EN CADA ESTACIÓN
+-- 3. REGISTRO DE TERMINALES FÍSICOS Y PUNTOS OX_TARGET EN HOSPITALES
 -- ============================================================================
 
 CreateThread(function()
@@ -213,48 +283,81 @@ CreateThread(function()
             })
         end
 
-        -- 3. GARAJE DE AMBULANCIAS
+        -- 3. GARAJE MÉDICO (TERMINAL FÍSICO CON OX_TARGET)
         if stationData.garage then
-            exports.ox_target:addSphereZone({
-                coords = stationData.garage.interact,
-                radius = 2.2,
-                debug = Config.Debug,
-                options = {
+            local termCoords = stationData.garage.interact
+            local termHeading = stationData.garage.heading or (termCoords.w) or 270.0
+            local termModel = `prop_parkingpay`
+            lib.requestModel(termModel, 5000)
+
+            local terminalObj = CreateObject(termModel, termCoords.x, termCoords.y, termCoords.z - 0.95, false, false, false)
+            if terminalObj ~= 0 and DoesEntityExist(terminalObj) then
+                SetEntityHeading(terminalObj, termHeading + 0.0)
+                PlaceObjectOnGroundProperly(terminalObj)
+                FreezeEntityPosition(terminalObj, true)
+                SetEntityInvincible(terminalObj, true)
+                table.insert(SpawnedStationProps, terminalObj)
+
+                -- Registrar ox_target directamente sobre el terminal físico
+                exports.ox_target:addLocalEntity(terminalObj, {
                     {
                         name = 'aura_ems_garage_' .. stationKey,
                         icon = 'fa-solid fa-truck-medical',
-                        label = 'Garaje de Ambulancias',
+                        label = 'Garaje Médico (Flota EMS)',
                         distance = 3.0,
                         canInteract = function()
                             local pState = LocalPlayer.state
-                            return pState.job == Config.JobName
+                            return pState.job == Config.JobName and pState.job_duty == true
                         end,
                         onSelect = function()
-                            OpenGarageMenu(stationKey, stationData, false)
+                            OpenEmsGarageNUI(stationKey, stationData, false)
                         end
                     }
-                }
-            })
+                })
+            else
+                -- Fallback con zona esférica si no se creara el prop
+                exports.ox_target:addSphereZone({
+                    coords = vec3(termCoords.x, termCoords.y, termCoords.z),
+                    radius = 2.0,
+                    debug = Config.Debug,
+                    options = {
+                        {
+                            name = 'aura_ems_garage_zone_' .. stationKey,
+                            icon = 'fa-solid fa-truck-medical',
+                            label = 'Garaje Médico (Flota EMS)',
+                            distance = 3.0,
+                            canInteract = function()
+                                local pState = LocalPlayer.state
+                                return pState.job == Config.JobName and pState.job_duty == true
+                            end,
+                            onSelect = function()
+                                OpenEmsGarageNUI(stationKey, stationData, false)
+                            end
+                        }
+                    }
+                })
+            end
         end
 
         -- 4. HELIPUERTO MEDEVAC
         if stationData.helipad then
+            local heliCoords = stationData.helipad.interact
             exports.ox_target:addSphereZone({
-                coords = stationData.helipad.interact,
+                coords = vec3(heliCoords.x, heliCoords.y, heliCoords.z),
                 radius = 2.5,
                 debug = Config.Debug,
                 options = {
                     {
                         name = 'aura_ems_helipad_' .. stationKey,
                         icon = 'fa-solid fa-helicopter',
-                        label = 'Helipuerto Air-Ambulance',
+                        label = 'Helipuerto Sanitario (Medevac Air Support)',
                         distance = 3.5,
                         canInteract = function()
                             local pState = LocalPlayer.state
-                            return pState.job == Config.JobName
+                            return pState.job == Config.JobName and pState.job_duty == true
                         end,
                         onSelect = function()
-                            OpenGarageMenu(stationKey, stationData, true)
+                            OpenEmsGarageNUI(stationKey, stationData, true)
                         end
                     }
                 }
@@ -262,3 +365,4 @@ CreateThread(function()
         end
     end
 end)
+

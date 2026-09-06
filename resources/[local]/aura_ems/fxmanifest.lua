@@ -34,7 +34,11 @@ ui_page 'web/index.html'
 files {
     'web/index.html',
     'web/css/style.css',
-    'web/js/app.js'
+    'web/js/app.js',
+    'web/images/silueta_hombre.png',
+    'web/images/silueta_mujer.png',
+    'web/images/*.png',
+    'web/images/*'
 }
 
 dependencies {

@@ -268,11 +268,6 @@ RegisterKeyMapping('dispatch_gps', 'Acudir / Responder a último aviso y fijar G
 local function ToggleDispatchBoard()
     local pState = LocalPlayer.state
     if not (pState.job == 'police' and pState.job_duty == true) then
-        lib.notify({
-            title = 'Centralita LSPD',
-            description = 'Debes estar de servicio como policía para abrir la central.',
-            type = 'error'
-        })
         return
     end
 

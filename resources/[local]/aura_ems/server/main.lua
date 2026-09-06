@@ -77,6 +77,10 @@ lib.callback.register('aura_ems:server:resuscitatePatient', function(source, tar
     local medicSrc = source
     local targetSrc = tonumber(targetServerId)
 
+    if not IsEmsOnDuty(medicSrc) then
+        return false, "Debes ser personal médico (EMS) y estar de servicio activo."
+    end
+
     if not targetSrc or targetSrc <= 0 or not GetPlayerPed(targetSrc) or GetPlayerPed(targetSrc) == 0 then
         return false, "Paciente no válido o fuera de alcance."
     end
@@ -110,7 +114,24 @@ lib.callback.register('aura_ems:server:resuscitatePatient', function(source, tar
         TriggerClientEvent('aura_death:client:revivePlayer', targetSrc)
     end
 
-    -- 2. Restablecer daños corporales en aura_medical
+    -- 2. Restablecer daños corporales y fracturas en aura_medical
+    local healthyBones = {
+        head = { health = 100, injuries = {} },
+        torso = { health = 100, injuries = {} },
+        right_arm = { health = 100, injuries = {} },
+        left_arm = { health = 100, injuries = {} },
+        right_hand = { health = 100, injuries = {} },
+        left_hand = { health = 100, injuries = {} },
+        right_leg = { health = 100, injuries = {} },
+        left_leg = { health = 100, injuries = {} },
+        right_foot = { health = 100, injuries = {} },
+        left_foot = { health = 100, injuries = {} }
+    }
+    Player(targetSrc).state:set('bone_damage', healthyBones, true)
+    
+    if exports.aura_medical and exports.aura_medical.SetPlayerBoneDamage then
+        exports.aura_medical:SetPlayerBoneDamage(targetSrc, healthyBones)
+    end
     TriggerClientEvent('aura_medical:client:resetDamage', targetSrc)
 
     -- 3. Aplicar agotamiento metabólico post-coma en aura_status (15% hambre/sed, 0% estamina)
@@ -119,13 +140,13 @@ lib.callback.register('aura_ems:server:resuscitatePatient', function(source, tar
     -- 4. Notificaciones
     TriggerClientEvent('ox_lib:notify', targetSrc, {
         title = 'Reanimación Exitosa',
-        description = 'Has sido desfibrilado con éxito. Sufres de cansancio y deshidratación severa.',
+        description = 'Has sido desfibrilado con éxito. Tus fracturas y lesiones han sido estabilizadas.',
         type = 'success',
         icon = 'heart-pulse',
         duration = 7000
     })
 
-    return true, "¡Descarga sincronizada efectiva! Signos vitales restablecidos."
+    return true, "¡Descarga sincronizada efectiva! Signos vitales y lesiones restablecidos."
 end)
 
 -- ============================================================================
@@ -135,6 +156,10 @@ end)
 lib.callback.register('aura_ems:server:applyTourniquet', function(source, targetServerId)
     local medicSrc = source
     local targetSrc = tonumber(targetServerId)
+
+    if not IsEmsOnDuty(medicSrc) then
+        return false, "Debes ser personal médico (EMS) y estar de servicio activo."
+    end
 
     if not targetSrc or targetSrc <= 0 or not GetPlayerPed(targetSrc) or GetPlayerPed(targetSrc) == 0 then
         return false, "Paciente no válido o no encontrado."
@@ -174,7 +199,131 @@ lib.callback.register('aura_ems:server:applyTourniquet', function(source, target
 end)
 
 -- ============================================================================
--- 3. GESTIÓN DE SERVICIO OFICIAL (DUTY TOGGLE)
+-- 3. TELEMETRÍA Y DIAGNÓSTICO CLÍNICO INTEGRAL (PUENTE MULTI-RECURSO)
+-- ============================================================================
+
+lib.callback.register('aura_ems:server:getPatientDiagnosticData', function(source, targetServerId)
+    local medicSrc = source
+    if not IsEmsOnDuty(medicSrc) then
+        return nil
+    end
+
+    local targetSrc = tonumber(targetServerId)
+    if not targetSrc or targetSrc <= 0 or not GetPlayerPed(targetSrc) or GetPlayerPed(targetSrc) == 0 then
+        return nil
+    end
+
+    local ped = GetPlayerPed(targetSrc)
+    local pState = Player(targetSrc).state
+
+    -- 1. Identidad del Paciente
+    local patientName = "Paciente Desconocido"
+    local citizenId = "HLWWIZKU"
+
+    if exports.aura_multichar and exports.aura_multichar.GetActiveCharacter then
+        local char = exports.aura_multichar:GetActiveCharacter(targetSrc)
+        if char then
+            patientName = (char.firstname or "") .. " " .. (char.lastname or "")
+            if patientName:match("^%s*$") then patientName = char.name or GetPlayerName(targetSrc) end
+            citizenId = char.citizenid or char.citizenId or citizenId
+        else
+            patientName = GetPlayerName(targetSrc)
+        end
+    else
+        patientName = GetPlayerName(targetSrc)
+    end
+
+    -- 2. Estado de Coma / Muerte / Sangrado
+    local isDead = pState.isDead == true
+    if not isDead and exports.aura_death and exports.aura_death.isPlayerDead then
+        isDead = exports.aura_death:isPlayerDead(targetSrc)
+    end
+
+    local bleedoutPaused = pState.bleedoutPaused == true
+
+    -- 3. Daños Óseos y Traumas (aura_medical)
+    local boneDamage = pState.bone_damage or {
+        head = { health = 100, injuries = {} },
+        torso = { health = 100, injuries = {} },
+        right_arm = { health = 100, injuries = {} },
+        left_arm = { health = 100, injuries = {} },
+        right_hand = { health = 100, injuries = {} },
+        left_hand = { health = 100, injuries = {} },
+        right_leg = { health = 100, injuries = {} },
+        left_leg = { health = 100, injuries = {} },
+        right_foot = { health = 100, injuries = {} },
+        left_foot = { health = 100, injuries = {} }
+    }
+
+    -- 4. Constantes Fisiológicas (aura_status)
+    local maxHealth = GetEntityMaxHealth(ped)
+    local curHealth = GetEntityHealth(ped)
+    local healthPct = 0
+    if maxHealth > 100 then
+        healthPct = math.max(0, math.min(100, math.floor(((curHealth - 100) / (maxHealth - 100)) * 100)))
+    else
+        healthPct = math.max(0, math.min(100, math.floor((curHealth / maxHealth) * 100)))
+    end
+    if isDead then healthPct = 0 end
+
+    local armor = math.min(100, GetPedArmour(ped))
+    local hunger = pState.hunger or 100.0
+    local thirst = pState.thirst or 100.0
+    local stamina = isDead and 0 or 100.0
+
+    -- 5. Termorregulación y Clima (aura_seasons)
+    local bodyTemp = pState.body_temperature or (isDead and 34.8 or 36.8)
+    local ambientTemp = 21.0
+    if exports.aura_seasons and exports.aura_seasons.GetAmbientTemperature then
+        ambientTemp = exports.aura_seasons:GetAmbientTemperature() or 21.0
+    end
+
+    -- 6. Hemodinámica y Ritmo
+    local bpm = isDead and 0 or (healthPct < 40 and 125 or (healthPct < 70 and 96 or 72))
+    if bodyTemp > 38.5 then bpm = bpm + 12 end
+    if bodyTemp < 35.0 and not isDead then bpm = math.max(40, bpm - 15) end
+
+    local bloodPressure = isDead and "0/0 mmHg" or (healthPct < 40 and "85/50 mmHg" or "120/80 mmHg")
+    local spo2 = isDead and 40 or (healthPct < 30 and 72 or (healthPct < 70 and 88 or 98))
+    local bleedingLevel = isDead and (bleedoutPaused and "Ocluida (Torniquete C-A-T)" or "Grave (Arteria Femoral)") or "Sin Hemorragias Activas"
+
+    local hasLimbTrauma = false
+    for _, b in pairs(boneDamage) do
+        if b.health and b.health < 100 then
+            hasLimbTrauma = true
+            break
+        end
+    end
+    if not isDead and hasLimbTrauma and bleedingLevel == "Sin Hemorragias Activas" then
+        bleedingLevel = "Leve / Moderada"
+    end
+
+    return {
+        targetSrc = targetSrc,
+        name = patientName,
+        citizenid = citizenId,
+        isDead = isDead,
+        glasgow = isDead and 3 or 15,
+        health = healthPct,
+        armor = armor,
+        hunger = hunger,
+        thirst = thirst,
+        stamina = stamina,
+        temperature = bodyTemp,
+        ambientTemp = ambientTemp,
+        insulation = 35.0,
+        bpm = bpm,
+        bloodPressure = bloodPressure,
+        spo2 = spo2,
+        bleedingLevel = bleedingLevel,
+        hasTourniquet = bleedoutPaused,
+        isTourniquetApplied = bleedoutPaused,
+        boneDamage = boneDamage
+    }
+end)
+
+-- ============================================================================
+-- 4. GESTIÓN DE SERVICIO OFICIAL (DUTY TOGGLE)
 -- ============================================================================
 
 lib.callback.register('aura_ems:server:toggleDuty', function(source)
@@ -258,4 +407,62 @@ RegisterNetEvent('aura_ems:server:debugSimulateEmergency', function(coords, stre
         duration = 5000
     })
 end)
+
+RegisterNetEvent('aura_ems:server:consumeTestItem', function(itemName)
+    local src = source
+    if itemName ~= 'torniquete' then return end
+    if exports.ox_inventory then
+        exports.ox_inventory:RemoveItem(src, itemName, 1)
+    end
+end)
+
+-- ============================================================================
+-- 5. SINCRONIZACIÓN DE TRANSPORTE DE PACIENTES Y CAMILLAS
+-- ============================================================================
+
+RegisterNetEvent('aura_ems:server:carryTarget', function(targetSrc)
+    local medicSrc = source
+    if not IsEmsOnDuty(medicSrc) then return end
+
+    local target = tonumber(targetSrc)
+    if not target or target <= 0 or not GetPlayerPed(target) or GetPlayerPed(target) == 0 then return end
+
+    Player(target).state:set('isCarried', true, true)
+    Player(medicSrc).state:set('isCarrying', true, true)
+
+    TriggerClientEvent('aura_ems:client:getCarried', target, medicSrc)
+end)
+
+RegisterNetEvent('aura_ems:server:stopCarryTarget', function(targetSrc)
+    local medicSrc = source
+    local target = tonumber(targetSrc)
+    if target and target > 0 and GetPlayerPed(target) and GetPlayerPed(target) ~= 0 then
+        Player(target).state:set('isCarried', false, true)
+        TriggerClientEvent('aura_ems:client:getReleased', target)
+    end
+    Player(medicSrc).state:set('isCarrying', false, true)
+end)
+
+RegisterNetEvent('aura_ems:server:putInAmbulance', function(vehNet, targetSrc, seatIndex)
+    local medicSrc = source
+    if not IsEmsOnDuty(medicSrc) then return end
+
+    local target = tonumber(targetSrc)
+    if not target or target <= 0 or not GetPlayerPed(target) or GetPlayerPed(target) == 0 then return end
+
+    Player(target).state:set('isCarried', false, true)
+    TriggerClientEvent('aura_ems:client:putInAmbulanceSeat', target, vehNet, seatIndex or 1)
+end)
+
+RegisterNetEvent('aura_ems:server:outOfAmbulance', function(vehNet, targetSrc)
+    local medicSrc = source
+    if not IsEmsOnDuty(medicSrc) then return end
+
+    local target = tonumber(targetSrc)
+    if not target or target <= 0 or not GetPlayerPed(target) or GetPlayerPed(target) == 0 then return end
+
+    TriggerClientEvent('aura_ems:client:leaveAmbulanceSeat', target)
+end)
+
+
 

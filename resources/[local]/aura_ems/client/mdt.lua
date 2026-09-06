@@ -52,6 +52,36 @@ local function RemoveTabletProp()
     end
 end
 
+CreateThread(function()
+    while true do
+        if isMdtOpen then
+            DisableControlAction(0, 1, true)   -- LookLeftRight
+            DisableControlAction(0, 2, true)   -- LookUpDown
+            DisableControlAction(0, 24, true)  -- Attack
+            DisableControlAction(0, 25, true)  -- Aim
+            DisableControlAction(0, 30, true)  -- MoveLR
+            DisableControlAction(0, 31, true)  -- MoveUD
+            DisableControlAction(0, 32, true)  -- MoveUpOnly (W)
+            DisableControlAction(0, 33, true)  -- MoveDownOnly (S)
+            DisableControlAction(0, 34, true)  -- MoveLeftOnly (A)
+            DisableControlAction(0, 35, true)  -- MoveRightOnly (D)
+            DisableControlAction(0, 21, true)  -- Sprint
+            DisableControlAction(0, 22, true)  -- Jump
+            DisableControlAction(0, 23, true)  -- Enter vehicle
+            DisableControlAction(0, 44, true)  -- Cover
+            DisableControlAction(0, 140, true) -- MeleeAttackLight
+            DisableControlAction(0, 141, true) -- MeleeAttackHeavy
+            DisableControlAction(0, 142, true) -- MeleeAttackAlternate
+            DisableControlAction(0, 257, true) -- Attack 2
+            DisableControlAction(0, 263, true) -- Melee 1
+            DisableControlAction(0, 264, true) -- Melee 2
+            Wait(0)
+        else
+            Wait(300)
+        end
+    end
+end)
+
 local function OpenEmsMdt()
     local pState = LocalPlayer.state
     if pState.job ~= Config.JobName then
