@@ -16,11 +16,11 @@
     <div id="death-app" class="death-app hidden">
         <!-- Barra Superior Flotante Despegada del Borde -->
         <main class="death-container">
-            <!-- Sección Izquierda: Estado Crítico, ECG y Prompt de Rol -->
+            <!-- Sección Izquierda: Estado de Trauma, ECG y Prompt de Rol -->
             <div class="hud-col hud-left">
-                <div class="status-badge">
-                    <span class="pulse-dot"></span>
-                    <span class="badge-text">ESTADO CRÍTICO</span>
+                <div class="status-badge" id="status-badge">
+                    <span id="pulse-dot" class="pulse-dot injured"></span>
+                    <span id="badge-text" class="badge-text injured">HERIDO</span>
                 </div>
                 <div class="ecg-monitor">
                     <svg class="ecg-svg" viewBox="0 0 200 24" preserveAspectRatio="none">
@@ -36,7 +36,7 @@
                 </div>
                 <div class="roleplay-hint">
                     <i class="fa-solid fa-keyboard"></i>
-                    <span><strong>[T]</strong> Chat • <strong class="highlight-action">[Click Derecho]</strong> Modo Cámara / Ratón</span>
+                    <span id="hint-text"><strong>[T]</strong> Chat • <strong class="highlight-action">[Click Derecho]</strong> Cámara</span>
                 </div>
             </div>
 
@@ -45,8 +45,8 @@
             <!-- Sección Central: Temporizador de Desangrado y Signos Vitales -->
             <div class="hud-col hud-center">
                 <div class="timer-wrapper">
-                    <span class="timer-tag">DESANGRADO</span>
-                    <div id="countdown-timer" class="countdown-digits">10:00</div>
+                    <span class="timer-tag" id="timer-tag">DESANGRADO</span>
+                    <div id="countdown-timer" class="countdown-digits">05:00</div>
                 </div>
                 <div class="telemetry-row">
                     <span class="tele-item"><i class="fa-solid fa-heart-pulse"></i> <b id="tele-heart">32 BPM</b></span>
@@ -59,22 +59,22 @@
 
             <div class="hud-divider"></div>
 
-            <!-- Sección Derecha: Acciones (Emergencias y Reaparecer en Hospital) -->
+            <!-- Sección Derecha: Acciones (Auxilio [G] y Reaparecer en Hospital) -->
             <div class="hud-col hud-right">
                 <button id="dispatch-btn" class="aura-btn aura-btn-dispatch" type="button">
                     <div class="btn-content">
                         <i class="fa-solid fa-truck-medical btn-icon"></i>
-                        <span id="btn-text" class="btn-text">EMERGENCIAS</span>
+                        <span id="btn-text" class="btn-text">AUXILIO [G]</span>
                     </div>
                     <div id="cooldown-overlay" class="cooldown-overlay hidden">
                         <div id="cooldown-bar" class="cooldown-bar"></div>
                     </div>
                 </button>
 
-                <button id="respawn-btn" class="aura-btn aura-btn-respawn" type="button">
+                <button id="respawn-btn" class="aura-btn aura-btn-respawn disabled locked" type="button" disabled>
                     <div class="btn-content">
-                        <i class="fa-solid fa-bed-pulse btn-icon"></i>
-                        <span class="btn-text">HOSPITAL</span>
+                        <i id="respawn-icon" class="fa-solid fa-lock btn-icon"></i>
+                        <span id="respawn-text" class="btn-text">HOSPITAL</span>
                     </div>
                 </button>
             </div>

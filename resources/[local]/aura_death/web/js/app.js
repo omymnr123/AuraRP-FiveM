@@ -1,5 +1,6 @@
 // ============================================================================
-// AURARP - CRITICAL STATE & COMA SYSTEM (PHASE 8 JS CONTROLLER)
+// AURARP - CRITICAL STATE & COMA SYSTEM (PHASE 8.2 JS CONTROLLER)
+// Dynamic 2-Phase Trauma Engine: Injured (Crawling/Immobile) & Unconscious
 // ============================================================================
 
 const DISPATCH_COOLDOWN_SECONDS = 120; // 2 Minutos de enfriamiento
@@ -10,19 +11,29 @@ const countdownEl = document.getElementById('countdown-timer');
 const dispatchBtn = document.getElementById('dispatch-btn');
 const respawnBtn = document.getElementById('respawn-btn');
 const btnText = document.getElementById('btn-text');
+const respawnIcon = document.getElementById('respawn-icon');
+const respawnText = document.getElementById('respawn-text');
+const badgeText = document.getElementById('badge-text');
+const pulseDot = document.getElementById('pulse-dot');
+const hintText = document.getElementById('hint-text');
 const cooldownOverlay = document.getElementById('cooldown-overlay');
 const cooldownBar = document.getElementById('cooldown-bar');
 const teleHeart = document.getElementById('tele-heart');
 const teleSpo2 = document.getElementById('tele-spo2');
+const timerTag = document.getElementById('timer-tag');
 
 // Variables de estado
 let countdownTimer = null;
 let cooldownTimer = null;
 let telemetryTimer = null;
 
-let totalSeconds = 600;
-let secondsRemaining = 600;
+let totalSeconds = 300; // 5 Minutos de desangrado (300 segundos)
+let secondsRemaining = 300;
 let cooldownRemaining = 0;
+let currentDeathState = 'injured'; // 'injured' o 'unconscious'
+let canCrawl = true;
+let crawlRemaining = 60;
+let unconsciousDelay = 300; // 5 minutos = 300s
 
 /**
  * Formatea segundos a string MM:SS
@@ -37,32 +48,125 @@ function formatTime(totalSec) {
 }
 
 /**
- * Inicia la cuenta regresiva del estado crítico (10:00)
+ * Configura la UI para la fase de HERIDO (Desangrado de 5 minutos)
+ */
+function setInjuredState(isCrawling, crawlSec) {
+    currentDeathState = 'injured';
+    canCrawl = isCrawling;
+    crawlRemaining = crawlSec !== undefined ? crawlSec : (canCrawl ? 60 : 0);
+
+    if (timerTag) {
+        timerTag.textContent = 'DESANGRADO';
+    }
+
+    if (badgeText) {
+        badgeText.textContent = canCrawl ? 'HERIDO (ARRÁSTRATE)' : 'HERIDO';
+        badgeText.className = 'badge-text injured';
+    }
+    if (pulseDot) {
+        pulseDot.className = 'pulse-dot injured';
+    }
+
+    // Botón de Hospital bloqueado en fase de Herido
+    if (respawnBtn) {
+        respawnBtn.disabled = true;
+        respawnBtn.classList.add('disabled', 'locked');
+    }
+    if (respawnIcon) {
+        respawnIcon.className = 'fa-solid fa-lock btn-icon';
+    }
+    if (respawnText) {
+        respawnText.textContent = 'HOSPITAL';
+    }
+
+    if (btnText && cooldownRemaining <= 0) {
+        btnText.innerHTML = 'AUXILIO <span style="font-size:11px; opacity:0.8; margin-left:4px;">[G]</span>';
+    }
+
+    if (hintText) {
+        hintText.innerHTML = canCrawl
+            ? '<strong>[W/A/S/D]</strong> Arrastrarse • <strong>[T]</strong> Chat'
+            : '<strong>[T]</strong> Chat • <strong class="highlight-action">[Click Derecho]</strong> Cámara';
+    }
+}
+
+/**
+ * Configura la UI para la fase de INCONSCIENTE (Desbloquea el botón de Hospital)
+ */
+function setUnconsciousState() {
+    currentDeathState = 'unconscious';
+    canCrawl = false;
+    crawlRemaining = 0;
+
+    if (timerTag) {
+        timerTag.textContent = 'INCONSCIENTE';
+    }
+
+    if (badgeText) {
+        badgeText.textContent = 'INCONSCIENTE';
+        badgeText.className = 'badge-text unconscious';
+    }
+    if (pulseDot) {
+        pulseDot.className = 'pulse-dot unconscious';
+    }
+
+    // Botón de Hospital DESBLOQUEADO
+    if (respawnBtn) {
+        respawnBtn.disabled = false;
+        respawnBtn.classList.remove('disabled', 'locked');
+    }
+    if (respawnIcon) {
+        respawnIcon.className = 'fa-solid fa-bed-pulse btn-icon';
+    }
+    if (respawnText) {
+        respawnText.textContent = 'HOSPITAL';
+    }
+
+    if (btnText && cooldownRemaining <= 0) {
+        btnText.innerHTML = 'AUXILIO <span style="font-size:11px; opacity:0.8; margin-left:4px;">[G]</span>';
+    }
+
+    if (hintText) {
+        hintText.innerHTML = '<strong>[T]</strong> Chat • <strong class="highlight-action">[Click Derecho]</strong> Cámara';
+    }
+}
+
+/**
+ * Inicia la cuenta regresiva del desangrado (05:00)
  * @param {number} initialSeconds 
  */
 function startCountdown(initialSeconds) {
     if (countdownTimer) clearInterval(countdownTimer);
     
-    totalSeconds = 600;
-    secondsRemaining = Math.max(1, initialSeconds || 600);
+    totalSeconds = 300;
+    secondsRemaining = Math.max(0, initialSeconds !== undefined ? initialSeconds : 300);
     countdownEl.textContent = formatTime(secondsRemaining);
 
     countdownTimer = setInterval(() => {
         secondsRemaining--;
 
+        // Reducir tiempo de arrastre en UI
+        if (canCrawl && crawlRemaining > 0) {
+            crawlRemaining--;
+            if (crawlRemaining <= 0) {
+                canCrawl = false;
+                if (badgeText && currentDeathState === 'injured') {
+                    badgeText.textContent = 'HERIDO';
+                }
+                if (hintText) {
+                    hintText.innerHTML = '<strong>[T]</strong> Chat • <strong class="highlight-action">[Click Derecho]</strong> Cámara';
+                }
+            }
+        }
+
+        // Comprobación de paso a INCONSCIENTE al terminar el tiempo de desangrado (00:00)
         if (secondsRemaining <= 0) {
             clearInterval(countdownTimer);
             countdownTimer = null;
+            secondsRemaining = 0;
             countdownEl.textContent = "00:00";
 
-            // Notificar a FiveM Lua que el tiempo expiró para ejecutar PK
-            fetch(`https://${GetParentResourceName()}/timerExpired`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json; charset=UTF-8',
-                },
-                body: JSON.stringify({})
-            }).catch(() => {});
+            setUnconsciousState();
             return;
         }
 
@@ -84,7 +188,7 @@ function startCountdown(initialSeconds) {
 }
 
 /**
- * Inicia el enfriamiento de 2 minutos para el botón de emergencias
+ * Inicia el enfriamiento de 2 minutos para el botón de auxilio
  */
 function startDispatchCooldown() {
     if (cooldownTimer) clearInterval(cooldownTimer);
@@ -106,7 +210,7 @@ function startDispatchCooldown() {
             dispatchBtn.disabled = false;
             dispatchBtn.classList.remove('disabled');
             cooldownOverlay.classList.add('hidden');
-            btnText.textContent = 'EMERGENCIAS';
+            btnText.innerHTML = 'AUXILIO <span style="font-size:11px; opacity:0.8; margin-left:4px;">[G]</span>';
             cooldownBar.style.width = '100%';
             return;
         }
@@ -125,17 +229,21 @@ function startTelemetrySimulation() {
 
     telemetryTimer = setInterval(() => {
         if (teleHeart) {
-            const randomHeart = Math.floor(Math.random() * (38 - 26 + 1)) + 26;
+            const randomHeart = (currentDeathState === 'injured') 
+                ? Math.floor(Math.random() * (48 - 34 + 1)) + 34
+                : Math.floor(Math.random() * (28 - 18 + 1)) + 18;
             teleHeart.textContent = `${randomHeart} BPM`;
         }
         if (teleSpo2) {
-            const randomSpo2 = Math.floor(Math.random() * (52 - 42 + 1)) + 42;
+            const randomSpo2 = (currentDeathState === 'injured')
+                ? Math.floor(Math.random() * (68 - 55 + 1)) + 55
+                : Math.floor(Math.random() * (45 - 30 + 1)) + 30;
             teleSpo2.textContent = `${randomSpo2}%`;
         }
     }, 3000);
 }
 
-// Click Handler: Botón de Emergencias
+// Click Handler: Botón de Auxilio
 if (dispatchBtn) {
     dispatchBtn.addEventListener('click', (e) => {
         e.preventDefault();
@@ -153,10 +261,12 @@ if (dispatchBtn) {
     });
 }
 
-// Click Handler: Botón de Reaparecer en Hospital
+// Click Handler: Botón de Reaparecer en Hospital (Solo disponible en Inconsciencia)
 if (respawnBtn) {
     respawnBtn.addEventListener('click', (e) => {
         e.preventDefault();
+        if (respawnBtn.disabled || currentDeathState !== 'unconscious') return;
+
         fetch(`https://${GetParentResourceName()}/respawnHospital`, {
             method: 'POST',
             headers: {
@@ -189,6 +299,17 @@ window.addEventListener('message', (event) => {
             appContainer.classList.remove('hidden');
             appContainer.style.display = 'flex';
 
+            unconsciousDelay = data.unconsciousDelay || 300;
+            const initialState = data.deathState || 'injured';
+            const initialCanCrawl = data.canCrawl !== undefined ? data.canCrawl : true;
+            const initialCrawlRem = data.crawlRemaining !== undefined ? data.crawlRemaining : 60;
+
+            if (initialState === 'unconscious') {
+                setUnconsciousState();
+            } else {
+                setInjuredState(initialCanCrawl, initialCrawlRem);
+            }
+
             // Limpieza y reinicio garantizado del botón de emergencias
             cooldownRemaining = 0;
             if (cooldownTimer) {
@@ -200,10 +321,25 @@ window.addEventListener('message', (event) => {
                 dispatchBtn.classList.remove('disabled');
             }
             if (cooldownOverlay) cooldownOverlay.classList.add('hidden');
-            if (btnText) btnText.innerHTML = 'EMERGENCIAS <span style="font-size:11px; opacity:0.8; margin-left:4px;">[G]</span>';
+            if (btnText) btnText.innerHTML = 'AUXILIO <span style="font-size:11px; opacity:0.8; margin-left:4px;">[G]</span>';
 
-            startCountdown(data.timeRemaining || 600);
+            startCountdown(data.timeRemaining !== undefined ? data.timeRemaining : 300);
             startTelemetrySimulation();
+            break;
+
+        case 'setUnconscious':
+            setUnconsciousState();
+            break;
+
+        case 'crawlExpired':
+            canCrawl = false;
+            crawlRemaining = 0;
+            if (badgeText && currentDeathState === 'injured') {
+                badgeText.textContent = 'HERIDO';
+            }
+            if (hintText) {
+                hintText.innerHTML = '<strong>[T]</strong> Chat • <strong class="highlight-action">[Click Derecho]</strong> Cámara';
+            }
             break;
 
         case 'triggerDispatchKey':
@@ -233,7 +369,7 @@ window.addEventListener('message', (event) => {
                 dispatchBtn.disabled = false;
                 dispatchBtn.classList.remove('disabled');
                 if (cooldownOverlay) cooldownOverlay.classList.add('hidden');
-                if (btnText) btnText.innerHTML = 'EMERGENCIAS <span style="font-size:11px; opacity:0.8; margin-left:4px;">[G]</span>';
+                if (btnText) btnText.innerHTML = 'AUXILIO <span style="font-size:11px; opacity:0.8; margin-left:4px;">[G]</span>';
             }
             break;
 
@@ -257,3 +393,4 @@ window.addEventListener('message', (event) => {
             break;
     }
 });
+

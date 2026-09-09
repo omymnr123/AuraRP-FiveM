@@ -24,18 +24,20 @@ CREATE TABLE IF NOT EXISTS `aura_death` (
   `character_id` int(11) NOT NULL,
   `citizenid` varchar(50) NOT NULL,
   `is_dead` tinyint(1) NOT NULL DEFAULT 0,
+  `death_state` enum('injured','unconscious') NOT NULL DEFAULT 'injured',
   `death_time` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `bleedout_remaining` int(11) NOT NULL DEFAULT 600 COMMENT 'Segundos restantes de estado crítico (10 min = 600 seg)',
   `death_reason` varchar(255) DEFAULT 'Heridas Críticas',
   `killer_source` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`character_id`),
   KEY `idx_death_citizenid` (`citizenid`),
-  KEY `idx_death_status` (`is_dead`)
+  KEY `idx_death_status` (`is_dead`),
+  KEY `idx_death_state` (`death_state`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Volcando datos para la tabla aurarp.aura_death: ~1 rows (aproximadamente)
-INSERT INTO `aura_death` (`character_id`, `citizenid`, `is_dead`, `death_time`, `bleedout_remaining`, `death_reason`, `killer_source`) VALUES
-	(11, 'HLWWIZKU', 0, '2026-09-06 13:47:04', 0, 'Muerte Provocada', NULL);
+INSERT INTO `aura_death` (`character_id`, `citizenid`, `is_dead`, `death_state`, `death_time`, `bleedout_remaining`, `death_reason`, `killer_source`) VALUES
+	(11, 'HLWWIZKU', 1, 'injured', '2026-09-07 13:09:09', 600, 'Muerte Provocada', NULL);
 
 -- Volcando estructura para tabla aurarp.aura_doors
 CREATE TABLE IF NOT EXISTS `aura_doors` (
@@ -74,6 +76,43 @@ INSERT INTO `aura_doors` (`door_id`, `is_locked`, `job`, `coords_x`, `coords_y`,
 	('vazou_main', 1, 'vazou', -1564.43994140625, -974.6099853515625, 13.020000457763672, 2),
 	('vazou_secundaria', 1, 'vazou', -1558.6600341796875, -972.219970703125, 13.020000457763672, 2),
 	('yellowjack_main', 1, 'yellowjack', 1986.04, 3048.36, 47.22, 2.5);
+
+-- Volcando estructura para tabla aurarp.aura_ems_radio_channels
+CREATE TABLE IF NOT EXISTS `aura_ems_radio_channels` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `channel_index` int(11) NOT NULL,
+  `label` varchar(64) NOT NULL,
+  `frequency` decimal(4,1) NOT NULL,
+  `color` varchar(16) NOT NULL DEFAULT '#40E0D0',
+  `blip_color` int(11) NOT NULL DEFAULT 1,
+  `is_encrypted` tinyint(1) NOT NULL DEFAULT 1,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_ems_channel` (`channel_index`),
+  KEY `idx_ems_freq` (`frequency`)
+) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Volcando datos para la tabla aurarp.aura_ems_radio_channels: ~20 rows (aproximadamente)
+INSERT INTO `aura_ems_radio_channels` (`id`, `channel_index`, `label`, `frequency`, `color`, `blip_color`, `is_encrypted`) VALUES
+	(1, 1, 'Canal #1', 10.1, '#40E0D0', 1, 1),
+	(2, 2, 'Canal #2', 10.2, '#40E0D0', 1, 1),
+	(3, 3, 'Canal #3', 10.3, '#40E0D0', 1, 1),
+	(4, 4, 'Canal #4', 10.4, '#40E0D0', 1, 1),
+	(5, 5, 'Canal #5', 10.5, '#FF007F', 48, 1),
+	(6, 6, 'Canal #6', 10.6, '#FF007F', 48, 1),
+	(7, 7, 'Canal #7', 10.7, '#FF007F', 48, 1),
+	(8, 8, 'Canal #8', 10.8, '#40E0D0', 38, 1),
+	(9, 9, 'Canal #9', 10.9, '#40E0D0', 38, 1),
+	(10, 10, 'Canal #10', 11.0, '#38bdf8', 3, 1),
+	(11, 11, 'Canal #11', 11.1, '#f59e0b', 46, 1),
+	(12, 12, 'Canal #12', 11.2, '#3b82f6', 38, 1),
+	(13, 13, 'Canal #13', 11.3, '#ef4444', 1, 1),
+	(14, 14, 'Canal #14', 11.4, '#40E0D0', 1, 1),
+	(15, 15, 'Canal #15', 11.5, '#a855f7', 27, 1),
+	(16, 16, 'Canal #16', 11.6, '#10b981', 2, 1),
+	(17, 17, 'Canal #17', 11.7, '#64748b', 39, 1),
+	(18, 18, 'Canal #18', 11.8, '#40E0D0', 1, 1),
+	(19, 19, 'Canal #19', 11.9, '#FF007F', 48, 1),
+	(20, 20, 'Canal #20', 12.0, '#d946ef', 83, 1);
 
 -- Volcando estructura para tabla aurarp.aura_gang_laundry
 CREATE TABLE IF NOT EXISTS `aura_gang_laundry` (
@@ -395,6 +434,26 @@ INSERT INTO `aura_market_items` (`name`, `base_price`, `min_price`, `max_price`,
 	('scrap_metal', 80, 30, 180, 1000, 1000, 0.05, '2026-09-04 11:18:20'),
 	('wood_log', 25, 8, 70, 4000, 4000, 0.04, '2026-08-30 17:39:34');
 
+-- Volcando estructura para tabla aurarp.aura_medical_diagnoses
+CREATE TABLE IF NOT EXISTS `aura_medical_diagnoses` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `session_id` varchar(64) NOT NULL,
+  `patient_src` int(11) NOT NULL,
+  `medic_src` int(11) NOT NULL,
+  `bpm_initial` int(11) NOT NULL DEFAULT 75,
+  `bpm_final` int(11) NOT NULL DEFAULT 75,
+  `total_injuries` int(11) NOT NULL DEFAULT 0,
+  `cured_injuries` int(11) NOT NULL DEFAULT 0,
+  `is_revived` tinyint(1) NOT NULL DEFAULT 0,
+  `payload_json` longtext NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `idx_diag_session` (`session_id`),
+  KEY `idx_diag_created` (`created_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Volcando datos para la tabla aurarp.aura_medical_diagnoses: ~0 rows (aproximadamente)
+
 -- Volcando estructura para tabla aurarp.aura_medical_records
 CREATE TABLE IF NOT EXISTS `aura_medical_records` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -404,14 +463,18 @@ CREATE TABLE IF NOT EXISTS `aura_medical_records` (
   `doctor_name` varchar(100) DEFAULT 'Sistema Médico Automatizado',
   `diagnosis` text NOT NULL,
   `injuries_json` longtext NOT NULL COMMENT 'Detalle de huesos dañados y tipo de trauma',
+  `treatments_json` longtext DEFAULT NULL,
   `vital_signs` longtext NOT NULL COMMENT 'Salud, temperatura, hambre, sed al momento del scan',
+  `outcome` varchar(50) NOT NULL DEFAULT 'Estabilizado / Reanimado',
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
   KEY `idx_medical_citizenid` (`citizenid`),
   KEY `idx_medical_created` (`created_at`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Volcando datos para la tabla aurarp.aura_medical_records: ~0 rows (aproximadamente)
+INSERT INTO `aura_medical_records` (`id`, `citizenid`, `patient_name`, `doctor_citizenid`, `doctor_name`, `diagnosis`, `injuries_json`, `treatments_json`, `vital_signs`, `outcome`, `created_at`) VALUES
+	(1, 'DUMMY_1_TEST', 'Paciente Simulador #1', 'EMS-1', 'Médico #1', '[EVALUACIÓN MÉDICA EMS]\n• Estado Clínico: Consciente y Orientado (GCS 15/15)\n• Constantes: FC 78 BPM | TA 120/80 mmHg | SpO2 98%\n• Temperatura Corporal: 36.8ºC (Aislamiento: 79/100)\n• Lesiones Óseas: Brazo Derecho (60% HP), Pierna Izquierda (75% HP), Tórax, Espina Dorsal y Pelvis (35% HP), Pierna Derecha (20% HP), Cabeza y Cuello (85% HP)', '{}', NULL, '{}', 'Estabilizado / Reanimado', '2026-09-06 17:37:38');
 
 -- Volcando estructura para tabla aurarp.aura_phone_calls
 CREATE TABLE IF NOT EXISTS `aura_phone_calls` (
@@ -673,7 +736,7 @@ CREATE TABLE IF NOT EXISTS `aura_seasons` (
 
 -- Volcando datos para la tabla aurarp.aura_seasons: ~0 rows (aproximadamente)
 INSERT INTO `aura_seasons` (`id`, `current_season`, `current_day`, `day_in_season`, `last_rotation`, `weather_override`, `current_weather`, `base_temperature`, `has_snow`, `updated_at`, `current_hour`, `current_minute`, `time_frozen`, `day_duration`, `night_duration`) VALUES
-	(1, 'summer', 1, 1, '2026-09-06 11:15:10', 'EXTRASUNNY', 'EXTRASUNNY', 33.4, 0, '2026-09-06 14:01:13', 12, 2, 0, 4286, 6000);
+	(1, 'spring', 1, 2, '2026-09-06 16:27:05', NULL, 'CLEAR', 14.0, 0, '2026-09-07 19:05:49', 9, 22, 0, 2143, 1500);
 
 -- Volcando estructura para tabla aurarp.aura_societies
 CREATE TABLE IF NOT EXISTS `aura_societies` (
@@ -743,9 +806,9 @@ CREATE TABLE IF NOT EXISTS `aura_transactions` (
   KEY `idx_target_char` (`target_character_id`),
   KEY `idx_type` (`type`),
   KEY `idx_tx_uuid` (`transaction_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=100 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=103 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Volcando datos para la tabla aurarp.aura_transactions: ~21 rows (aproximadamente)
+-- Volcando datos para la tabla aurarp.aura_transactions: ~24 rows (aproximadamente)
 INSERT INTO `aura_transactions` (`id`, `transaction_id`, `character_id`, `target_character_id`, `account`, `type`, `amount`, `balance_before`, `balance_after`, `fee`, `reason`, `metadata`, `created_at`) VALUES
 	(1, 'TX-1788119036-11-f3ed8221', 11, NULL, 'bank', 'WITHDRAW', 500, 5000, 4500, 0, 'Emisión de Tarjeta de Crédito', NULL, '2026-08-30 19:43:56'),
 	(2, 'TX-1788119131-11-62a01561', 11, NULL, 'bank', 'WITHDRAW', 500, 4500, 4000, 0, 'Retirada ATM', '{"executor":11}', '2026-08-30 19:45:31'),
@@ -767,7 +830,10 @@ INSERT INTO `aura_transactions` (`id`, `transaction_id`, `character_id`, `target
 	(96, 'TX-1788520627-11-84518e41', 11, NULL, 'bank', 'DEPOSIT', 3040, 16560, 19600, 0, 'Nómina: LSPD (Comisario)', '{"tax_rate":0.05,"gross":3200,"grade":5,"tax_sunk":160,"job":"police"}', '2026-09-04 11:17:07'),
 	(97, 'TX-1788542622-11-bbcba315', 11, NULL, 'bank', 'DEPOSIT', 3040, 19600, 22640, 0, 'Nómina: LSPD (Comisario)', '{"grade":5,"tax_rate":0.05,"job":"police","tax_sunk":160,"gross":3200}', '2026-09-04 17:23:42'),
 	(98, 'TX-1788594980-11-0d07b989', 11, NULL, 'bank', 'DEPOSIT', 3040, 22640, 25680, 0, 'Nómina: LSPD (Comisario)', '{"grade":5,"job":"police","tax_sunk":160,"gross":3200,"tax_rate":0.05}', '2026-09-05 07:56:20'),
-	(99, 'TX-1788632761-11-06f1389c', 11, NULL, 'cash', 'ADMIN', 500, 500, 0, 0, 'Sync cash con inventario físico', NULL, '2026-09-05 18:26:01');
+	(99, 'TX-1788632761-11-06f1389c', 11, NULL, 'cash', 'ADMIN', 500, 500, 0, 0, 'Sync cash con inventario físico', NULL, '2026-09-05 18:26:01'),
+	(100, 'TX-1788718593-11-ed573bb1', 11, NULL, 'bank', 'DEPOSIT', 2660, 25680, 28340, 0, 'Nómina: EMS & Médicos (Director Médico)', '{"tax_sunk":140,"gross":2800,"tax_rate":0.05,"job":"ambulance","grade":4}', '2026-09-06 18:16:33'),
+	(101, 'TX-1788721315-11-60b962f5', 11, NULL, 'bank', 'DEPOSIT', 2660, 25680, 28340, 0, 'Nómina: EMS & Médicos (Director Médico)', '{"job":"ambulance","tax_rate":0.05,"grade":4,"gross":2800,"tax_sunk":140}', '2026-09-06 19:01:55'),
+	(102, 'TX-1788805177-11-2906a291', 11, NULL, 'bank', 'DEPOSIT', 2660, 25680, 28340, 0, 'Nómina: EMS & Médicos (Director Médico)', '{"tax_rate":0.05,"job":"ambulance","gross":2800,"grade":4,"tax_sunk":140}', '2026-09-07 18:19:37');
 
 -- Volcando estructura para tabla aurarp.aura_vendor_transactions
 CREATE TABLE IF NOT EXISTS `aura_vendor_transactions` (
@@ -823,7 +889,7 @@ CREATE TABLE IF NOT EXISTS `characters` (
 
 -- Volcando datos para la tabla aurarp.characters: ~3 rows (aproximadamente)
 INSERT INTO `characters` (`id`, `citizenid`, `slot`, `firstname`, `lastname`, `nationality`, `dob`, `gender`, `metadata`, `created_at`, `last_played`, `accounts`, `inventory`, `job`, `job_grade`, `job_duty`, `badge`, `jail_time`, `iban`, `pin`, `phone_number`, `phone_settings`) VALUES
-	(11, 'HLWWIZKU', 1, 'test', 'uno', 'Angola', '1990-12-11', 0, '{"base_appearance":{"model":"mp_m_freemode_01","hair":{"highlight":-1,"texture":0,"style":0,"color":-1},"faceFeatures":{"nosePeakLowering":0,"noseBoneHigh":0,"chinHole":0,"noseWidth":0,"chinBoneLowering":0,"chinBoneLenght":0,"cheeksBoneHigh":0,"cheeksWidth":0,"noseBoneTwist":0,"nosePeakHigh":0,"eyeBrownHigh":0,"lipsThickness":0,"chinBoneSize":0,"nosePeakSize":0,"jawBoneBackSize":0,"eyeBrownForward":0,"cheeksBoneWidth":0,"eyesOpening":0,"jawBoneWidth":0,"neckThickness":0},"props":[{"prop_id":0,"texture":6,"drawable":10},{"prop_id":1,"texture":-1,"drawable":-1},{"prop_id":2,"texture":-1,"drawable":-1},{"prop_id":6,"texture":-1,"drawable":-1},{"prop_id":7,"texture":-1,"drawable":-1}],"eyeColor":-1,"headOverlays":{"blemishes":{"style":0,"color":0,"secondColor":0,"opacity":0},"moleAndFreckles":{"style":0,"color":0,"secondColor":0,"opacity":0},"eyebrows":{"style":0,"color":0,"secondColor":0,"opacity":0},"makeUp":{"style":0,"color":0,"secondColor":0,"opacity":0},"blush":{"style":0,"color":0,"secondColor":0,"opacity":0},"beard":{"style":0,"color":0,"secondColor":0,"opacity":0},"chestHair":{"style":0,"color":0,"secondColor":0,"opacity":0},"lipstick":{"style":0,"color":0,"secondColor":0,"opacity":0},"complexion":{"style":0,"color":0,"secondColor":0,"opacity":0},"sunDamage":{"style":0,"color":0,"secondColor":0,"opacity":0},"bodyBlemishes":{"style":0,"color":0,"secondColor":0,"opacity":0},"ageing":{"style":0,"color":0,"secondColor":0,"opacity":0}},"components":[{"component_id":0,"texture":0,"drawable":0},{"component_id":1,"texture":0,"drawable":0},{"component_id":2,"texture":0,"drawable":0},{"component_id":3,"texture":0,"drawable":200},{"component_id":4,"texture":1,"drawable":52},{"component_id":5,"texture":0,"drawable":48},{"component_id":6,"texture":0,"drawable":24},{"component_id":7,"texture":0,"drawable":1},{"component_id":8,"texture":0,"drawable":253},{"component_id":9,"texture":0,"drawable":101},{"component_id":10,"texture":0,"drawable":8},{"component_id":11,"texture":0,"drawable":629}],"tattoos":[],"headBlend":{"skinSecond":0,"shapeMix":0,"shapeThird":0,"shapeFirst":0,"skinFirst":0,"thirdMix":0,"shapeSecond":0,"skinMix":0,"skinThird":0}},"bank":5000,"health":200,"armor":0,"last_location":{"y":-585.7055053710938,"x":346.79998779296877,"heading":62.36220550537109,"z":43.2989501953125},"appearance":{"model":"mp_m_freemode_01","hair":{"highlight":-1,"texture":0,"style":0,"color":-1},"faceFeatures":{"nosePeakLowering":0,"noseBoneHigh":0,"chinHole":0,"noseWidth":0,"chinBoneLowering":0,"chinBoneLenght":0,"cheeksBoneHigh":0,"cheeksWidth":0,"noseBoneTwist":0,"nosePeakHigh":0,"eyeBrownHigh":0,"lipsThickness":0,"chinBoneSize":0,"nosePeakSize":0,"jawBoneBackSize":0,"eyeBrownForward":0,"cheeksBoneWidth":0,"eyesOpening":0,"jawBoneWidth":0,"neckThickness":0},"props":[{"prop_id":0,"texture":6,"drawable":10},{"prop_id":1,"texture":-1,"drawable":-1},{"prop_id":2,"texture":-1,"drawable":-1},{"prop_id":6,"texture":-1,"drawable":-1},{"prop_id":7,"texture":-1,"drawable":-1}],"eyeColor":-1,"headOverlays":{"blemishes":{"style":0,"color":0,"secondColor":0,"opacity":0},"moleAndFreckles":{"style":0,"color":0,"secondColor":0,"opacity":0},"eyebrows":{"style":0,"color":0,"secondColor":0,"opacity":0},"makeUp":{"style":0,"color":0,"secondColor":0,"opacity":0},"blush":{"style":0,"color":0,"secondColor":0,"opacity":0},"beard":{"style":0,"color":0,"secondColor":0,"opacity":0},"chestHair":{"style":0,"color":0,"secondColor":0,"opacity":0},"lipstick":{"style":0,"color":0,"secondColor":0,"opacity":0},"complexion":{"style":0,"color":0,"secondColor":0,"opacity":0},"sunDamage":{"style":0,"color":0,"secondColor":0,"opacity":0},"bodyBlemishes":{"style":0,"color":0,"secondColor":0,"opacity":0},"ageing":{"style":0,"color":0,"secondColor":0,"opacity":0}},"components":[{"component_id":0,"texture":0,"drawable":0},{"component_id":1,"texture":0,"drawable":0},{"component_id":2,"texture":0,"drawable":0},{"component_id":3,"texture":0,"drawable":200},{"component_id":4,"texture":1,"drawable":52},{"component_id":5,"texture":0,"drawable":48},{"component_id":6,"texture":0,"drawable":24},{"component_id":7,"texture":0,"drawable":1},{"component_id":8,"texture":0,"drawable":253},{"component_id":9,"texture":0,"drawable":101},{"component_id":10,"texture":0,"drawable":8},{"component_id":11,"texture":0,"drawable":629}],"tattoos":[],"headBlend":{"skinSecond":0,"shapeMix":0,"shapeThird":0,"shapeFirst":0,"skinFirst":0,"thirdMix":0,"shapeSecond":0,"skinMix":0,"skinThird":0}},"cash":1000}', '2026-08-29 13:56:37', '2026-09-06 13:50:00', '{"bank":25680,"black_money":0,"cash":0}', '[{"slot":1,"count":1,"name":"phone"},{"metadata":{"description":"Placa Nº: 101\\nOficial: test uno\\nRango: Comisario\\nDepartamento: LSPD","officer_name":"test uno","badge":"101","grade_label":"Comisario","citizenid":"HLWWIZKU"},"slot":2,"count":1,"name":"police_badge"}]', 'police', 5, 0, '101', 0, 'AURA56149361', '6444', '555-8966', '{"ringtone":"ringtone.mp3","security":{"pin_code":"","face_id":true},"message_tone":"sms.mp3","volume_msg":80,"notifications":{"messages":true,"bank":true,"calls":true},"volume_ring":80,"frame_color":"#555566","device_name":"Otto","wallpaper_url":"https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=2564&auto=format&fit=crop"}'),
+	(11, 'HLWWIZKU', 1, 'test', 'uno', 'Angola', '1990-12-11', 0, '{"last_location":{"x":1142.17578125,"y":-1608.4088134765626,"z":34.6885986328125,"heading":286.2991943359375},"bank":5000,"cash":1000,"health":200,"appearance":{"hair":{"color":-1,"style":0,"texture":0,"highlight":-1},"tattoos":[],"faceFeatures":{"jawBoneBackSize":0,"noseBoneHigh":0,"chinBoneLenght":0,"eyeBrownForward":0,"nosePeakHigh":0,"eyeBrownHigh":0,"cheeksBoneWidth":0,"nosePeakLowering":0,"neckThickness":0,"jawBoneWidth":0,"noseWidth":0,"noseBoneTwist":0,"cheeksWidth":0,"chinHole":0,"lipsThickness":0,"cheeksBoneHigh":0,"nosePeakSize":0,"chinBoneLowering":0,"eyesOpening":0,"chinBoneSize":0},"props":[{"texture":6,"prop_id":0,"drawable":10},{"texture":-1,"prop_id":1,"drawable":-1},{"texture":-1,"prop_id":2,"drawable":-1},{"texture":-1,"prop_id":6,"drawable":-1},{"texture":-1,"prop_id":7,"drawable":-1}],"headOverlays":{"sunDamage":{"color":0,"style":0,"opacity":0,"secondColor":0},"ageing":{"color":0,"style":0,"opacity":0,"secondColor":0},"beard":{"color":0,"style":0,"opacity":0,"secondColor":0},"eyebrows":{"color":0,"style":0,"opacity":0,"secondColor":0},"moleAndFreckles":{"color":0,"style":0,"opacity":0,"secondColor":0},"blush":{"color":0,"style":0,"opacity":0,"secondColor":0},"blemishes":{"color":0,"style":0,"opacity":0,"secondColor":0},"makeUp":{"color":0,"style":0,"opacity":0,"secondColor":0},"complexion":{"color":0,"style":0,"opacity":0,"secondColor":0},"lipstick":{"color":0,"style":0,"opacity":0,"secondColor":0},"bodyBlemishes":{"color":0,"style":0,"opacity":0,"secondColor":0},"chestHair":{"color":0,"style":0,"opacity":0,"secondColor":0}},"components":[{"drawable":0,"texture":0,"component_id":0},{"drawable":0,"texture":0,"component_id":1},{"drawable":0,"texture":0,"component_id":2},{"drawable":200,"texture":0,"component_id":3},{"drawable":52,"texture":1,"component_id":4},{"drawable":48,"texture":0,"component_id":5},{"drawable":24,"texture":0,"component_id":6},{"drawable":1,"texture":0,"component_id":7},{"drawable":253,"texture":0,"component_id":8},{"drawable":101,"texture":0,"component_id":9},{"drawable":8,"texture":0,"component_id":10},{"drawable":629,"texture":0,"component_id":11}],"eyeColor":-1,"headBlend":{"skinThird":0,"thirdMix":0,"shapeSecond":0,"skinMix":0,"skinFirst":0,"shapeThird":0,"skinSecond":0,"shapeFirst":0,"shapeMix":0},"model":"mp_m_freemode_01"},"armor":0,"base_appearance":{"hair":{"color":-1,"style":0,"texture":0,"highlight":-1},"tattoos":[],"faceFeatures":{"jawBoneBackSize":0,"noseBoneHigh":0,"chinBoneLenght":0,"eyeBrownForward":0,"nosePeakHigh":0,"eyeBrownHigh":0,"cheeksBoneWidth":0,"nosePeakLowering":0,"neckThickness":0,"jawBoneWidth":0,"noseWidth":0,"noseBoneTwist":0,"cheeksWidth":0,"chinHole":0,"lipsThickness":0,"cheeksBoneHigh":0,"nosePeakSize":0,"chinBoneLowering":0,"eyesOpening":0,"chinBoneSize":0},"props":[{"texture":6,"prop_id":0,"drawable":10},{"texture":-1,"prop_id":1,"drawable":-1},{"texture":-1,"prop_id":2,"drawable":-1},{"texture":-1,"prop_id":6,"drawable":-1},{"texture":-1,"prop_id":7,"drawable":-1}],"headOverlays":{"sunDamage":{"color":0,"style":0,"opacity":0,"secondColor":0},"ageing":{"color":0,"style":0,"opacity":0,"secondColor":0},"beard":{"color":0,"style":0,"opacity":0,"secondColor":0},"eyebrows":{"color":0,"style":0,"opacity":0,"secondColor":0},"moleAndFreckles":{"color":0,"style":0,"opacity":0,"secondColor":0},"blush":{"color":0,"style":0,"opacity":0,"secondColor":0},"blemishes":{"color":0,"style":0,"opacity":0,"secondColor":0},"makeUp":{"color":0,"style":0,"opacity":0,"secondColor":0},"complexion":{"color":0,"style":0,"opacity":0,"secondColor":0},"lipstick":{"color":0,"style":0,"opacity":0,"secondColor":0},"bodyBlemishes":{"color":0,"style":0,"opacity":0,"secondColor":0},"chestHair":{"color":0,"style":0,"opacity":0,"secondColor":0}},"components":[{"drawable":0,"texture":0,"component_id":0},{"drawable":0,"texture":0,"component_id":1},{"drawable":0,"texture":0,"component_id":2},{"drawable":200,"texture":0,"component_id":3},{"drawable":52,"texture":1,"component_id":4},{"drawable":48,"texture":0,"component_id":5},{"drawable":24,"texture":0,"component_id":6},{"drawable":1,"texture":0,"component_id":7},{"drawable":253,"texture":0,"component_id":8},{"drawable":101,"texture":0,"component_id":9},{"drawable":8,"texture":0,"component_id":10},{"drawable":629,"texture":0,"component_id":11}],"eyeColor":-1,"headBlend":{"skinThird":0,"thirdMix":0,"shapeSecond":0,"skinMix":0,"skinFirst":0,"shapeThird":0,"skinSecond":0,"shapeFirst":0,"shapeMix":0},"model":"mp_m_freemode_01"}}', '2026-08-29 13:56:37', '2026-09-07 19:03:49', '{"black_money":0,"bank":25680,"cash":0}', '[{"name":"phone","count":1,"slot":1},{"name":"police_badge","count":1,"slot":2,"metadata":{"grade_label":"Comisario","officer_name":"test uno","description":"Placa Nº: 101\\nOficial: test uno\\nRango: Comisario\\nDepartamento: LSPD","badge":"101","citizenid":"HLWWIZKU"}},{"name":"radio","count":1,"slot":3},{"name":"tablet","count":1,"slot":4},{"name":"water","count":9,"slot":5},{"name":"desfibrilador","count":1,"slot":6},{"name":"torniquete","count":4,"slot":7}]', 'ambulance', 4, 1, '101', 0, 'AURA56149361', '6444', '555-8966', '{"ringtone":"ringtone.mp3","security":{"pin_code":"","face_id":true},"message_tone":"sms.mp3","volume_msg":80,"notifications":{"messages":true,"bank":true,"calls":true},"volume_ring":80,"frame_color":"#555566","device_name":"Otto","wallpaper_url":"https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=2564&auto=format&fit=crop"}'),
 	(12, 'HLWWIZKU', 2, 'Gang', 'Test', 'Afganistán', '1990-02-05', 0, '{"appearance": {"hair": {"color": 0, "style": 14, "texture": 0, "highlight": 0}, "components": [{"texture": 0, "drawable": 0, "component_id": 0}, {"texture": 0, "drawable": 0, "component_id": 1}, {"texture": 0, "drawable": 0, "component_id": 2}, {"texture": 0, "drawable": 0, "component_id": 3}, {"texture": 0, "drawable": 0, "component_id": 4}, {"texture": 0, "drawable": 0, "component_id": 5}, {"texture": 0, "drawable": 8, "component_id": 6}, {"texture": 0, "drawable": 0, "component_id": 7}, {"texture": 0, "drawable": 0, "component_id": 8}, {"texture": 0, "drawable": 0, "component_id": 9}, {"texture": 0, "drawable": 0, "component_id": 10}, {"texture": 0, "drawable": 57, "component_id": 11}], "props": [{"drawable": -1, "texture": -1, "prop_id": 0}, {"drawable": -1, "texture": -1, "prop_id": 1}, {"drawable": -1, "texture": -1, "prop_id": 2}, {"drawable": -1, "texture": -1, "prop_id": 6}, {"drawable": -1, "texture": -1, "prop_id": 7}], "headOverlays": {"bodyBlemishes": {"color": 0, "style": 0, "secondColor": 0, "opacity": 0}, "makeUp": {"color": 0, "style": 0, "secondColor": 0, "opacity": 0}, "complexion": {"color": 0, "style": 0, "secondColor": 0, "opacity": 0}, "ageing": {"color": 0, "style": 0, "secondColor": 0, "opacity": 0}, "moleAndFreckles": {"color": 0, "style": 0, "secondColor": 0, "opacity": 0}, "sunDamage": {"color": 0, "style": 0, "secondColor": 0, "opacity": 0}, "beard": {"color": 0, "style": 16, "secondColor": 0, "opacity": 1}, "blemishes": {"color": 0, "style": 0, "secondColor": 0, "opacity": 0}, "blush": {"color": 0, "style": 0, "secondColor": 0, "opacity": 0}, "eyebrows": {"color": 0, "style": 0, "secondColor": 0, "opacity": 0}, "lipstick": {"color": 0, "style": 0, "secondColor": 0, "opacity": 0}, "chestHair": {"color": 0, "style": 0, "secondColor": 0, "opacity": 0}}, "tattoos": [], "headBlend": {"shapeMix": 0, "skinMix": 0, "shapeThird": 0, "shapeFirst": 0, "skinThird": 0, "thirdMix": 0, "skinFirst": 0, "shapeSecond": 0, "skinSecond": 0}, "model": "mp_m_freemode_01", "faceFeatures": {"noseWidth": 0, "jawBoneWidth": 0, "cheeksBoneHigh": 0, "nosePeakSize": 0, "chinHole": 0, "chinBoneSize": 0, "jawBoneBackSize": 0, "lipsThickness": 0, "nosePeakLowering": 0, "neckThickness": 0, "chinBoneLowering": 0, "cheeksBoneWidth": 0, "nosePeakHigh": 0, "eyeBrownForward": 0, "chinBoneLenght": 0, "eyeBrownHigh": 0, "noseBoneHigh": 0, "eyesOpening": 0, "cheeksWidth": 0, "noseBoneTwist": 0}, "eyeColor": 0}, "cash": 0, "health": 200, "armor": 0, "last_location": {"y": -1701.6527099609376, "x": -430.9186706542969, "heading": 215.43309020996095, "z": 19.018310546875}, "black_money": 0, "bank": 5000, "hud_positions": {"hud": {"x": 17.5, "y": 3.5}, "hotbar": {"x": 50.0, "y": 3.5}}}', '2026-09-04 08:29:03', '2026-09-04 16:52:15', '{"black_money":0,"cash":0,"bank":5000}', '[{"name":"adv_lockpick","count":10,"slot":1},{"name":"lockpick","count":2,"slot":2},{"name":"car_parts","count":5,"slot":3},{"name":"car_wheel","count":4,"slot":4},{"name":"black_money","count":18285,"slot":5},{"name":"car_door","count":4,"slot":6},{"name":"car_hood","count":1,"slot":7},{"name":"car_engine","count":1,"slot":8},{"name":"scrap_metal","count":7,"slot":9},{"name":"car_exhaust","count":1,"slot":10}]', 'cartel', 4, 0, NULL, 0, NULL, NULL, '555-8236', NULL),
 	(13, 'FULGFGXT', 1, 'Carlos', 'Romero', 'China', '2000-02-01', 0, '{"health": 200, "black_money": 0, "appearance": {"faceFeatures": {"nosePeakSize": 0, "noseBoneHigh": 0, "neckThickness": 0, "jawBoneWidth": 0, "nosePeakLowering": 0, "nosePeakHigh": 0, "chinBoneLowering": 0, "cheeksWidth": 0, "chinBoneLenght": 0, "jawBoneBackSize": 0, "chinHole": 0, "cheeksBoneHigh": 0, "eyeBrownHigh": 0, "noseBoneTwist": 0, "chinBoneSize": 0, "noseWidth": 0, "lipsThickness": 0, "eyesOpening": 0, "eyeBrownForward": 0, "cheeksBoneWidth": 0}, "props": [{"prop_id": 0, "drawable": -1, "texture": -1}, {"prop_id": 1, "drawable": -1, "texture": -1}, {"prop_id": 2, "drawable": -1, "texture": -1}, {"prop_id": 6, "drawable": -1, "texture": -1}, {"prop_id": 7, "drawable": -1, "texture": -1}], "headBlend": {"skinSecond": 0, "skinThird": 0, "skinFirst": 0, "thirdMix": 0, "shapeFirst": 0, "shapeSecond": 0, "skinMix": 0, "shapeMix": 0, "shapeThird": 0}, "hair": {"highlight": 0, "style": 57, "texture": 0, "color": 0}, "model": "mp_m_freemode_01", "headOverlays": {"moleAndFreckles": {"secondColor": 0, "style": 0, "opacity": 0, "color": 0}, "complexion": {"secondColor": 0, "style": 0, "opacity": 0, "color": 0}, "eyebrows": {"secondColor": 0, "style": 0, "opacity": 0, "color": 0}, "ageing": {"secondColor": 0, "style": 0, "opacity": 0, "color": 0}, "makeUp": {"secondColor": 0, "style": 0, "opacity": 0, "color": 0}, "beard": {"secondColor": 0, "style": 0, "opacity": 0, "color": 0}, "chestHair": {"secondColor": 0, "style": 0, "opacity": 0, "color": 0}, "lipstick": {"secondColor": 0, "style": 0, "opacity": 0, "color": 0}, "blemishes": {"secondColor": 0, "style": 0, "opacity": 0, "color": 0}, "bodyBlemishes": {"secondColor": 0, "style": 0, "opacity": 0, "color": 0}, "blush": {"secondColor": 0, "style": 0, "opacity": 0, "color": 0}, "sunDamage": {"secondColor": 0, "style": 0, "opacity": 0, "color": 0}}, "components": [{"drawable": 0, "component_id": 0, "texture": 0}, {"drawable": 0, "component_id": 1, "texture": 0}, {"drawable": 0, "component_id": 2, "texture": 0}, {"drawable": 0, "component_id": 3, "texture": 0}, {"drawable": 0, "component_id": 4, "texture": 0}, {"drawable": 0, "component_id": 5, "texture": 0}, {"drawable": 0, "component_id": 6, "texture": 0}, {"drawable": 0, "component_id": 7, "texture": 0}, {"drawable": 0, "component_id": 8, "texture": 0}, {"drawable": 0, "component_id": 9, "texture": 0}, {"drawable": 0, "component_id": 10, "texture": 0}, {"drawable": 0, "component_id": 11, "texture": 0}], "eyeColor": 0, "tattoos": []}, "last_location": {"x": -863.6439819335938, "heading": 141.73228454589845, "z": 13.5084228515625, "y": -2616.514404296875}, "bank": 5000, "armor": 0, "cash": 0, "hud_positions": {"hud": {"x": 17.5, "y": 3.5}, "hotbar": {"x": 50.0, "y": 3.5}}}', '2026-09-04 10:15:11', '2026-09-04 16:52:15', '{"bank":5000,"black_money":0,"cash":0}', NULL, 'unemployed', 0, 0, NULL, 0, NULL, NULL, '555-2548', NULL);
 
@@ -874,12 +940,13 @@ CREATE TABLE IF NOT EXISTS `ox_inventory` (
   UNIQUE KEY `owner` (`owner`,`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
--- Volcando datos para la tabla aurarp.ox_inventory: ~3 rows (aproximadamente)
+-- Volcando datos para la tabla aurarp.ox_inventory: ~5 rows (aproximadamente)
 INSERT INTO `ox_inventory` (`owner`, `name`, `data`, `lastupdated`) VALUES
 	('', 'vendor_stock_tequilala', '[{"count":100,"slot":1,"name":"water"},{"count":100,"slot":2,"name":"chips"},{"count":100,"slot":3,"name":"cocktail"},{"count":100,"slot":4,"name":"tequila_shot"},{"count":100,"slot":5,"name":"whiskey"},{"count":100,"slot":6,"name":"beer"}]', '2026-09-01 12:37:29'),
 	('', 'police_disposal_mission_row', NULL, '2026-09-02 14:05:01'),
 	('', 'police_disposal_mrpd', NULL, '2026-09-02 14:05:01'),
-	('', 'dummy_suspect_inv_1', '[{"metadata":{"ammo":0,"durability":100,"components":[],"serial":"775288CBF236658"},"name":"WEAPON_PISTOL","slot":1,"count":1},{"name":"ammo-9","slot":2,"count":50},{"name":"lockpick","slot":3,"count":3},{"name":"money","slot":4,"count":1500}]', '2026-09-03 21:15:00');
+	('', 'dummy_suspect_inv_1', '[{"count":1,"metadata":{"components":[],"serial":"775288CBF236658","durability":100,"ammo":0},"name":"WEAPON_PISTOL","slot":1},{"count":100,"name":"ammo-9","slot":2},{"count":6,"name":"lockpick","slot":3},{"count":3000,"name":"money","slot":4},{"count":1,"metadata":{"components":[],"serial":"400107ZFG345087","durability":100,"ammo":0},"name":"WEAPON_PISTOL","slot":5}]', '2026-09-06 15:45:00'),
+	('', 'dummy_suspect_inv_2', '[{"count":1,"metadata":{"components":[],"serial":"859178UNH809232","durability":100,"ammo":0},"name":"WEAPON_PISTOL","slot":1},{"count":50,"name":"ammo-9","slot":2},{"count":3,"name":"lockpick","slot":3},{"count":1500,"name":"money","slot":4}]', '2026-09-06 16:02:37');
 
 -- Volcando estructura para tabla aurarp.player_outfit_codes
 CREATE TABLE IF NOT EXISTS `player_outfit_codes` (
@@ -923,7 +990,7 @@ CREATE TABLE IF NOT EXISTS `players` (
 
 -- Volcando datos para la tabla aurarp.players: ~2 rows (aproximadamente)
 INSERT INTO `players` (`id`, `license`, `citizenid`, `metadata`, `created_at`, `last_updated`, `last_login`) VALUES
-	(1, 'license:fb83002da5edb49dd7bdb39c170a8c8af7cf5298', 'HLWWIZKU', '{"last_location":{"y":-978.8703002929688,"x":425.2615356445313,"z":30.6951904296875,"heading":127.55905151367188},"permissions":"user","money":{"cash":500,"bank":1500},"status":{"hunger":100,"thirst":100},"position":{"y":0.0,"x":0.0,"z":0.0}}', '2026-08-28 18:31:20', '2026-09-06 14:01:13', '2026-09-06 14:01:13'),
+	(1, 'license:fb83002da5edb49dd7bdb39c170a8c8af7cf5298', 'HLWWIZKU', '{"last_location":{"heading":127.55905151367188,"z":30.6951904296875,"y":-978.8703002929688,"x":425.2615356445313},"position":{"y":0.0,"z":0.0,"x":0.0},"status":{"hunger":100,"thirst":100},"money":{"bank":1500,"cash":500},"permissions":"user"}', '2026-08-28 18:31:20', '2026-09-07 18:52:19', '2026-09-07 18:52:19'),
 	(2, 'license:158f6c2adc48a219db13bcf84229d592bd19da6a', 'FULGFGXT', '{"status":{"thirst":100,"hunger":100},"permissions":"user","last_location":{"heading":330.0,"x":-1037.8,"y":-2737.9,"z":20.17},"money":{"cash":500,"bank":1500}}', '2026-09-04 10:12:54', '2026-09-04 10:12:54', '2026-09-04 10:12:54');
 
 -- Volcando estructura para tabla aurarp.playerskins

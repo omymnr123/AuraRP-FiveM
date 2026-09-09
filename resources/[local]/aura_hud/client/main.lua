@@ -45,44 +45,13 @@ RegisterNetEvent('aura_core:client:playerSpawned', ShowHUD)
 RegisterNetEvent('aura_core:playerSpawnedAndReady', ShowHUD)
 RegisterNetEvent('aura_multichar:client:characterLoaded', ShowHUD)
 
--- Obtener dimensiones del minimapa de GTA V (Resolución Responsiva)
-function GetMinimapAnchor()
-    local safezone = GetSafeZoneSize()
-    local safezone_x = 1.0 / 20.0
-    local safezone_y = 1.0 / 20.0
-    local aspect_ratio = GetAspectRatio(0)
-    if aspect_ratio <= 0.0 then aspect_ratio = GetAspectRatio(1) end
-    if aspect_ratio <= 0.0 then aspect_ratio = 16.0 / 9.0 end
-
-    local res_x, res_y = GetActiveScreenResolution()
-    local xscale = 1.0 / res_x
-    local yscale = 1.0 / res_y
-
-    local total_width = xscale * (res_x / (4 * aspect_ratio))
-    local total_height = yscale * (res_y / 5.674)
-    local left_x = xscale * (res_x * (safezone_x * ((math.abs(safezone - 1.0)) * 10)))
-    local bottom_y = 1.0 - yscale * (res_y * (safezone_y * ((math.abs(safezone - 1.0)) * 10)))
-    
-    -- El radar de GTA V inicia exactamente en top_y y cubre hasta el 93% de la altura total
-    local top_y = bottom_y - total_height
-    local radar_height = total_height * 0.93
-
-    return {
-        x = left_x,
-        y = top_y,
-        width = total_width,
-        height = radar_height
-    }
-end
-
--- Bucle para mantener el minimapa siempre visible, borrar la vida/armadura nativa y actualizar el marco
+-- Bucle para mantener el minimapa siempre visible y borrar la vida/armadura nativa
 CreateThread(function()
     local minimap = RequestScaleformMovie("minimap")
     SetRadarBigmapEnabled(true, false)
     Wait(0)
     SetRadarBigmapEnabled(false, false)
 
-    local lastUpdate = 0
     while true do
         Wait(0)
         
@@ -96,16 +65,6 @@ CreateThread(function()
         BeginScaleformMovieMethod(minimap, "SETUP_HEALTH_ARMOUR")
         ScaleformMovieMethodAddParamInt(3)
         EndScaleformMovieMethod()
-
-        -- Enviar coordenadas del mapa al NUI para posicionar el marco gradiente
-        local now = GetGameTimer()
-        if HUD_VISIBLE and (now - lastUpdate > 500) then
-            lastUpdate = now
-            SendNUIMessage({
-                action = 'updateMinimapBorder',
-                rect = GetMinimapAnchor()
-            })
-        end
     end
 end)
 

@@ -11,16 +11,18 @@ CreateThread(function()
           `character_id` int(11) NOT NULL,
           `citizenid` varchar(50) NOT NULL,
           `is_dead` tinyint(1) NOT NULL DEFAULT 0,
+          `death_state` enum('injured','unconscious') NOT NULL DEFAULT 'injured',
           `death_time` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
           `bleedout_remaining` int(11) NOT NULL DEFAULT 600 COMMENT 'Segundos restantes de estado crítico',
           `death_reason` varchar(255) DEFAULT 'Heridas Críticas',
           `killer_source` varchar(100) DEFAULT NULL,
           PRIMARY KEY (`character_id`),
           KEY `idx_death_citizenid` (`citizenid`),
-          KEY `idx_death_status` (`is_dead`)
+          KEY `idx_death_status` (`is_dead`),
+          KEY `idx_death_state` (`death_state`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
     ]], {}, function(success)
-        -- Verificar si la tabla existe con el esquema antiguo (sin character_id) y migrarla
+        -- 1. Verificar si la tabla existe con el esquema antiguo (sin character_id) y migrarla
         MySQL.query([[
             SELECT COLUMN_NAME 
             FROM INFORMATION_SCHEMA.COLUMNS 
@@ -39,12 +41,29 @@ CreateThread(function()
                         ADD INDEX `idx_death_citizenid` (`citizenid`);
                     ]])
                 end)
-                print("[AURA_DEATH] Migración de `aura_death` completada.")
-            else
-                if Config.Debug then
-                    print("[AURA_DEATH] Tabla `aura_death` verificada y lista con Primary Key `character_id`.")
-                end
+                print("[AURA_DEATH] Migración de `aura_death` a `character_id` completada.")
             end
+
+            -- 2. Verificar columna death_state
+            MySQL.query([[
+                SELECT COLUMN_NAME 
+                FROM INFORMATION_SCHEMA.COLUMNS 
+                WHERE TABLE_SCHEMA = DATABASE() 
+                  AND TABLE_NAME = 'aura_death' 
+                  AND COLUMN_NAME = 'death_state';
+            ]], {}, function(resState)
+                if not resState or #resState == 0 then
+                    print("[AURA_DEATH] Añadiendo columna `death_state` a tabla `aura_death`...")
+                    pcall(function()
+                        MySQL.query.await([[
+                            ALTER TABLE `aura_death` 
+                            ADD COLUMN `death_state` ENUM('injured', 'unconscious') NOT NULL DEFAULT 'injured' AFTER `is_dead`,
+                            ADD INDEX `idx_death_state` (`death_state`);
+                        ]])
+                    end)
+                    print("[AURA_DEATH] Columna `death_state` añadida exitosamente.")
+                end
+            end)
         end)
     end)
 end)
@@ -131,8 +150,8 @@ end
 -- EVENTOS DE RED (SERVER EVENTS)
 -- ============================================================================
 
--- Jugador entra en coma / estado crítico
-RegisterNetEvent('aura_death:server:playerEnteredComa', function(remainingTime, deathReason, killerSource)
+-- Jugador entra en coma / estado crítico (Fase inicial: Herido)
+RegisterNetEvent('aura_death:server:playerEnteredComa', function(remainingTime, deathReason, killerSource, deathState)
     local src = source
     local charInfo = GetPlayerCharacterInfo(src)
     if not charInfo then return end
@@ -140,29 +159,33 @@ RegisterNetEvent('aura_death:server:playerEnteredComa', function(remainingTime, 
     local bleedoutTime = tonumber(remainingTime) or Config.BleedoutTime
     local reason = deathReason or "Trauma Crítico"
     local killerStr = killerSource and tostring(killerSource) or nil
+    local state = deathState or "injured"
 
     deadPlayers[src] = {
         charId = charInfo.charId,
         citizenid = charInfo.citizenid,
         remaining = bleedoutTime,
+        deathState = state,
         deathTime = os.time(),
         lastDispatch = 0
     }
 
     Player(src).state:set('isDead', true, true)
+    Player(src).state:set('deathState', state, true)
 
     -- Guardado atómico en tabla dedicada `aura_death`
     MySQL.insert([[
-        INSERT INTO `aura_death` (`character_id`, `citizenid`, `is_dead`, `bleedout_remaining`, `death_reason`, `killer_source`, `death_time`)
-        VALUES (?, ?, 1, ?, ?, ?, NOW())
+        INSERT INTO `aura_death` (`character_id`, `citizenid`, `is_dead`, `death_state`, `bleedout_remaining`, `death_reason`, `killer_source`, `death_time`)
+        VALUES (?, ?, 1, ?, ?, ?, ?, NOW())
         ON DUPLICATE KEY UPDATE
             `citizenid` = VALUES(`citizenid`),
             `is_dead` = 1,
+            `death_state` = VALUES(`death_state`),
             `bleedout_remaining` = VALUES(`bleedout_remaining`),
             `death_reason` = VALUES(`death_reason`),
             `killer_source` = VALUES(`killer_source`),
             `death_time` = NOW()
-    ]], { charInfo.charId, charInfo.citizenid, bleedoutTime, reason, killerStr })
+    ]], { charInfo.charId, charInfo.citizenid, state, bleedoutTime, reason, killerStr })
 
     -- Doble persistencia en la tabla `characters`
     MySQL.update([[
@@ -170,10 +193,10 @@ RegisterNetEvent('aura_death:server:playerEnteredComa', function(remainingTime, 
         SET `metadata` = JSON_SET(
             IFNULL(`metadata`, '{}'),
             '$.is_dead', 1,
-            '$.death', JSON_OBJECT('inComa', true, 'remaining', ?, 'reason', ?)
+            '$.death', JSON_OBJECT('inComa', true, 'remaining', ?, 'reason', ?, 'state', ?)
         )
         WHERE `id` = ?
-    ]], { bleedoutTime, reason, charInfo.charId })
+    ]], { bleedoutTime, reason, state, charInfo.charId })
 
     -- Actualizar memoria de aura_multichar
     if exports.aura_multichar and exports.aura_multichar.GetActiveCharacter then
@@ -184,31 +207,36 @@ RegisterNetEvent('aura_death:server:playerEnteredComa', function(remainingTime, 
             char.metadata.death = {
                 inComa = true,
                 remaining = bleedoutTime,
-                reason = reason
+                reason = reason,
+                state = state
             }
         end
     end
 
     if Config.Debug then
-        print(string.format("[AURA_DEATH] Personaje ID %s (CitizenID: %s) guardado en COMA en BD. Tiempo: %ss.", charInfo.charId, charInfo.citizenid, bleedoutTime))
+        print(string.format("[AURA_DEATH] Personaje ID %s (CitizenID: %s) guardado en estado [%s] en BD. Tiempo: %ss.", charInfo.charId, charInfo.citizenid, state, bleedoutTime))
     end
 end)
 
--- Sincronización periódica del tiempo restante de desangrado
-RegisterNetEvent('aura_death:server:syncBleedoutTime', function(remaining)
+-- Sincronización periódica del tiempo restante de desangrado y estado de trauma
+RegisterNetEvent('aura_death:server:syncBleedoutTime', function(remaining, deathState)
     local src = source
     local charInfo = GetPlayerCharacterInfo(src)
     if not charInfo then return end
 
     local seconds = tonumber(remaining)
     if not seconds then return end
+    local state = deathState or "injured"
 
     if deadPlayers[src] then
         deadPlayers[src].remaining = seconds
+        deadPlayers[src].deathState = state
     end
+    Player(src).state:set('deathState', state, true)
 
-    MySQL.update('UPDATE `aura_death` SET `bleedout_remaining` = ?, `death_time` = NOW() WHERE `character_id` = ? AND `is_dead` = 1', {
+    MySQL.update('UPDATE `aura_death` SET `bleedout_remaining` = ?, `death_state` = ?, `death_time` = NOW() WHERE `character_id` = ? AND `is_dead` = 1', {
         seconds,
+        state,
         charInfo.charId
     })
 end)
@@ -391,29 +419,53 @@ RegisterNetEvent('aura_death:server:checkDeathState', function()
     if deathRecord and deathRecord.is_dead == 1 then
         local elapsed = os.time() - (deathRecord.death_ts or os.time())
         local remaining = (deathRecord.bleedout_remaining or Config.BleedoutTime) - elapsed
+        local totalElapsed = (Config.BleedoutTime - (deathRecord.bleedout_remaining or Config.BleedoutTime)) + elapsed
+        local maxTotalAllowed = Config.BleedoutTime + (Config.ComaDuration or 300)
 
-        if remaining <= 0 then
-            -- El tiempo expiró mientras estaba desconectado: ejecutar reaparición en hospital
+        if totalElapsed >= maxTotalAllowed then
+            -- El tiempo total de desangrado y coma expiró mientras estaba desconectado: ejecutar reaparición en hospital
             ConfiscatePlayerInventoryForHospital(src)
             MySQL.update('UPDATE `aura_death` SET `is_dead` = 0, `bleedout_remaining` = 0 WHERE `character_id` = ?', { charInfo.charId })
             MySQL.update("UPDATE `characters` SET `metadata` = JSON_SET(IFNULL(`metadata`, '{}'), '$.is_dead', 0, '$.death', JSON_OBJECT('inComa', false)) WHERE `id` = ?", { charInfo.charId })
             deadPlayers[src] = nil
             Player(src).state:set('isDead', false, true)
+            Player(src).state:set('deathState', nil, true)
             TriggerClientEvent('aura_death:client:respawnAtHospital', src)
-        else
-            -- Sigue en estado crítico: restaurar coma con el tiempo exacto restante
+        elseif remaining <= 0 then
+            -- Desangrado terminado (5 minutos transcurridos): restaurar en estado INCONSCIENTE con botón Hospital
+            local calculatedState = "unconscious"
             deadPlayers[src] = {
                 charId = charInfo.charId,
                 citizenid = charInfo.citizenid,
-                remaining = remaining,
+                remaining = 0,
+                deathState = calculatedState,
                 deathTime = os.time(),
                 lastDispatch = 0
             }
             Player(src).state:set('isDead', true, true)
-            TriggerClientEvent('aura_death:client:setInComa', src, remaining, "Estado Crítico Persistente")
+            Player(src).state:set('deathState', calculatedState, true)
+            TriggerClientEvent('aura_death:client:setInComa', src, 0, "Estado Crítico Persistente", calculatedState, 0)
+        else
+            -- Fase de desangrado activa (HERIDO)
+            local calculatedState = "injured"
+            local crawlRemaining = math.max(0, (Config.CrawlDuration or 60) - totalElapsed)
+
+            deadPlayers[src] = {
+                charId = charInfo.charId,
+                citizenid = charInfo.citizenid,
+                remaining = remaining,
+                deathState = calculatedState,
+                deathTime = os.time(),
+                lastDispatch = 0
+            }
+            Player(src).state:set('isDead', true, true)
+            Player(src).state:set('deathState', calculatedState, true)
+
+            TriggerClientEvent('aura_death:client:setInComa', src, remaining, "Estado Crítico Persistente", calculatedState, crawlRemaining)
         end
     else
         Player(src).state:set('isDead', false, true)
+        Player(src).state:set('deathState', nil, true)
     end
 end)
 
@@ -422,12 +474,14 @@ AddEventHandler('playerDropped', function()
     local src = source
     local data = deadPlayers[src]
     if data and data.charId then
-        MySQL.update.await('UPDATE `aura_death` SET `bleedout_remaining` = ?, `death_time` = NOW() WHERE `character_id` = ? AND `is_dead` = 1', {
+        MySQL.update.await('UPDATE `aura_death` SET `bleedout_remaining` = ?, `death_state` = ?, `death_time` = NOW() WHERE `character_id` = ? AND `is_dead` = 1', {
             data.remaining,
+            data.deathState or 'injured',
             data.charId
         })
-        MySQL.update.await("UPDATE `characters` SET `metadata` = JSON_SET(IFNULL(`metadata`, '{}'), '$.is_dead', 1, '$.death', JSON_OBJECT('inComa', true, 'remaining', ?)) WHERE `id` = ?", {
+        MySQL.update.await("UPDATE `characters` SET `metadata` = JSON_SET(IFNULL(`metadata`, '{}'), '$.is_dead', 1, '$.death', JSON_OBJECT('inComa', true, 'remaining', ?, 'state', ?)) WHERE `id` = ?", {
             data.remaining,
+            data.deathState or 'injured',
             data.charId
         })
         deadPlayers[src] = nil
@@ -439,12 +493,14 @@ local function SaveAllDeathStates()
     local count = 0
     for src, data in pairs(deadPlayers) do
         if data and data.charId and data.remaining then
-            MySQL.update.await('UPDATE `aura_death` SET `bleedout_remaining` = ?, `death_time` = NOW() WHERE `character_id` = ? AND `is_dead` = 1', {
+            MySQL.update.await('UPDATE `aura_death` SET `bleedout_remaining` = ?, `death_state` = ?, `death_time` = NOW() WHERE `character_id` = ? AND `is_dead` = 1', {
                 data.remaining,
+                data.deathState or 'injured',
                 data.charId
             })
-            MySQL.update.await("UPDATE `characters` SET `metadata` = JSON_SET(IFNULL(`metadata`, '{}'), '$.is_dead', 1, '$.death', JSON_OBJECT('inComa', true, 'remaining', ?)) WHERE `id` = ?", {
+            MySQL.update.await("UPDATE `characters` SET `metadata` = JSON_SET(IFNULL(`metadata`, '{}'), '$.is_dead', 1, '$.death', JSON_OBJECT('inComa', true, 'remaining', ?, 'state', ?)) WHERE `id` = ?", {
                 data.remaining,
+                data.deathState or 'injured',
                 data.charId
             })
             count = count + 1

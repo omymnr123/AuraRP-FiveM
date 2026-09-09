@@ -2,6 +2,75 @@
 -- AURA MEDICAL: SERVER MAIN CONTROLLER
 -- ============================================================================
 
+CreateThread(function()
+    -- Asegurar tablas requeridas en base de datos
+    pcall(function()
+        MySQL.query([=[
+            CREATE TABLE IF NOT EXISTS `aura_medical_records` (
+              `id` int(11) NOT NULL AUTO_INCREMENT,
+              `citizenid` varchar(50) NOT NULL,
+              `patient_name` varchar(100) NOT NULL,
+              `doctor_citizenid` varchar(50) DEFAULT NULL,
+              `doctor_name` varchar(100) DEFAULT 'Cuerpo Médico AuraRP',
+              `diagnosis` text NOT NULL,
+              `injuries_json` longtext NOT NULL,
+              `treatments_json` longtext DEFAULT NULL,
+              `vital_signs` longtext NOT NULL,
+              `outcome` varchar(50) NOT NULL DEFAULT 'Estabilizado / Reanimado',
+              `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+              PRIMARY KEY (`id`),
+              KEY `idx_medical_citizenid` (`citizenid`),
+              KEY `idx_medical_doctor` (`doctor_citizenid`),
+              KEY `idx_medical_created` (`created_at`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+        ]=])
+
+        -- Migraciones seguras para columnas sin errores en consola
+        MySQL.query([[
+            SELECT COLUMN_NAME 
+            FROM INFORMATION_SCHEMA.COLUMNS 
+            WHERE TABLE_NAME = 'aura_medical_records' 
+            AND TABLE_SCHEMA = DATABASE() 
+            AND COLUMN_NAME IN ('treatments_json', 'outcome');
+        ]], {}, function(result)
+            local hasTreatments = false
+            local hasOutcome = false
+            if result and type(result) == "table" then
+                for _, row in ipairs(result) do
+                    if row.COLUMN_NAME == 'treatments_json' then hasTreatments = true end
+                    if row.COLUMN_NAME == 'outcome' then hasOutcome = true end
+                end
+            end
+
+            if not hasTreatments then
+                MySQL.query("ALTER TABLE `aura_medical_records` ADD COLUMN `treatments_json` longtext DEFAULT NULL AFTER `injuries_json`")
+            end
+            if not hasOutcome then
+                MySQL.query("ALTER TABLE `aura_medical_records` ADD COLUMN `outcome` varchar(50) NOT NULL DEFAULT 'Estabilizado / Reanimado' AFTER `vital_signs`")
+            end
+        end)
+
+        MySQL.query([=[
+            CREATE TABLE IF NOT EXISTS `aura_medical_diagnoses` (
+              `id` int(11) NOT NULL AUTO_INCREMENT,
+              `session_id` varchar(64) NOT NULL,
+              `patient_src` int(11) NOT NULL,
+              `medic_src` int(11) NOT NULL,
+              `bpm_initial` int(11) NOT NULL DEFAULT 75,
+              `bpm_final` int(11) NOT NULL DEFAULT 75,
+              `total_injuries` int(11) NOT NULL DEFAULT 0,
+              `cured_injuries` int(11) NOT NULL DEFAULT 0,
+              `is_revived` tinyint(1) NOT NULL DEFAULT 0,
+              `payload_json` longtext NOT NULL,
+              `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+              PRIMARY KEY (`id`),
+              KEY `idx_diag_session` (`session_id`),
+              KEY `idx_diag_created` (`created_at`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+        ]=])
+    end)
+end)
+
 local function InitPlayerMedicalState(src)
     if not src or src <= 0 then return end
 

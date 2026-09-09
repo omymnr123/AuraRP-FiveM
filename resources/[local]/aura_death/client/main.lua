@@ -4,6 +4,8 @@
 
 local isDead = false
 local currentBleedoutRemaining = Config.BleedoutTime
+local deathState = "injured" -- "injured" o "unconscious"
+local crawlRemaining = Config.CrawlDuration or 60
 local isInHospitalBed = false
 local isCursorActive = true
 
@@ -23,11 +25,18 @@ local function SetDeathCursorMode(active)
 end
 exports('SetDeathCursorMode', SetDeathCursorMode)
 
--- Desactivar auto-spawn nativo de GTA V para erradicar la pantalla "Wasted"
+-- Desactivar auto-spawn nativo de GTA V y precargar animaciones críticas de trauma en memoria
 CreateThread(function()
     if exports.spawnmanager then
         exports.spawnmanager:setAutoSpawn(false)
     end
+    -- Precarga inmediata de animaciones de dolor, arrastre y hospital
+    RequestAnimDict("move_crawl")
+    RequestAnimDict("combat@damage@writheidle_a")
+    RequestAnimDict("combat@damage@writheidle_b")
+    RequestAnimDict("combat@damage@writheidle_c")
+    RequestAnimDict("combat@damage@rb_writhe")
+    RequestAnimDict("anim@gangops@morgue@table@")
 end)
 
 --- Control estricto de silencio de voz, radio y canales pma-voice
@@ -86,15 +95,30 @@ local function GetNearestHospitalBed(coords)
     return nearestBed
 end
 
---- Inicia el Estado Crítico / Coma del Jugador
+--- Inicia el Estado Crítico / Coma del Jugador en sus 2 fases progresivas
 --- @param timeRemaining number Tiempo en segundos de cuenta regresiva
 --- @param deathReason string Causa de la muerte o trauma
 --- @param killerSource number|string Fuente del atacante si existe
-local function EnterCriticalState(timeRemaining, deathReason, killerSource)
+--- @param initialDeathState string|nil Estado inicial ("injured" o "unconscious")
+--- @param initialCrawlRemaining number|nil Segundos restantes de arrastre
+local function EnterCriticalState(timeRemaining, deathReason, killerSource, initialDeathState, initialCrawlRemaining)
     if isDead then return end
     isDead = true
     isInHospitalBed = false
     currentBleedoutRemaining = tonumber(timeRemaining) or Config.BleedoutTime
+
+    local totalElapsed = Config.BleedoutTime - currentBleedoutRemaining
+    if initialDeathState then
+        deathState = initialDeathState
+    else
+        deathState = (totalElapsed >= (Config.UnconsciousDelay or 300)) and "unconscious" or "injured"
+    end
+
+    if initialCrawlRemaining ~= nil then
+        crawlRemaining = math.max(0, tonumber(initialCrawlRemaining))
+    else
+        crawlRemaining = (deathState == "injured") and math.max(0, (Config.CrawlDuration or 60) - totalElapsed) or 0
+    end
 
     local ped = PlayerPedId()
     local coords = GetEntityCoords(ped)
@@ -106,38 +130,53 @@ local function EnterCriticalState(timeRemaining, deathReason, killerSource)
         ped = PlayerPedId()
     end
 
-    -- 2. Configurar salud segura en coma, invencibilidad y forzar ragdoll
+    -- 2. Configurar salud segura en trauma, invencibilidad y desarmar
     SetEntityHealth(ped, 105)
     SetEntityInvincible(ped, true)
     ClearPedBloodDamage(ped)
-    SetPedToRagdoll(ped, 1000, 1000, 0, 0, 0, 0)
+    SetCurrentPedWeapon(ped, `WEAPON_UNARMED`, true)
 
-    -- 3. Estado en Red (StateBag)
+    -- 3. Forzar caída física INMEDIATA al suelo y expresión facial de dolor
+    SetFacialIdleAnimOverride(ped, "mood_injured_1", 0)
+    ClearPedTasksImmediately(ped)
+    SetPedToRagdoll(ped, 1200, 1200, 0, 0, 0, 0)
+
+    -- 4. Estado en Red (StateBag)
     LocalPlayer.state:set('isDead', true, true)
+    LocalPlayer.state:set('deathState', deathState, true)
 
-    -- 4. Silenciar comunicaciones
+    -- 5. Silenciar comunicaciones
     MuteVoiceAndComms(true)
 
-    -- 5. Ocultar HUD y Minimapa
+    -- 6. Ocultar HUD y Minimapa
     TriggerEvent('aura_hud:toggle', false)
     TriggerEvent('aura_hud:client:toggle', false)
     DisplayRadar(false)
 
-    -- 6. Aplicar filtro cinematográfico desaturado
-    SetTimecycleModifier(Config.TimecycleModifier)
-    SetTimecycleModifierStrength(Config.TimecycleStrength)
+    -- 7. Aplicar filtro cinematográfico según fase
+    if deathState == "unconscious" then
+        SetTimecycleModifier(Config.TimecycleUnconscious or 'DeathFailMPDark')
+        SetTimecycleModifierStrength(Config.TimecycleUnconsciousStrength or 0.92)
+    else
+        SetTimecycleModifier(Config.TimecycleInjured or 'DeathFailMPDark')
+        SetTimecycleModifierStrength(Config.TimecycleInjuredStrength or 0.50)
+    end
 
-    -- 7. Abrir NUI de Estado Crítico en la parte superior
+    -- 8. Abrir NUI de Estado Crítico en la parte superior
     SetDeathCursorMode(true)
     SendNUIMessage({
         action = 'openDeathScreen',
-        timeRemaining = currentBleedoutRemaining
+        timeRemaining = currentBleedoutRemaining,
+        deathState = deathState,
+        canCrawl = (deathState == "injured" and crawlRemaining > 0),
+        crawlRemaining = crawlRemaining,
+        unconsciousDelay = Config.UnconsciousDelay or 300
     })
 
-    -- 8. Notificar al servidor para persistencia atómica en base de datos
-    TriggerServerEvent('aura_death:server:playerEnteredComa', currentBleedoutRemaining, deathReason or 'Trauma Crítico', killerSource)
+    -- 9. Notificar al servidor para persistencia atómica en base de datos
+    TriggerServerEvent('aura_death:server:playerEnteredComa', currentBleedoutRemaining, deathReason or 'Trauma Crítico', killerSource, deathState)
 
-    -- 9. Hilo optimizado a 0.0ms para bloqueo de controles y gestión de cámara/cursor
+    -- 10. Hilo de bloqueo de controles y gestión de cámara/cursor (0.0ms)
     CreateThread(function()
         while isDead do
             Wait(0)
@@ -145,18 +184,17 @@ local function EnterCriticalState(timeRemaining, deathReason, killerSource)
             DisableAllControlActions(0)
 
             -- DETECTAR CLICK DERECHO DEL RATÓN (INPUT_AIM = 25 / INPUT_CONTEXT_SECONDARY = 52)
-            -- Alterna entre Modo Cursor (para pulsar botones NUI) y Modo Cámara Libre (para mover la vista 360º)
             if IsDisabledControlJustPressed(0, 25) or IsControlJustPressed(0, 25) or IsDisabledControlJustPressed(0, 52) then
                 SetDeathCursorMode(not isCursorActive)
             end
 
-            -- ACCESO DIRECTO TECLA [G] (INPUT_DETONATE = 47) PARA LLAMAR A EMERGENCIAS
+            -- ACCESO DIRECTO TECLA [G] (INPUT_DETONATE = 47) PARA LLAMAR A AUXILIO
             if IsDisabledControlJustPressed(0, 47) or IsControlJustPressed(0, 47) then
                 SendNUIMessage({ action = 'triggerDispatchKey' })
             end
 
             if isCursorActive then
-                -- MODO CURSOR ACTIVO: El ratón mueve el puntero de la interfaz NUI sin girar la cámara del juego
+                -- MODO CURSOR ACTIVO
                 DisableControlAction(0, 1, true)   -- Look LR bloqueado
                 DisableControlAction(0, 2, true)   -- Look UD bloqueado
                 EnableControlAction(0, 237, true) -- Cursor Accept (Click Izquierdo)
@@ -166,38 +204,192 @@ local function EnterCriticalState(timeRemaining, deathReason, killerSource)
                 EnableControlAction(0, 24, true)  -- Attack / Left Click
                 EnableControlAction(0, 18, true)  -- Enter
             else
-                -- MODO CÁMARA LIBRE: El cursor desaparece y el ratón gira libremente la cámara del juego
+                -- MODO CÁMARA LIBRE
                 EnableControlAction(0, 1, true)   -- Look LR habilitado
                 EnableControlAction(0, 2, true)   -- Look UD habilitado
+            end
+
+            -- Habilitar teclas de movimiento para arrastrarse si está en fase de arrastre
+            if deathState == "injured" and crawlRemaining > 0 and not isInHospitalBed then
+                EnableControlAction(0, 32, true) -- W (Move Up)
+                EnableControlAction(0, 33, true) -- S (Move Down)
+                EnableControlAction(0, 34, true) -- A (Move Left)
+                EnableControlAction(0, 35, true) -- D (Move Right)
+                EnableControlAction(0, 71, true) -- Accel
+                EnableControlAction(0, 72, true) -- Brake
             end
 
             -- HABILITAR APERTURA DE CHAT PARA COMANDOS DE ROL (/me, /do, /roll)
             EnableControlAction(0, 245, true) -- Chat T (INPUT_MP_TEXT_CHAT_ALL)
             EnableControlAction(0, 246, true) -- Chat Y (INPUT_MP_TEXT_CHAT_TEAM)
             EnableControlAction(0, 199, true) -- Pause Menu / Esc
-            EnableControlAction(0, 47, true)  -- Tecla G (Emergencias)
+            EnableControlAction(0, 47, true)  -- Tecla G (Auxilio)
 
             -- Silencio estricto de Voz Push-To-Talk
             DisableControlAction(0, 249, true) -- PTT N
             DisableControlAction(0, 19, true)  -- Alt PTT
             DisableControlAction(0, 137, true) -- Caps PTT
+        end
+    end)
 
-            -- Mantener el ped en ragdoll constante si no está en cama
+    -- 11. Hilo de Movimiento y Animaciones de Trauma (Dolor en Suelo vs Arrastre Doloroso vs Inconsciente)
+    CreateThread(function()
+        local lastPainSound = GetGameTimer()
+        local currentAnimState = nil -- "idle_pain", "crawling_fwd", "crawling_bwd", "immobile_pain", "ragdoll"
+
+        -- Asegurar diccionarios cargados
+        if not HasAnimDictLoaded("move_crawl") then RequestAnimDict("move_crawl") end
+        if not HasAnimDictLoaded("combat@damage@writheidle_a") then RequestAnimDict("combat@damage@writheidle_a") end
+
+        -- Breve pausa para permitir que el ragdoll inicial desplome al personaje al suelo
+        Wait(400)
+
+        while isDead do
+            Wait(0)
             if not isInHospitalBed then
                 local currentPed = PlayerPedId()
-                if not IsPedRagdoll(currentPed) then
-                    SetPedToRagdoll(currentPed, 1000, 1000, 0, 0, 0, 0)
+                local now = GetGameTimer()
+
+                if deathState == "injured" then
+                    if crawlRemaining > 0 then
+                        -- FASE 1.A: HERIDO CON CAPACIDAD DE ARRASTRE DOLOROSO (0s - 60s)
+                        local isMovingFwd = IsDisabledControlPressed(0, 32) or IsControlPressed(0, 32) or IsDisabledControlPressed(0, 71)
+                        local isMovingBwd = IsDisabledControlPressed(0, 33) or IsControlPressed(0, 33) or IsDisabledControlPressed(0, 72)
+                        local isTurningLeft = IsDisabledControlPressed(0, 34) or IsControlPressed(0, 34)
+                        local isTurningRight = IsDisabledControlPressed(0, 35) or IsControlPressed(0, 35)
+
+                        -- Rotación suave en el suelo con A y D
+                        if isTurningLeft then
+                            SetEntityHeading(currentPed, GetEntityHeading(currentPed) + 0.60)
+                        elseif isTurningRight then
+                            SetEntityHeading(currentPed, GetEntityHeading(currentPed) - 0.60)
+                        end
+
+                        if isMovingFwd then
+                            -- Arrastrándose hacia adelante con esfuerzo y dolor
+                            if currentAnimState ~= "crawling_fwd" or not IsEntityPlayingAnim(currentPed, "move_crawl", "onfront_fwd", 3) then
+                                TaskPlayAnim(currentPed, "move_crawl", "onfront_fwd", 4.0, -4.0, -1, 1, 0, false, false, false)
+                                currentAnimState = "crawling_fwd"
+                            end
+                            local fwd = GetEntityForwardVector(currentPed)
+                            SetEntityVelocity(currentPed, fwd.x * 0.32, fwd.y * 0.32, -0.2)
+
+                            -- Quejidos de dolor por el esfuerzo de arrastrarse cada 2.5 segundos
+                            if now - lastPainSound > 2500 then
+                                lastPainSound = now
+                                PlayPain(currentPed, math.random(6, 8), 0, 0)
+                            end
+                        elseif isMovingBwd then
+                            -- Arrastrándose hacia atrás
+                            if currentAnimState ~= "crawling_bwd" or not IsEntityPlayingAnim(currentPed, "move_crawl", "onfront_bwd", 3) then
+                                TaskPlayAnim(currentPed, "move_crawl", "onfront_bwd", 4.0, -4.0, -1, 1, 0, false, false, false)
+                                currentAnimState = "crawling_bwd"
+                            end
+                            local fwd = GetEntityForwardVector(currentPed)
+                            SetEntityVelocity(currentPed, -fwd.x * 0.20, -fwd.y * 0.20, -0.2)
+
+                            if now - lastPainSound > 2500 then
+                                lastPainSound = now
+                                PlayPain(currentPed, math.random(6, 8), 0, 0)
+                            end
+                        else
+                            -- EN REPOSO: TIRADO EN EL SUELO QUEJÁNDOSE DE DOLOR
+                            if currentAnimState ~= "idle_pain" or not IsEntityPlayingAnim(currentPed, "combat@damage@writheidle_a", "writhe_idle_a", 3) then
+                                TaskPlayAnim(currentPed, "combat@damage@writheidle_a", "writhe_idle_a", 4.0, -4.0, -1, 1, 0, false, false, false)
+                                currentAnimState = "idle_pain"
+                            end
+
+                            -- Gemidos y quejidos de dolor periódicos en el suelo cada 4.5 segundos
+                            if now - lastPainSound > 4500 then
+                                lastPainSound = now
+                                PlayPain(currentPed, math.random(6, 8), 0, 0)
+                            end
+                        end
+                    else
+                        -- FASE 1.B: HERIDO AGOTADO / INMÓVIL EN EL SUELO SUFRIENDO DOLOR (60s - 300s)
+                        if currentAnimState ~= "immobile_pain" or not IsEntityPlayingAnim(currentPed, "combat@damage@writheidle_a", "writhe_idle_a", 3) then
+                            TaskPlayAnim(currentPed, "combat@damage@writheidle_a", "writhe_idle_a", 4.0, -4.0, -1, 1, 0, false, false, false)
+                            currentAnimState = "immobile_pain"
+                        end
+
+                        if now - lastPainSound > 5500 then
+                            lastPainSound = now
+                            PlayPain(currentPed, math.random(6, 8), 0, 0)
+                        end
+                    end
+                else
+                    -- FASE 2: INCONSCIENTE / COMA PROFUNDO (300s - 600s)
+                    currentAnimState = "ragdoll"
+                    if not IsPedRagdoll(currentPed) then
+                        SetPedToRagdoll(currentPed, 1000, 1000, 0, 0, 0, 0)
+                    end
                 end
             end
         end
     end)
 
-    -- 10. Hilo de sincronización periódica del tiempo restante con el servidor
+    -- 11. Hilo de Control Temporal (Arrastre, Transición a Inconsciencia y Sincronización)
     CreateThread(function()
+        local syncCounter = 0
         while isDead do
-            Wait(Config.SyncInterval * 1000)
-            if isDead and currentBleedoutRemaining > 0 then
-                TriggerServerEvent('aura_death:server:syncBleedoutTime', currentBleedoutRemaining)
+            Wait(1000)
+            if not isDead then break end
+
+            syncCounter = syncCounter + 1
+
+            -- Reducción del tiempo de desangrado (5 minutos = 300 segundos)
+            if currentBleedoutRemaining > 0 then
+                currentBleedoutRemaining = currentBleedoutRemaining - 1
+            end
+
+            -- Reducción de tiempo de arrastre si está en fase de herido (1 minuto = 60 segundos)
+            if deathState == "injured" and crawlRemaining > 0 then
+                crawlRemaining = crawlRemaining - 1
+                if crawlRemaining == 0 then
+                    SendNUIMessage({ action = 'crawlExpired' })
+                    if lib and lib.notify then
+                        lib.notify({
+                            title = 'Agotamiento Físico',
+                            description = 'Tus fuerzas se han agotado. Ya no puedes seguir arrastrándote por el suelo.',
+                            type = 'inform',
+                            icon = 'person-falling',
+                            duration = 4000
+                        })
+                    end
+                end
+            end
+
+            -- Transición automática a INCONSCIENTE al terminar los 5 minutos de desangrado
+            if deathState == "injured" and currentBleedoutRemaining <= 0 then
+                deathState = "unconscious"
+                LocalPlayer.state:set('deathState', 'unconscious', true)
+
+                -- Aplicar filtro visual más oscuro
+                SetTimecycleModifier(Config.TimecycleUnconscious or 'DeathFailMPDark')
+                SetTimecycleModifierStrength(Config.TimecycleUnconsciousStrength or 0.92)
+
+                -- Notificar a la interfaz NUI para desbloquear el botón de Hospital y cambiar badge
+                SendNUIMessage({ action = 'setUnconscious' })
+
+                if lib and lib.notify then
+                    lib.notify({
+                        title = 'Pérdida de Consciencia',
+                        description = 'Has perdido el conocimiento y entrado en coma. El traslado al hospital ya está disponible.',
+                        type = 'error',
+                        icon = 'bed-pulse',
+                        duration = 6000
+                    })
+                end
+
+                local p = PlayerPedId()
+                ClearPedTasksImmediately(p)
+                SetPedToRagdoll(p, 1000, 1000, 0, 0, 0, 0)
+            end
+
+            -- Sincronizar periódicamente con el servidor
+            if syncCounter >= Config.SyncInterval and isDead then
+                syncCounter = 0
+                TriggerServerEvent('aura_death:server:syncBleedoutTime', currentBleedoutRemaining, deathState)
             end
         end
     end)
@@ -222,6 +414,7 @@ local function ExitCriticalState(reviveCoords, isHospitalRespawn)
     SetEntityInvincible(ped, false)
     ClearPedTasksImmediately(ped)
     ClearPedBloodDamage(ped)
+    ClearFacialIdleAnimOverride(ped)
 
     local finalHealth = isHospitalRespawn and Config.HospitalReviveHealth or 200
     SetEntityHealth(ped, finalHealth)
@@ -394,9 +587,9 @@ RegisterNetEvent('aura_death:client:revivePlayer', function(coords)
     end
 end)
 
--- Forzar entrada a coma con tiempo específico (reconectar o comando)
-RegisterNetEvent('aura_death:client:setInComa', function(timeRemaining, reason)
-    EnterCriticalState(timeRemaining or Config.BleedoutTime, reason or "Estado Crítico Persistente", nil)
+-- Forzar entrada a coma con tiempo específico y fase (reconectar o comando)
+RegisterNetEvent('aura_death:client:setInComa', function(timeRemaining, reason, calculatedState, initialCrawlRemaining)
+    EnterCriticalState(timeRemaining or Config.BleedoutTime, reason or "Estado Crítico Persistente", nil, calculatedState, initialCrawlRemaining)
 end)
 
 -- Pausar desangrado por aplicación de torniquete táctico

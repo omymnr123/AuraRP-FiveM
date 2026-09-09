@@ -3,229 +3,458 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AuraRP - Escáner Médico Diagnóstico 3D</title>
+  <title>AuraRP - Sistema Médico & Biometría 3D</title>
+  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet" />
+  <!-- Font Awesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
-  <div id="medical-app" class="medical-app hidden">
-    <!-- SVG Defs para Degradados Neón Rosa & Cyan -->
-    <svg width="0" height="0" class="svg-defs">
-      <defs>
-        <linearGradient id="aura-pink-cyan-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stop-color="#ff007f" />
-          <stop offset="50%" stop-color="#d946ef" />
-          <stop offset="100%" stop-color="#00f2fe" />
-        </linearGradient>
-        <linearGradient id="aura-pink-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stop-color="#ff007f" />
-          <stop offset="100%" stop-color="#ff00a0" />
-        </linearGradient>
-      </defs>
-    </svg>
 
-    <!-- Overlay de Escaneo Holográfico y Viñeteado Cyber-Medical -->
-    <div class="hologram-overlay">
-      <div class="scan-grid-lines"></div>
-      <div class="vignette-layer"></div>
-      <div class="hud-corner top-left"></div>
-      <div class="hud-corner top-right"></div>
-      <div class="hud-corner bottom-left"></div>
-      <div class="hud-corner bottom-right"></div>
-      <div class="scanner-sweep-line"></div>
-    </div>
+  <!-- SVG Defs para Degradados Neón AuraRP Compartidos -->
+  <svg width="0" height="0" class="svg-defs">
+    <defs>
+      <linearGradient id="auraGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#40E0D0" />
+        <stop offset="100%" stop-color="#FF007F" />
+      </linearGradient>
+    </defs>
+  </svg>
 
-    <!-- Barra de Estado Superior -->
-    <header class="top-nav-bar">
-      <div class="nav-brand">
-        <div class="medical-cross-logo">
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="12" y1="5" x2="12" y2="19"></line>
-            <line x1="5" y1="12" x2="19" y2="12"></line>
-          </svg>
+  <!-- =========================================================================
+       MODO 1: ESCÁNER MÉDICO 3D WORLD-TO-SCREEN (ACCESO INVENTARIO / SALUD)
+       ========================================================================= -->
+  <div id="scannerApp" class="scanner-app hidden">
+    <!-- Capa Superior: Cabecera HUD -->
+    <header class="scanner-header">
+      <div class="scanner-header-left">
+        <div class="scanner-logo-badge">
+          <i class="fa-solid fa-plus"></i>
         </div>
-        <div class="brand-text-block">
-          <div class="brand-title">AURA BIOMETRICS // ESCÁNER MÉDICO 3D</div>
-          <div class="brand-subtitle">SISTEMA AVANZADO DE TELEMETRÍA ANATÓMICA & DIAGNÓSTICO</div>
+        <div class="scanner-header-text">
+          <h1 class="scanner-title">AURA BIOMETRICS <span class="scanner-title-highlight">// ESCÁNER MÉDICO 3D</span></h1>
+          <p class="scanner-subtitle">SISTEMA AVANZADO DE TELEMETRÍA ANATÓMICA & DIAGNÓSTICO</p>
         </div>
       </div>
-      <div class="nav-actions">
-        <div class="system-status-tag">
-          <span class="pulse-dot"></span>
+      <div class="scanner-header-right">
+        <div class="scanner-live-badge">
+          <span class="scanner-live-dot"></span>
           <span>SINCRONIZACIÓN BIOMÉTRICA EN VIVO</span>
         </div>
-        <button id="btn-close-scanner" class="btn-close-modal" title="Cerrar Escáner (ESC)">
-          <span>ESC</span>
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-          </svg>
+        <button id="btnCloseScanner" class="btn-close-scanner" title="Cerrar Escáner">
+          <span>ESC</span> <i class="fa-solid fa-xmark"></i>
         </button>
       </div>
     </header>
 
-    <!-- Contenedor de Nodos 3D Proyectados (World-to-Screen) -->
-    <div id="nodes-container" class="nodes-container">
-      <!-- Nodos generados dinámicamente: Cabeza, Torso, Brazos, Manos, Piernas, Pies -->
+    <!-- Capa 3D de Nodos Anatómicos Flotantes sobre el Ped -->
+    <div id="scannerNodesContainer" class="scanner-nodes-container">
+      <!-- Generado y proyectado dinámicamente según GetScreenCoordFromWorldCoord -->
     </div>
 
-    <!-- Panel Lateral Glassmorphism: Signos Vitales y Diagnóstico Clínico -->
-    <aside class="side-diagnostics-panel">
-      <div class="panel-glass-backdrop"></div>
-      <div class="panel-content-scroll">
-        
-        <!-- Tarjeta de Estado General -->
-        <section class="vital-card health-overview-card">
-          <div class="card-header">
-            <span class="card-tag">BIOMETRÍA GENERAL</span>
-            <span id="overall-status-badge" class="badge-status badge-healthy">ESTABLE</span>
-          </div>
-          
-          <div class="health-radial-wrapper">
-            <div class="radial-gauge">
-              <svg class="progress-ring" width="115" height="115">
-                <circle class="progress-ring-circle-bg" stroke="rgba(255,255,255,0.06)" stroke-width="8" fill="transparent" r="48" cx="57.5" cy="57.5" />
-                <circle id="health-ring" class="progress-ring-circle" stroke="url(#aura-pink-cyan-gradient)" stroke-width="8" stroke-dasharray="301" stroke-dashoffset="0" stroke-linecap="round" fill="transparent" r="48" cx="57.5" cy="57.5" />
-              </svg>
-              <div class="gauge-center-info">
-                <span id="health-percentage" class="gauge-value">100%</span>
-                <span class="gauge-label">VITALIDAD</span>
-              </div>
-            </div>
+    <!-- Retícula / Radar Inferior Izquierdo -->
+    <div class="scanner-radar-box">
+      <div class="radar-crosshair"><i class="fa-solid fa-crosshairs"></i></div>
+      <div class="radar-scan-line"></div>
+    </div>
 
-            <div class="vital-stats-column">
-              <div class="stat-mini-row ecg-stat-row">
-                <div class="stat-mini-icon ecg-icon">
-                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
-                  </svg>
-                </div>
-                <div class="stat-mini-data">
-                  <div class="stat-mini-label">PULSO CARDÍACO</div>
-                  <div class="stat-mini-value"><span id="bpm-value">72</span> <small>BPM</small></div>
-                </div>
-              </div>
-
-              <div class="stat-mini-row armor-stat-row">
-                <div class="stat-mini-icon armor-icon">
-                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-                  </svg>
-                </div>
-                <div class="stat-mini-data">
-                  <div class="stat-mini-label">BLINDAJE CORPORAL</div>
-                  <div class="stat-mini-value"><span id="armor-value">0%</span></div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Gráfica de Onda ECG en Vivo Rosa/Cyan -->
-          <div class="ecg-waveform-box">
-            <div class="ecg-line-anim"></div>
-            <div class="ecg-grid"></div>
-          </div>
-        </section>
-
-        <!-- Integración con aura_status y aura_seasons -->
-        <section class="vital-card metabolism-card">
-          <div class="card-header">
-            <span class="card-tag">METABOLISMO & TERMOREGULACIÓN</span>
-          </div>
-
-          <!-- Temperatura Corporal (aura_seasons) -->
-          <div class="metabolism-row temp-row">
-            <div class="meta-icon temp-icon">
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"></path>
-              </svg>
-            </div>
-            <div class="meta-content">
-              <div class="meta-top">
-                <span class="meta-title">Temperatura Corporal</span>
-                <span id="temperature-badge" class="meta-badge">36.8 °C</span>
-              </div>
-              <div class="meta-substatus" id="temperature-status">Óptima (Homeostasis)</div>
-            </div>
-          </div>
-
-          <!-- Hambre (aura_status) -->
-          <div class="metabolism-row hunger-row">
-            <div class="meta-icon hunger-icon">
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
-                <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path>
-                <line x1="6" y1="1" x2="6" y2="4"></line>
-                <line x1="10" y1="1" x2="10" y2="4"></line>
-                <line x1="14" y1="1" x2="14" y2="4"></line>
-              </svg>
-            </div>
-            <div class="meta-content">
-              <div class="meta-top">
-                <span class="meta-title">Nutrición (Hambre)</span>
-                <span id="hunger-text" class="meta-val">100%</span>
-              </div>
-              <div class="bar-container">
-                <div id="hunger-bar" class="bar-fill hunger-fill" style="width: 100%;"></div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Sed (aura_status) -->
-          <div class="metabolism-row thirst-row">
-            <div class="meta-icon thirst-icon">
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path>
-              </svg>
-            </div>
-            <div class="meta-content">
-              <div class="meta-top">
-                <span class="meta-title">Hidratación (Sed)</span>
-                <span id="thirst-text" class="meta-val">100%</span>
-              </div>
-              <div class="bar-container">
-                <div id="thirst-bar" class="bar-fill thirst-fill" style="width: 100%;"></div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- Inspección Anatómica de Extremidad Seleccionada -->
-        <section class="vital-card limb-inspector-card">
-          <div class="card-header">
-            <span class="card-tag">INSPECTOR DE EXTREMIDAD</span>
-            <span id="selected-limb-health" class="badge-status badge-healthy">100%</span>
-          </div>
-
-          <div class="selected-limb-title-box">
-            <div class="limb-name-row">
-              <div class="limb-accent-dot"></div>
-              <h3 id="selected-limb-name">Tórax y Espina Dorsal</h3>
-            </div>
-            <p class="limb-subtitle" id="selected-limb-sub">Haz clic en los nodos 3D para inspeccionar cada extremidad.</p>
-          </div>
-
-          <div class="injuries-list-container" id="injuries-list">
-            <div class="no-injuries-banner">
-              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#ff00a0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                <polyline points="22 4 12 14.01 9 11.01"></polyline>
-              </svg>
-              <span>Sin lesiones traumáticas detectadas.</span>
-            </div>
-          </div>
-        </section>
-
-        <!-- Instrucción de Uso -->
-        <div class="scanner-instruction-footer">
-          <div class="key-pill">CLIC IZQUIERDO</div>
-          <span>Seleccionar extremidad 3D para análisis clínico</span>
+    <!-- Barra Lateral Derecha: Telemetría, Metabolismo & Inspector -->
+    <aside class="scanner-sidebar">
+      <!-- 1. Tarjeta: Biometría General -->
+      <div class="scanner-card">
+        <div class="scanner-card-header">
+          <span class="scanner-card-title">BIOMETRÍA GENERAL</span>
+          <span id="scannerGeneralStatus" class="scanner-status-pill status-stable">ESTABLE</span>
         </div>
+        <div class="scanner-biometrics-row">
+          <!-- Círculo de Progreso SVG -->
+          <div class="circular-progress-box">
+            <svg class="progress-ring" width="88" height="88">
+              <circle class="progress-ring-bg" stroke="rgba(255, 255, 255, 0.08)" stroke-width="6" fill="transparent" r="38" cx="44" cy="44" />
+              <circle id="scannerVitalityCircle" class="progress-ring-circle" stroke="url(#auraGradient)" stroke-width="6" stroke-dasharray="238.76" stroke-dashoffset="0" stroke-linecap="round" fill="transparent" r="38" cx="44" cy="44" />
+            </svg>
+            <div class="progress-center-text">
+              <span id="scannerVitalityVal" class="vitality-val">100%</span>
+              <span class="vitality-lbl">VITALIDAD</span>
+            </div>
+          </div>
+          <!-- Métricas de Pulso y Blindaje -->
+          <div class="scanner-vitals-stack">
+            <div class="scanner-vital-pill">
+              <div class="vital-icon-box"><i class="fa-solid fa-heart-pulse"></i></div>
+              <div class="vital-meta">
+                <span class="vital-meta-label">PULSO CARDÍACO</span>
+                <span class="vital-meta-val"><strong id="scannerBpm">72</strong> BPM</span>
+              </div>
+            </div>
+            <div class="scanner-vital-pill">
+              <div class="vital-icon-box"><i class="fa-solid fa-shield-halved"></i></div>
+              <div class="vital-meta">
+                <span class="vital-meta-label">BLINDAJE CORPORAL</span>
+                <span class="vital-meta-val"><strong id="scannerArmor">0%</strong></span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Gráfica ECG Inferior -->
+        <div class="scanner-ecg-strip">
+          <div class="scanner-ecg-grid"></div>
+          <div class="scanner-ecg-line"></div>
+        </div>
+      </div>
 
+      <!-- 2. Tarjeta: Metabolismo & Termoregulación -->
+      <div class="scanner-card">
+        <div class="scanner-card-header">
+          <span class="scanner-card-title">METABOLISMO & TERMOREGULACIÓN</span>
+        </div>
+        <div class="scanner-metabolism-list">
+          <div class="scanner-meta-row">
+            <div class="meta-row-left">
+              <i class="fa-solid fa-temperature-half meta-row-icon"></i>
+              <div class="meta-row-info">
+                <span class="meta-row-name">Temperatura Corporal</span>
+                <span id="scannerTempStatus" class="meta-row-desc">Normal</span>
+              </div>
+            </div>
+            <span id="scannerTempVal" class="meta-row-val temp-val">37.0 °C</span>
+          </div>
+
+          <div class="scanner-meta-bar-item">
+            <div class="meta-bar-header">
+              <span class="meta-bar-label"><i class="fa-solid fa-mug-hot"></i> Nutrición (Hambre)</span>
+              <span id="scannerHungerVal" class="meta-bar-percent">92%</span>
+            </div>
+            <div class="meta-progress-track">
+              <div id="scannerHungerBar" class="meta-progress-fill hunger-fill" style="width: 92%;"></div>
+            </div>
+          </div>
+
+          <div class="scanner-meta-bar-item">
+            <div class="meta-bar-header">
+              <span class="meta-bar-label"><i class="fa-solid fa-droplet"></i> Hidratación (Sed)</span>
+              <span id="scannerThirstVal" class="meta-bar-percent">79%</span>
+            </div>
+            <div class="meta-progress-track">
+              <div id="scannerThirstBar" class="meta-progress-fill thirst-fill" style="width: 79%;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. Tarjeta: Inspector de Extremidad -->
+      <div class="scanner-card" id="scannerInspectorCard">
+        <div class="scanner-card-header">
+          <span class="scanner-card-title">INSPECTOR DE EXTREMIDAD</span>
+          <span id="scannerLimbHealthBadge" class="scanner-status-pill status-limb-health">100%</span>
+        </div>
+        <div class="scanner-inspector-body">
+          <div class="inspector-limb-title">
+            <span class="limb-bullet">●</span>
+            <span id="scannerLimbName">BRAZO DERECHO</span>
+          </div>
+          <p id="scannerLimbDesc" class="inspector-limb-desc">Estructura ósea y tejido muscular en estado óptimo.</p>
+          <div id="scannerLimbStatusBox" class="inspector-status-box status-ok">
+            <i id="scannerLimbStatusIcon" class="fa-solid fa-circle-check"></i>
+            <span id="scannerLimbStatusText">Sin lesiones traumáticas activas en esta extremidad.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. Footer Card: Hint de Clic -->
+      <div class="scanner-hint-card">
+        <div class="scanner-hint-badge">CLIC IZQUIERDO</div>
+        <span class="scanner-hint-text">Seleccionar extremidad 3D para análisis clínico</span>
       </div>
     </aside>
+  </div>
+
+  <!-- =========================================================================
+       MODO 2: SISTEMA DE DIAGNÓSTICO Y CURACIÓN P2P (MÉDICO VS PACIENTE)
+       ========================================================================= -->
+  <div id="medicalApp" class="medical-app hidden">
+
+    <!-- Contenedor Principal Glassmorphism -->
+    <div class="medical-window-container">
+      
+      <!-- Barra Superior de Navegación y Estado -->
+      <header class="medical-header">
+        <div class="header-left">
+          <div class="medical-logo-badge">
+            <i class="fa-solid fa-heart-pulse"></i>
+          </div>
+          <div class="header-titles">
+            <div class="header-tag">
+              <span class="pulse-dot"></span>
+              <span id="headerModeTag">TELEMETRÍA CLÍNICA P2P</span>
+            </div>
+            <h1 class="header-title">
+              AURA BIOMETRICS <span class="gradient-text">// DIAGNÓSTICO</span>
+            </h1>
+            <p class="header-subtitle" id="headerSubtitle">
+              Sincronización médica interactiva entre paciente y facultativo
+            </p>
+          </div>
+        </div>
+
+        <div class="header-right">
+          <div class="patient-pill" id="patientInfoPill">
+            <i class="fa-solid fa-user-injured"></i>
+            <span id="patientNameDisplay">Paciente</span>
+          </div>
+          <button id="btnTogglePerspective" class="btn-toggle-perspective" title="Alternar entre Vista del Médico y Vista del Paciente (TAB)">
+            <i class="fa-solid fa-repeat"></i>
+            <span id="togglePerspectiveLabel">Ver Vista Paciente (TAB)</span>
+          </button>
+          <button id="btnCloseModal" class="btn-close-modal" title="Cerrar Interfaz">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+      </header>
+
+      <!-- Cuerpo Principal Dividido en 2 Columnas -->
+      <main class="medical-main-grid">
+        
+        <!-- Columna Izquierda: Silueta Anatómica Interactiva (10 Zonas Diferenciadas) -->
+        <section class="silhouette-section">
+          <div class="silhouette-card">
+            <div class="card-header-bar">
+              <span class="card-title"><i class="fa-solid fa-person"></i> TOPOGRAFÍA ANATÓMICA</span>
+              <span class="silhouette-gender-tag" id="silhouetteGenderTag">Masculino</span>
+            </div>
+
+            <div class="silhouette-stage">
+              <!-- Imagen de Silueta Centrada -->
+              <img id="silhouetteImg" src="images/silueta_hombre.png" alt="Silueta Anatómica" class="silhouette-img" />
+
+              <!-- 10 Zonas Anatómicas Clicables y Perfectamente Posicionadas -->
+              <div class="hotspot-layer">
+                <!-- 1. Cabeza y Cuello -->
+                <div class="zone-hotspot zone-head" data-zone="head" title="Cabeza y Cuello">
+                  <div class="hotspot-tag"><i class="fa-solid fa-head-side-medical"></i> Cabeza</div>
+                  <div class="damage-counter" id="counter-head">0</div>
+                </div>
+
+                <!-- 2. Tronco y Tórax -->
+                <div class="zone-hotspot zone-torso" data-zone="torso" title="Tronco y Tórax">
+                  <div class="hotspot-tag"><i class="fa-solid fa-lungs"></i> Tronco</div>
+                  <div class="damage-counter" id="counter-torso">0</div>
+                </div>
+
+                <!-- 3. Brazo Derecho (Vista Paciente -> Izquierda pantalla) -->
+                <div class="zone-hotspot zone-right-arm" data-zone="right_arm" title="Brazo Derecho">
+                  <div class="hotspot-tag">Brazo D.</div>
+                  <div class="damage-counter" id="counter-right_arm">0</div>
+                </div>
+
+                <!-- 4. Brazo Izquierdo (Vista Paciente -> Derecha pantalla) -->
+                <div class="zone-hotspot zone-left-arm" data-zone="left_arm" title="Brazo Izquierdo">
+                  <div class="hotspot-tag">Brazo I.</div>
+                  <div class="damage-counter" id="counter-left_arm">0</div>
+                </div>
+
+                <!-- 5. Mano Derecha (Vista Paciente -> Izquierda pantalla) -->
+                <div class="zone-hotspot zone-right-hand" data-zone="right_hand" title="Mano Derecha">
+                  <div class="hotspot-tag">Mano D.</div>
+                  <div class="damage-counter" id="counter-right_hand">0</div>
+                </div>
+
+                <!-- 6. Mano Izquierda (Vista Paciente -> Derecha pantalla) -->
+                <div class="zone-hotspot zone-left-hand" data-zone="left_hand" title="Mano Izquierda">
+                  <div class="hotspot-tag">Mano I.</div>
+                  <div class="damage-counter" id="counter-left_hand">0</div>
+                </div>
+
+                <!-- 7. Pierna Derecha (Vista Paciente -> Izquierda pantalla) -->
+                <div class="zone-hotspot zone-right-leg" data-zone="right_leg" title="Pierna Derecha">
+                  <div class="hotspot-tag">Pierna D.</div>
+                  <div class="damage-counter" id="counter-right_leg">0</div>
+                </div>
+
+                <!-- 8. Pierna Izquierda (Vista Paciente -> Derecha pantalla) -->
+                <div class="zone-hotspot zone-left-leg" data-zone="left_leg" title="Pierna Izquierda">
+                  <div class="hotspot-tag">Pierna I.</div>
+                  <div class="damage-counter" id="counter-left_leg">0</div>
+                </div>
+
+                <!-- 9. Pie Derecho (Vista Paciente -> Izquierda pantalla) -->
+                <div class="zone-hotspot zone-right-foot" data-zone="right_foot" title="Pie Derecho">
+                  <div class="hotspot-tag">Pie D.</div>
+                  <div class="damage-counter" id="counter-right_foot">0</div>
+                </div>
+
+                <!-- 10. Pie Izquierdo (Vista Paciente -> Derecha pantalla) -->
+                <div class="zone-hotspot zone-left-foot" data-zone="left_foot" title="Pie Izquierdo">
+                  <div class="hotspot-tag">Pie I.</div>
+                  <div class="damage-counter" id="counter-left_foot">0</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Footer Informativo de la Silueta -->
+            <div class="silhouette-footer">
+              <div class="status-legend">
+                <span class="legend-item"><span class="legend-dot healthy"></span> Sano / Curado</span>
+                <span class="legend-item"><span class="legend-dot damaged"></span> Lesión Activa</span>
+                <span class="legend-item"><span class="legend-dot selected"></span> Zona Seleccionada</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Columna Derecha: Panel Dinámico (Paciente vs Médico) -->
+        <section class="action-section">
+          
+          <!-- 1. VISTA DEL PACIENTE (INPUT DE LESIONES Y BPM) -->
+          <div id="patientViewPanel" class="view-panel">
+            
+            <!-- Cabecera de la Zona Seleccionada -->
+            <div class="zone-header-card">
+              <div class="zone-title-block">
+                <div class="zone-icon-box" id="patientZoneIcon">
+                  <i class="fa-solid fa-head-side-medical"></i>
+                </div>
+                <div>
+                  <h2 class="zone-title" id="patientZoneTitle">Cabeza y Cuello</h2>
+                  <p class="zone-desc" id="patientZoneDesc">Selecciona los traumatismos sufridos en esta zona anatómica.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Lista de 8 Checkboxes de Lesiones -->
+            <div class="injuries-checkbox-grid" id="injuriesChecklist">
+              <!-- Generado dinámicamente por JS -->
+            </div>
+
+            <!-- Configuración de Constantes Vitales (BPM Slider) -->
+            <div class="vitals-config-card">
+              <div class="vitals-header">
+                <span class="vitals-title"><i class="fa-solid fa-heart-pulse"></i> CONSTANTE VITAL (BPM)</span>
+                <div class="bpm-readout">
+                  <span id="patientBpmVal" class="bpm-val">75</span>
+                  <span class="bpm-unit">BPM</span>
+                  <span id="patientBpmTag" class="badge-bpm bpm-normal">NORMAL</span>
+                </div>
+              </div>
+
+              <div class="slider-wrapper">
+                <input type="range" id="patientBpmSlider" min="0" max="200" value="75" class="bpm-range-slider" />
+                <div class="slider-marks">
+                  <span>0 (Parada)</span>
+                  <span>60</span>
+                  <span>100 (Estable)</span>
+                  <span>160</span>
+                  <span>200 (Taquicardia)</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Botón de Envío del Diagnóstico -->
+            <div class="patient-actions-footer">
+              <button id="btnSubmitDiagnosis" class="btn-submit-diagnosis">
+                <i class="fa-solid fa-paper-plane"></i>
+                <span>ENVIAR DIAGNÓSTICO AL MÉDICO</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- 2. VISTA DEL MÉDICO (TRATAMIENTOS, MEDICACIÓN Y DESBLOQUEO FINAL) -->
+          <div id="emsViewPanel" class="view-panel hidden">
+            
+            <!-- Cabecera de la Zona Seleccionada -->
+            <div class="zone-header-card">
+              <div class="zone-title-block">
+                <div class="zone-icon-box" id="emsZoneIcon">
+                  <i class="fa-solid fa-head-side-medical"></i>
+                </div>
+                <div>
+                  <h2 class="zone-title" id="emsZoneTitle">Cabeza y Cuello</h2>
+                  <p class="zone-desc" id="emsZoneDesc">Aplica los procedimientos quirúrgicos adecuados para cada lesión.</p>
+                </div>
+              </div>
+              <div class="zone-status-badge" id="emsZoneStatusBadge">CURADO / SANO</div>
+            </div>
+
+            <!-- Contenedor de Tratamientos Activos para la Zona -->
+            <div class="treatments-scroll-container" id="emsTreatmentsContainer">
+              <!-- Generado dinámicamente: Tarjetas de lesión con botón de tratamiento -->
+            </div>
+
+            <!-- Monitor Hemodinámico & Farmacología (BPM Control) -->
+            <div class="hemodynamic-card">
+              <div class="hemo-header">
+                <div class="hemo-title">
+                  <i class="fa-solid fa-wave-square"></i> MONITOR CARDÍACO & FARMACOLOGÍA
+                </div>
+                <div class="bpm-readout">
+                  <span id="emsBpmVal" class="bpm-val">75</span>
+                  <span class="bpm-unit">BPM</span>
+                  <span id="emsBpmTag" class="badge-bpm bpm-normal">RITMO SINUSAL</span>
+                </div>
+              </div>
+
+              <!-- Gráfica ECG Animada -->
+              <div class="ecg-monitor-box">
+                <div class="ecg-grid"></div>
+                <div class="ecg-line-wave" id="ecgWave"></div>
+              </div>
+
+              <!-- Botones de Inyección de Fármacos -->
+              <div class="medications-grid">
+                <button class="btn-medication btn-med-adrenaline" data-med="adrenaline" title="Aumenta contractilidad y BPM">
+                  <i class="fa-solid fa-syringe"></i>
+                  <span>+25 Adrenalina</span>
+                </button>
+                <button class="btn-medication btn-med-sedative" data-med="sedative" title="Reduce taquicardia severa">
+                  <i class="fa-solid fa-pills"></i>
+                  <span>-20 Sedante</span>
+                </button>
+                <button class="btn-medication btn-med-atropine" data-med="atropine" title="Estimula ritmo cardíaco">
+                  <i class="fa-solid fa-flask-vial"></i>
+                  <span>+15 Atropina</span>
+                </button>
+                <button class="btn-medication btn-med-saline" data-med="saline" title="Normaliza hacia 75 BPM">
+                  <i class="fa-solid fa-droplet"></i>
+                  <span>Solución Salina</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Sección de Procedimientos Finales (Torniquete y Desfibrilador) -->
+            <div class="final-unlock-container" id="finalUnlockContainer">
+              
+              <!-- Banner de Estado (Bloqueado o Desbloqueado) -->
+              <div class="unlock-locked-banner" id="unlockLockedBanner">
+                <i class="fa-solid fa-lock"></i>
+                <span>Trata todas las lesiones y estabiliza el ritmo (60-100 BPM) para desbloquear las maniobras finales.</span>
+              </div>
+              <div class="unlock-success-ribbon hidden" id="unlockSuccessRibbon">
+                <i class="fa-solid fa-circle-check"></i> PACIENTE ESTABILIZADO - LISTO PARA PROCEDIMIENTO FINAL
+              </div>
+
+              <!-- Botones Finales Siempre Presentes (En blanco y negro hasta desbloquearse) -->
+              <div class="final-buttons-row">
+                <button id="btnFinalTourniquet" class="btn-final-action btn-tourniquet btn-locked" disabled>
+                  <i class="fa-solid fa-droplet-slash"></i>
+                  <span>CONTROLAR HEMORRAGIA</span>
+                </button>
+                <button id="btnFinalDefib" class="btn-final-action btn-defib btn-locked" disabled>
+                  <i class="fa-solid fa-bolt-lightning"></i>
+                  <span>DESFIBRILADOR (DEA)</span>
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+        </section>
+
+      </main>
+
+    </div>
   </div>
 
   <script src="js/app.js"></script>

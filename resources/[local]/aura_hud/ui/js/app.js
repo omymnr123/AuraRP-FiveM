@@ -287,15 +287,11 @@ window.addEventListener('message', (event) => {
         case 'showHUD':
             container.classList.remove('hidden');
             container.style.display = 'flex';
-            const borderShow = document.getElementById('minimap-border');
-            if (borderShow) borderShow.classList.remove('hidden');
             break;
 
         case 'hideHUD':
             container.classList.add('hidden');
             container.style.display = 'none';
-            const borderHide = document.getElementById('minimap-border');
-            if (borderHide) borderHide.classList.add('hidden');
             break;
 
         case 'editMode':
@@ -322,17 +318,6 @@ window.addEventListener('message', (event) => {
                 hotbarPreviewEl.style.left = data.hotbar.x + '%';
                 hotbarPreviewEl.style.bottom = data.hotbar.y + '%';
                 hotbarPreviewEl.style.transform = 'none';
-            }
-            break;
-            
-        case 'updateMinimapBorder':
-            const mapBorder = document.getElementById('minimap-border');
-            if (mapBorder && data.rect) {
-                mapBorder.classList.remove('hidden');
-                mapBorder.style.left = (data.rect.x * window.innerWidth) + 'px';
-                mapBorder.style.top = (data.rect.y * window.innerHeight) + 'px';
-                mapBorder.style.width = (data.rect.width * window.innerWidth) + 'px';
-                mapBorder.style.height = (data.rect.height * window.innerHeight) + 'px';
             }
             break;
     }

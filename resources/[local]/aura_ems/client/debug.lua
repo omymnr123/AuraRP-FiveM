@@ -61,6 +61,18 @@ function SpawnMedicalDummy()
         bleedingLevel = "Grave (Arteria Femoral)",
         isTourniquetApplied = false,
         cprCount = 0,
+        injuries = {
+            head = { "bullet", "contusion" },
+            torso = { "bullet", "puncture" },
+            right_arm = { "scratch" },
+            left_arm = {},
+            right_hand = {},
+            left_hand = {},
+            right_leg = { "muscle_tear" },
+            left_leg = {},
+            right_foot = {},
+            left_foot = { "sprain" }
+        },
         boneDamage = {
             head = { health = 80, injuries = { { type = "Cut", typeLabel = "Laceración / Corte", severityLabel = "Corte Superficial", damage = 20, badgeColor = "#ff00a0" } } },
             torso = { health = 35, injuries = { { type = "Bullet", typeLabel = "Impacto Balístico", severityLabel = "Impacto Balístico con Hemorragia Interna", damage = 65, badgeColor = "#ff007f" } } },
@@ -136,51 +148,39 @@ function OpenDummyDiagnostic(dummyId)
         return
     end
 
-    local ambientTemp = 21.0
-    if exports.aura_seasons and exports.aura_seasons.GetAmbientTemperature then
-        ambientTemp = exports.aura_seasons:GetAmbientTemperature() or 21.0
-    end
+    local myPed = cache.ped or PlayerPedId()
+    TaskTurnPedToFaceEntity(myPed, dummyData.ped, 800)
 
-    local coreTemp = dummyData.isDead and 34.8 or 36.8
-    local insulation = 35.0
-    if exports.aura_seasons and exports.aura_seasons.GetInsulation then
-        insulation = exports.aura_seasons:GetInsulation() or 35.0
-    end
+    CreateThread(function()
+        local progressSuccess = exports.aura_progress:Start(
+            'Estableciendo telemetría...',
+            3000,
+            true,
+            true,
+            { dict = 'amb@medic@standing@kneel@base', clip = 'base', flag = 1 }
+        )
 
-    local patientPayload = {
-        dummyId = dummyId,
-        name = "Paciente Simulador #" .. dummyId,
-        citizenid = "DUMMY_" .. dummyId .. "_TEST",
-        isMale = dummyData.isMale,
-        isDead = dummyData.isDead,
-        glasgow = dummyData.isDead and 3 or 15,
-        bpm = dummyData.heartRate,
-        bloodPressure = dummyData.bloodPressure,
-        spo2 = dummyData.spo2,
-        bleedingLevel = dummyData.bleedingLevel,
-        hasTourniquet = dummyData.isTourniquetApplied,
-        isTourniquetApplied = dummyData.isTourniquetApplied,
-        temperature = coreTemp,
-        ambientTemp = ambientTemp,
-        insulation = insulation,
-        health = dummyData.isDead and 0 or 100,
-        armor = 0,
-        hunger = dummyData.isDead and 15 or 85,
-        thirst = dummyData.isDead and 10 or 80,
-        stamina = dummyData.isDead and 0 or 95,
-        boneDamage = dummyData.boneDamage
-    }
-
-    if SetDiagnosticFocus then
-        SetDiagnosticFocus(true)
-    else
-        SetNuiFocus(true, true)
-    end
-
-    SendNUIMessage({
-        action = 'openDiagnosticModal',
-        patient = patientPayload
-    })
+        if progressSuccess then
+            TriggerServerEvent('aura_medical:server:startDummySession', {
+                dummyId = dummyId,
+                isMale = dummyData.isMale,
+                patientName = "Paciente Dummy #" .. dummyId .. " (Simulación)",
+                bpm = dummyData.heartRate or 38,
+                injuries = dummyData.injuries or {
+                    head = { "bullet", "contusion" },
+                    torso = { "bullet", "puncture" },
+                    right_arm = { "scratch" },
+                    left_arm = {},
+                    right_hand = {},
+                    left_hand = {},
+                    right_leg = { "muscle_tear" },
+                    left_leg = {},
+                    right_foot = {},
+                    left_foot = { "sprain" }
+                }
+            })
+        end
+    end)
 end
 
 function ApplyTourniquetToDummy(dummyId)
@@ -382,6 +382,52 @@ function UseDefibOnDummy(dummyId)
         return false, "Descarga desincronizada o interrumpida. El paciente sigue en parada."
     end
 end
+
+RegisterNetEvent('aura_medical:client:syncTreatmentApplied', function(syncData)
+    for _, d in ipairs(SpawnedDummies) do
+        d.injuries = syncData.allInjuries or d.injuries
+        d.heartRate = syncData.bpm or d.heartRate
+    end
+end)
+
+RegisterNetEvent('aura_medical:client:syncBpmUpdated', function(syncData)
+    for _, d in ipairs(SpawnedDummies) do
+        d.heartRate = syncData.bpm or d.heartRate
+    end
+end)
+
+RegisterNetEvent('aura_medical:client:reviveDummy', function(dummyKey)
+    local dummyIdNum = tonumber(string.match(tostring(dummyKey), "%d+"))
+    for _, d in ipairs(SpawnedDummies) do
+        if not dummyIdNum or d.id == dummyIdNum then
+            d.isDead = false
+            d.hasPulse = true
+            d.heartRate = 78
+            d.injuries = {
+                head = {}, torso = {},
+                right_arm = {}, left_arm = {},
+                right_hand = {}, left_hand = {},
+                right_leg = {}, left_leg = {},
+                right_foot = {}, left_foot = {}
+            }
+            if d.ped and DoesEntityExist(d.ped) then
+                ClearPedTasksImmediately(d.ped)
+                SetEntityHealth(d.ped, 200)
+                ClearPedBloodDamage(d.ped)
+                ResetPedVisibleDamage(d.ped)
+                
+                lib.requestAnimDict('mini@cpr@char_b@cpr_str', 3000)
+                TaskPlayAnim(d.ped, 'mini@cpr@char_b@cpr_str', 'cpr_success', 8.0, -8.0, 3500, 0, 0, false, false, false)
+                SetTimeout(3500, function()
+                    if DoesEntityExist(d.ped) then
+                        ClearPedTasks(d.ped)
+                        TaskStartScenarioInPlace(d.ped, "WORLD_HUMAN_STAND_IMPARTIAL", 0, true)
+                    end
+                end)
+            end
+        end
+    end
+end)
 
 -- ============================================================================
 -- 2. LIMPIEZA DE DUMMIES

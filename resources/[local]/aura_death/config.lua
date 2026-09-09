@@ -3,8 +3,17 @@ Config = {}
 -- Modo depuración en consola del servidor/cliente
 Config.Debug = false
 
--- Tiempo total de desangrado / coma en segundos (10 minutos = 600 segundos)
-Config.BleedoutTime = 600
+-- Tiempo de desangrado en estado herido (5 minutos = 300 segundos)
+Config.BleedoutTime = 300
+
+-- Tiempo durante el cual el personaje herido puede arrastrarse por el suelo (1 minuto = 60 segundos)
+Config.CrawlDuration = 60
+
+-- Tiempo desde que cae herido hasta que pierde el conocimiento (5 minutos = 300 segundos)
+Config.UnconsciousDelay = 300
+
+-- Tiempo de coma/inconsciencia adicional antes de PK forzoso si no se pulsa Hospital (5 minutos = 300 segundos)
+Config.ComaDuration = 300
 
 -- Cooldown en segundos del botón de alerta a emergencias (2 minutos = 120 segundos)
 Config.DispatchCooldown = 120
@@ -12,9 +21,11 @@ Config.DispatchCooldown = 120
 -- Umbral de salud para activación del estado crítico (GTA V: 100 = muerte)
 Config.DeathHealthThreshold = 100
 
--- Filtro cinemático de pantalla durante el estado crítico
-Config.TimecycleModifier = 'DeathFailMPDark'
-Config.TimecycleStrength = 0.85
+-- Filtros cinemáticos de pantalla según la fase
+Config.TimecycleInjured = 'DeathFailMPDark'
+Config.TimecycleInjuredStrength = 0.50
+Config.TimecycleUnconscious = 'DeathFailMPDark'
+Config.TimecycleUnconsciousStrength = 0.92
 
 -- Intervalo de sincronización periódica del tiempo restante con el servidor (segundos)
 Config.SyncInterval = 10

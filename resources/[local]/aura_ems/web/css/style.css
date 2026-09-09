@@ -2910,8 +2910,7 @@ html, body {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(3, 6, 16, 0.82);
-    backdrop-filter: blur(10px);
+    background: rgba(3, 6, 16, 0.88);
     pointer-events: auto;
     transition: opacity 0.25s ease;
 }

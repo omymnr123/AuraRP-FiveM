@@ -161,7 +161,7 @@ end
 
 CreateThread(function()
     exports.ox_target:addGlobalPlayer({
-        -- 1. DIAGNÓSTICO Y CONSTANTES VITALES
+        -- 1. DIAGNÓSTICO Y CONSTANTES VITALES (FASE 11: AURA MEDICAL P2P)
         {
             name = 'aura_ems_diagnose_patient',
             icon = 'fa-solid fa-stethoscope',
@@ -181,33 +181,22 @@ CreateThread(function()
                     return
                 end
 
-                -- Detección exacta de género (Masculino / Femenino)
-                local isMale = true
-                local model = GetEntityModel(targetPed)
-                if model == `mp_f_freemode_01` or not IsPedMale(targetPed) then
-                    isMale = false
-                end
-
-                -- Animación de auscultación / revisión rápida
                 local myPed = PlayerPedId()
-                lib.requestAnimDict('amb@medic@standing@kneel@base', 2000)
                 TaskTurnPedToFaceEntity(myPed, targetPed, 800)
 
-                lib.callback('aura_ems:server:getPatientDiagnosticData', false, function(patientData)
-                    if not patientData then
-                        lib.notify({ title = 'Error', description = 'No se ha podido recopilar la telemetría del paciente o no estás de servicio.', type = 'error' })
-                        return
-                    end
+                -- 1. Notificar al servidor para abrir la interfaz del paciente
+                TriggerServerEvent('aura_medical:server:requestPatientTelemetry', targetSrc)
 
-                    patientData.isMale = isMale
-                    patientData.targetSrc = targetSrc
-
-                    SetDiagnosticFocus(true)
-                    SendNUIMessage({
-                        action = 'openDiagnosticModal',
-                        patient = patientData
-                    })
-                end, targetSrc)
+                -- 2. Iniciar barra de progreso en el médico
+                CreateThread(function()
+                    exports.aura_progress:Start(
+                        'Estableciendo telemetría...',
+                        10000,
+                        true,
+                        true,
+                        { dict = 'amb@medic@standing@kneel@base', clip = 'base', flag = 1 }
+                    )
+                end)
             end
         },
 

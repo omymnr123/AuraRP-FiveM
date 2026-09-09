@@ -24,7 +24,8 @@ end)
 RegisterNUICallback('syncTime', function(data, cb)
     local remaining = tonumber(data.timeRemaining)
     if remaining then
-        TriggerServerEvent('aura_death:server:syncBleedoutTime', remaining)
+        local state = LocalPlayer.state.deathState or 'injured'
+        TriggerServerEvent('aura_death:server:syncBleedoutTime', remaining, state)
     end
     cb({ ok = true })
 end)

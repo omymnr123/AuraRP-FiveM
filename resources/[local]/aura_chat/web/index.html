@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es" style="background: transparent !important; background-color: transparent !important;">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AuraRP - Chat UI</title>
+    <!-- Google Fonts: Outfit & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- FontAwesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body style="background: transparent !important; background-color: transparent !important;">
+    <div id="app">
+        <!-- Contenedor Principal de la Ventana de Chat -->
+        <div id="chat-window" class="chat-container">
+            <!-- 1. Lista de Mensajes (Crece dinámicamente según contenido hasta 8 líneas) -->
+            <div id="messages-container" class="messages-box">
+                <div id="messages-list"></div>
+            </div>
+
+            <!-- Zona de Anclaje Fijo del Input (Ubicada a la altura fija de 8 líneas) -->
+            <div id="input-anchor" class="input-anchor-zone">
+                <!-- 2. Contenedor del Input de Entrada -->
+                <div id="input-wrapper" class="input-container" style="display: none;">
+                    <div class="input-field-box">
+                        <div class="input-icon">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </div>
+                        <input 
+                            type="text" 
+                            id="chat-input" 
+                            placeholder="Escribe un mensaje OOC o un comando (/me, /do, etc.)..." 
+                            autocomplete="off" 
+                            spellcheck="false"
+                            maxlength="300"
+                        />
+                        <div class="input-badge">AuraRP</div>
+                    </div>
+                    <!-- Borde inferior degradado turquesa a rosa -->
+                    <div class="input-gradient-border"></div>
+                </div>
+
+                <!-- 3. Sugerencias de Autocompletado (Debajo del input) -->
+                <div id="suggestions-box" class="suggestions-container" style="display: none;">
+                    <div class="suggestions-header">
+                        <i class="fa-solid fa-terminal icon-turq"></i> Comandos Disponibles
+                    </div>
+                    <div id="suggestions-list"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
