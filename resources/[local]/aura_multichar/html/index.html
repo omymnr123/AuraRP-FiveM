@@ -3,90 +3,256 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aura MultiChar</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <title>AuraRP - Sistema de Identidad</title>
+    
+    <!-- Google Fonts: Outfit, Plus Jakarta Sans & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome 6.5.1 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    
+    <!-- Hoja de estilos AuraRP -->
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <div id="app" style="display: none;">
-        <div class="background-overlay"></div>
-        
+        <!-- Header / Logotipo Oficial de AuraRP -->
         <header class="logo-container">
-            <h1>AURA</h1>
-            <p>SISTEMA DE IDENTIDAD</p>
+            <div class="brand-badge">
+                <i class="fa-solid fa-fingerprint"></i>
+                <span>SISTEMA DE IDENTIDAD AURA</span>
+            </div>
+            <h1 class="brand-title">AURA<span>RP</span></h1>
+            <p class="brand-subtitle">SELECCIÓN Y GESTIÓN DE CIUDADANOS</p>
         </header>
 
-        <!-- Selección de Personaje -->
+        <!-- Pantalla 1: Selección de Personaje -->
         <main id="character-selection" class="screen active">
-            <div class="slots-container" id="slots-container">
-                <!-- Se llenará vía JS -->
-            </div>
-            
-            <div class="character-info-panel glass-panel" id="char-info-panel">
-                <h2 id="info-name">SELECCIONA UN PERFIL</h2>
-                <div class="info-details">
-                    <p><span>Nacionalidad:</span> <span id="info-nationality">-</span></p>
-                    <p><span>Fecha de Nac.:</span> <span id="info-dob">-</span></p>
+            <!-- Dock Inferior: Ranuras de Personajes (Slots) -->
+            <div class="slots-wrapper">
+                <div class="slots-header">
+                    <span class="slots-label"><i class="fa-solid fa-users"></i> RANURAS DE IDENTIDAD</span>
+                    <span class="slots-counter" id="slots-count-display">4 DISPONIBLES</span>
                 </div>
-                <button class="btn-primary" id="btn-play" disabled>ENTRAR AL MUNDO</button>
-                <button class="btn-danger" id="btn-delete" disabled>BORRAR REGISTRO</button>
+                <div class="slots-container" id="slots-container">
+                    <!-- Se rellena dinámicamente vía JavaScript -->
+                </div>
             </div>
-        </main>
 
-        <!-- Creación de Personaje -->
-        <main id="character-creation" class="screen">
-            <div class="creation-panel glass-panel">
-                <h2>NUEVA IDENTIDAD</h2>
-                <form id="creation-form">
-                    <div class="form-group">
-                        <input type="text" id="firstname" required placeholder=" ">
-                        <label for="firstname">Nombre</label>
+            <!-- Panel Lateral Derecho: Ficha del Ciudadano Seleccionado -->
+            <aside class="character-info-panel glass-panel" id="char-info-panel">
+                <div class="panel-header">
+                    <div class="panel-tag-group">
+                        <span class="badge-slot" id="info-slot-badge"><i class="fa-solid fa-id-badge"></i> SLOT 01</span>
+                        <span class="badge-citizenid" id="info-citizenid"><i class="fa-solid fa-hashtag"></i> ID #----</span>
                     </div>
-                    <div class="form-group">
-                        <input type="text" id="lastname" required placeholder=" ">
-                        <label for="lastname">Apellido</label>
-                    </div>
-                    <div class="form-group">
-                        <select id="nationality" required>
-                            <option value="" disabled selected hidden>Selecciona un país</option>
-                        </select>
-                        <label class="static-label">Nacionalidad</label>
-                    </div>
-                    <div class="form-group">
-                        <input type="date" id="dob" required>
-                        <label class="static-label">Fecha de Nacimiento</label>
-                    </div>
-                    <div class="form-group gender-selector">
-                        <label class="static-label">Género Físico</label>
-                        <div class="radio-group">
-                            <input type="radio" id="gender-m" name="gender" value="0" checked>
-                            <label for="gender-m">Masculino</label>
-                            
-                            <input type="radio" id="gender-f" name="gender" value="1">
-                            <label for="gender-f">Femenino</label>
+                    <h2 id="info-name">SELECCIONA UN PERFIL</h2>
+                    <div class="header-divider"></div>
+                </div>
+
+                <!-- Cuadrícula de Atributos & Estadísticas Civiles -->
+                <div class="info-grid">
+                    <!-- Empleo / Cargo -->
+                    <div class="stat-card">
+                        <div class="stat-icon icon-cyan">
+                            <i class="fa-solid fa-briefcase"></i>
+                        </div>
+                        <div class="stat-content">
+                            <span class="stat-title">OCUPACIÓN</span>
+                            <span class="stat-value" id="info-job">Civil / Desempleado</span>
                         </div>
                     </div>
-                    
+
+                    <!-- Cuenta Bancaria -->
+                    <div class="stat-card">
+                        <div class="stat-icon icon-pink">
+                            <i class="fa-solid fa-building-columns"></i>
+                        </div>
+                        <div class="stat-content">
+                            <span class="stat-title">BANCO</span>
+                            <span class="stat-value font-mono highlight-cyan" id="info-bank">$0</span>
+                        </div>
+                    </div>
+
+                    <!-- Efectivo Disponible -->
+                    <div class="stat-card">
+                        <div class="stat-icon icon-cyan">
+                            <i class="fa-solid fa-wallet"></i>
+                        </div>
+                        <div class="stat-content">
+                            <span class="stat-title">EFECTIVO</span>
+                            <span class="stat-value font-mono highlight-pink" id="info-cash">$0</span>
+                        </div>
+                    </div>
+
+                    <!-- Teléfono -->
+                    <div class="stat-card">
+                        <div class="stat-icon icon-pink">
+                            <i class="fa-solid fa-mobile-screen-button"></i>
+                        </div>
+                        <div class="stat-content">
+                            <span class="stat-title">TELÉFONO</span>
+                            <span class="stat-value font-mono" id="info-phone">---</span>
+                        </div>
+                    </div>
+
+                    <!-- Nacionalidad -->
+                    <div class="stat-card">
+                        <div class="stat-icon icon-cyan">
+                            <i class="fa-solid fa-earth-americas"></i>
+                        </div>
+                        <div class="stat-content">
+                            <span class="stat-title">NACIONALIDAD</span>
+                            <span class="stat-value" id="info-nationality">-</span>
+                        </div>
+                    </div>
+
+                    <!-- Fecha de Nacimiento -->
+                    <div class="stat-card">
+                        <div class="stat-icon icon-pink">
+                            <i class="fa-solid fa-cake-candles"></i>
+                        </div>
+                        <div class="stat-content">
+                            <span class="stat-title">NACIMIENTO</span>
+                            <span class="stat-value font-mono" id="info-dob">-</span>
+                        </div>
+                    </div>
+
+                    <!-- Género -->
+                    <div class="stat-card full-span">
+                        <div class="stat-icon icon-cyan">
+                            <i class="fa-solid fa-venus-mars"></i>
+                        </div>
+                        <div class="stat-content">
+                            <span class="stat-title">GÉNERO FÍSICO</span>
+                            <span class="stat-value" id="info-gender">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botones de Acción -->
+                <div class="panel-actions">
+                    <button class="btn-primary" id="btn-play" disabled>
+                        <i class="fa-solid fa-play"></i>
+                        <span>ENTRAR AL MUNDO</span>
+                    </button>
+                    <button class="btn-danger" id="btn-delete" disabled>
+                        <i class="fa-solid fa-trash-can"></i>
+                        <span>BORRAR REGISTRO</span>
+                    </button>
+                </div>
+            </aside>
+        </main>
+
+        <!-- Pantalla 2: Creación de Nueva Identidad -->
+        <main id="character-creation" class="screen">
+            <div class="creation-panel glass-panel">
+                <div class="creation-header">
+                    <div class="brand-badge">
+                        <i class="fa-solid fa-user-plus"></i>
+                        <span>REGISTRO CIVIL</span>
+                    </div>
+                    <h2>NUEVA IDENTIDAD</h2>
+                    <p class="creation-subtitle">Ingresa los datos personales para comenzar tu historia en Los Santos</p>
+                    <div class="header-divider"></div>
+                </div>
+
+                <form id="creation-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="firstname"><i class="fa-solid fa-user"></i> Nombre</label>
+                            <div class="input-wrapper">
+                                <input type="text" id="firstname" required placeholder="Ej: Lucas" autocomplete="off">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="lastname"><i class="fa-solid fa-user-tag"></i> Apellido</label>
+                            <div class="input-wrapper">
+                                <input type="text" id="lastname" required placeholder="Ej: Bianchi" autocomplete="off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="nationality"><i class="fa-solid fa-earth-americas"></i> Nacionalidad</label>
+                        <div class="input-wrapper select-wrapper">
+                            <select id="nationality" required>
+                                <option value="" disabled selected hidden>Selecciona un país...</option>
+                            </select>
+                            <i class="fa-solid fa-chevron-down select-arrow"></i>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="dob"><i class="fa-solid fa-calendar-days"></i> Fecha de Nacimiento</label>
+                        <div class="input-wrapper">
+                            <input type="date" id="dob" required>
+                        </div>
+                    </div>
+
+                    <!-- Selector de Género Físico con Tarjetas Interactivas -->
+                    <div class="form-group gender-selector-group">
+                        <label class="group-label"><i class="fa-solid fa-venus-mars"></i> Género Físico del Personaje</label>
+                        <div class="gender-cards">
+                            <label class="gender-card" for="gender-m">
+                                <input type="radio" id="gender-m" name="gender" value="0" checked>
+                                <div class="card-content">
+                                    <i class="fa-solid fa-mars gender-icon"></i>
+                                    <span class="gender-title">MASCULINO</span>
+                                </div>
+                            </label>
+
+                            <label class="gender-card" for="gender-f">
+                                <input type="radio" id="gender-f" name="gender" value="1">
+                                <div class="card-content">
+                                    <i class="fa-solid fa-venus gender-icon"></i>
+                                    <span class="gender-title">FEMENINO</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
                     <div class="form-actions">
-                        <button type="button" class="btn-secondary" id="btn-cancel-create">CANCELAR</button>
-                        <button type="submit" class="btn-primary">REGISTRAR</button>
+                        <button type="button" class="btn-secondary" id="btn-cancel-create">
+                            <i class="fa-solid fa-arrow-left"></i>
+                            <span>CANCELAR</span>
+                        </button>
+                        <button type="submit" class="btn-primary">
+                            <i class="fa-solid fa-check"></i>
+                            <span>REGISTRAR IDENTIDAD</span>
+                        </button>
                     </div>
                 </form>
             </div>
         </main>
-        <!-- Modal Confirmación Borrado -->
+
+        <!-- Modal de Confirmación de Borrado de Seguridad -->
         <div id="delete-modal" class="modal-overlay" style="display: none;">
             <div class="modal-content glass-panel">
+                <div class="modal-warning-icon">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                </div>
                 <h2>¿ESTÁS SEGURO?</h2>
-                <p>Estás a punto de eliminar permanentemente esta identidad. Todo su progreso se perderá y la acción es irreversible.</p>
-                <div class="form-actions" style="margin-top: 25px;">
-                    <button type="button" class="btn-secondary" id="btn-cancel-delete">CANCELAR</button>
-                    <button type="button" class="btn-danger" id="btn-confirm-delete">BORRAR</button>
+                <p>Estás a punto de eliminar permanentemente a <strong id="delete-char-name" class="highlight-pink">este personaje</strong>.</p>
+                <p class="modal-subtext">Esta acción destruirá su progreso, dinero, propiedades e inventario de forma irreversible.</p>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" id="btn-cancel-delete">
+                        <i class="fa-solid fa-xmark"></i>
+                        <span>CANCELAR</span>
+                    </button>
+                    <button type="button" class="btn-danger-solid" id="btn-confirm-delete">
+                        <i class="fa-solid fa-trash"></i>
+                        <span>CONFIRMAR BORRADO</span>
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Script de lógica de NUI -->
     <script src="js/app.js"></script>
 </body>
 </html>
